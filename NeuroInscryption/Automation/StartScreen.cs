@@ -15,8 +15,8 @@ internal sealed class StartScreen : AutomationFlow<AscensionStartScreen>
     protected override IEnumerator Execute(AscensionStartScreen target)
     {
         yield return new WaitForSeconds(1);
-        yield return SimulatedMouse.MoveTo(target.newRunText);
+        yield return NeuroMouse.MoveTo(target.newRunText);
         yield return new WaitForSeconds(0.5f);
-        SimulatedMouse.ClickOnce();
+        NeuroMouse.ClickOnce();
     }
 }

@@ -11,12 +11,12 @@ namespace NeuroInscryption.API.Automation;
 internal abstract class AutomationFlow<T> : AutomationFlow
     where T : MonoBehaviour
 {
-    public sealed override IEnumerator Execute(object instanceOfHookedType)
-    {
-        return Execute((T)instanceOfHookedType);
-    }
-
+    protected virtual T GetTarget(object instanceOfHookedType) => (T)instanceOfHookedType;
+    protected virtual bool IsValid(T target) => true;
     protected abstract IEnumerator Execute(T target);
+
+    public sealed override bool IsValid(object instanceOfHookedType) => IsValid(GetTarget(instanceOfHookedType));
+    public sealed override IEnumerator Execute(object instanceOfHookedType) => Execute(GetTarget(instanceOfHookedType));
 }
 
 [HarmonyPatch]
@@ -35,6 +35,8 @@ internal abstract class AutomationFlow
     public abstract MethodBase EnableHook { get; }
 
     public virtual HarmonyPatchType PatchType => HarmonyPatchType.Postfix;
+
+    public virtual bool IsValid(object instanceOfHookedType) => true;
 
     public abstract IEnumerator Execute(object instanceOfHookedType);
 

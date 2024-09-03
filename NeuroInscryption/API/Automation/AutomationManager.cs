@@ -37,11 +37,17 @@ internal sealed class AutomationManager : Singlyboi<AutomationManager>
         }
     }
 
-    private void StartNewFlow(string id, object instance)
+    private void TryStartNewFlow(string id, object instance)
     {
         if (!_flowCache.TryGetValue(id, out AutomationFlow flow))
         {
-            throw new ArgumentException($"No flow with ID {id} found.");
+            throw new ArgumentException($"No flow with method ID \"{id}\" found.");
+        }
+
+        if (!flow.IsValid(instance))
+        {
+            Plugin.Logger.LogDebug($"Skipping change to flow {flow.GetType().Name} since current instance is not valid.");
+            return;
         }
 
         Plugin.Logger.LogInfo($"Changing flow from {_currentFlow?.GetType().Name} to {flow.GetType().Name}.");
@@ -58,13 +64,13 @@ internal sealed class AutomationManager : Singlyboi<AutomationManager>
     {
         IEnumerator executeEnumerator = flow.Execute(instance);
 
-        yield return new WaitUntil(() => !SimulatedMouse.AllowRegularInput);
+        yield return new WaitUntil(() => !NeuroMouse.AllowRegularInput);
 
         while (executeEnumerator.MoveNext())
         {
             yield return executeEnumerator.Current;
 
-            if (SimulatedMouse.AllowRegularInput)
+            if (NeuroMouse.AllowRegularInput)
             {
                 yield return CoExecuteFlow(flow, instance); // Restart the flow after input is allowed again
                 yield break;
@@ -75,7 +81,7 @@ internal sealed class AutomationManager : Singlyboi<AutomationManager>
         {
             yield return null;
 
-            if (SimulatedMouse.AllowRegularInput)
+            if (NeuroMouse.AllowRegularInput)
             {
                 yield return CoExecuteFlow(flow, instance); // Restart the flow after input is allowed again
                 yield break;
@@ -87,6 +93,6 @@ internal sealed class AutomationManager : Singlyboi<AutomationManager>
 
     private static void Patch(object __instance, MethodInfo __originalMethod)
     {
-        Instance.StartNewFlow(__originalMethod.FullDescription(), __instance);
+        Instance.TryStartNewFlow(__originalMethod.FullDescription(), __instance);
     }
 }

@@ -7,13 +7,13 @@ using UnityEngine;
 namespace NeuroInscryption.API.Input;
 
 [HarmonyPatch]
-internal sealed class SimulatedMouse : Singlyboi<SimulatedMouse>
+internal sealed class NeuroMouse : Singlyboi<NeuroMouse>
 {
     public static bool AllowRegularInput { get; private set; }
 
     public static void SnapTo(InteractableBase interactable)
     {
-        _simulatedMousePosition = GetScreenPoint(interactable);
+        _simulatedMousePosition = GetScreenPoint(interactable.transform.position);
     }
 
     public static IEnumerator MoveTo(InteractableBase interactable, float mouseSpeedMultiplier = 1)
@@ -24,7 +24,7 @@ internal sealed class SimulatedMouse : Singlyboi<SimulatedMouse>
             yield break;
         }
 
-        Vector2 end = GetScreenPoint(interactable);
+        Vector2 end = GetScreenPoint(interactable.transform.position);
 
         while (Vector2.Distance(_simulatedMousePosition, end) > 0.1f)
         {
@@ -135,5 +135,5 @@ internal sealed class SimulatedMouse : Singlyboi<SimulatedMouse>
 
     #endregion
 
-    private static Vector2 GetScreenPoint(MonoBehaviour behaviour) => InteractionCursor.Instance.rayCamera.WorldToScreenPoint(behaviour.transform.position);
+    private static Vector2 GetScreenPoint(Vector3 position) => InteractionCursor.Instance.rayCamera.WorldToScreenPoint(position);
 }

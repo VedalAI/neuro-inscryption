@@ -28,16 +28,16 @@ internal sealed class ChallengesScreen : AutomationFlow<AscensionChallengeScreen
         {
             if (enabledChallenges.Includes(icon.Info.challengeType, seenDifficulty) != icon.activatedRenderer.enabled)
             {
-                yield return SimulatedMouse.MoveTo(icon);
+                yield return NeuroMouse.MoveTo(icon);
                 yield return new WaitForSeconds(0.2f);
-                SimulatedMouse.ClickOnce();
+                NeuroMouse.ClickOnce();
             }
 
             if (icon.Info.challengeType == AscensionChallenge.BaseDifficulty) seenDifficulty = true;
         }
 
-        yield return SimulatedMouse.MoveTo(target.continueButton);
+        yield return NeuroMouse.MoveTo(target.continueButton);
         yield return new WaitForSeconds(0.5f);
-        SimulatedMouse.ClickOnce();
+        NeuroMouse.ClickOnce();
     }
 }

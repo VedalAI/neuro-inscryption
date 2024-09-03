@@ -13,7 +13,7 @@ internal sealed class MainGameStartScreen : AutomationFlow
 
     public override IEnumerator Execute(object _)
     {
-        SimulatedMouse.SnapOffScreen();
+        NeuroMouse.SnapOffScreen();
         yield break;
     }
 }
