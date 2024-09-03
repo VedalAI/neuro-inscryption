@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using HarmonyLib;
+using UnityEngine;
+
+namespace NeuroInscryption.API.Automation;
+
+internal abstract class AutomationFlow<T> : AutomationFlow
+    where T : MonoBehaviour
+{
+    public sealed override IEnumerator Execute(object instanceOfHookedType)
+    {
+        return Execute((T)instanceOfHookedType);
+    }
+
+    protected abstract IEnumerator Execute(T target);
+}
+
+[HarmonyPatch]
+internal abstract class AutomationFlow
+{
+    static AutomationFlow()
+    {
+        Flows = Assembly.GetExecutingAssembly().GetTypes()
+            .Where(t => !t.IsAbstract)
+            .Where(t => typeof(AutomationFlow).IsAssignableFrom(t))
+            .Select(Activator.CreateInstance)
+            .Cast<AutomationFlow>()
+            .ToList();
+    }
+
+    public abstract MethodBase EnableHook { get; }
+
+    public virtual HarmonyPatchType PatchType => HarmonyPatchType.Postfix;
+
+    public abstract IEnumerator Execute(object instanceOfHookedType);
+
+    public static IReadOnlyList<AutomationFlow> Flows { get; private set; }
+}
