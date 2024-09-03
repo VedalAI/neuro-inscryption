@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "dependencies": {
+    ".NETFramework,Version=v4.7.2": {
+      "BepInEx.AssemblyPublicizer.MSBuild": {
+        "type": "Direct",
+        "requested": "[0.4.1, )",
+        "resolved": "0.4.1",
+        "contentHash": "bbTaXa0CKDuap0vDR+NkSz9crQIYhMvIbId9njUajYZAcr8OTuVcyiSlexzeGxfkYAbbn0z9YpgbIoeyHADXqA=="
+      },
+      "BepInEx.AutoPlugin": {
+        "type": "Direct",
+        "requested": "[1.1.0, )",
+        "resolved": "1.1.0",
+        "contentHash": "/7Nmc1EA9lYlGBiyz6qPAaHvlcJHEjFZ1RFpGX+8EBj3GrgoX5kbpnZusuSHoOlLx0l+CnzKuQNE54B8UaGPyw=="
+      },
+      "BepInEx.Unity.Mono": {
+        "type": "Direct",
+        "requested": "[6.0.0-be.700, )",
+        "resolved": "6.0.0-be.700",
+        "contentHash": "+m1DW1pKc9ILuKknn8Bzj+tfMU8OgqqmcmTZrF13aMTPhfSiy7/mcqPkSaI5akvqMokqJHUKc0i7UGhf2RbD3w==",
+        "dependencies": {
+          "BepInEx.Core": "6.0.0-be.700",
+          "HarmonyX": "2.10.2",
+          "UnityEngine": "5.6.1"
+        }
+      },
+      "Inscryption.GameLibs": {
+        "type": "Direct",
+        "requested": "[1.9.0-r.0, )",
+        "resolved": "1.9.0-r.0",
+        "contentHash": "CYk8lSFcQ8xCeNOaUx8hoR3WZq/nu3w0gtsFd8JnAGFHwIhbMqLobc3w2NFxnBlb5bgyJwUQqDr2vKol9DGJsg=="
+      },
+      "JetBrains.Annotations": {
+        "type": "Direct",
+        "requested": "[2024.2.0, )",
+        "resolved": "2024.2.0",
+        "contentHash": "GNnqCFW/163p1fOehKx0CnAqjmpPrUSqrgfHM6qca+P+RN39C9rhlfZHQpJhxmQG/dkOYe/b3Z0P8b6Kv5m1qw=="
+      },
+      "Microsoft.NETFramework.ReferenceAssemblies": {
+        "type": "Direct",
+        "requested": "[1.0.3, )",
+        "resolved": "1.0.3",
+        "contentHash": "vUc9Npcs14QsyOD01tnv/m8sQUnGTGOw1BCmKcv77LBJY7OxhJ+zJF7UD/sCL3lYNFuqmQEVlkfS4Quif6FyYg==",
+        "dependencies": {
+          "Microsoft.NETFramework.ReferenceAssemblies.net472": "1.0.3"
+        }
+      },
+      "UnityEngine.Modules": {
+        "type": "Direct",
+        "requested": "[2019.4.24, )",
+        "resolved": "2019.4.24",
+        "contentHash": "Qrq0+YPa5oTk0ZUQEXB81IQJDNtKACTsFDq53BinxJEhSzH5B/6KE07G7BFUBwvj30lPMhX0OgAfTW7LCWPOow=="
+      },
+      "BepInEx.Core": {
+        "type": "Transitive",
+        "resolved": "6.0.0-be.700",
+        "contentHash": "ywFg9Hb+NkpxDv6Zrh7B/xfIqhYhFHMx3HE/VPSRuRzbPFnUNLNUVbPEAEKBCxDF8ofsshPEe9EChR9FsfDOsw==",
+        "dependencies": {
+          "HarmonyX": "2.10.2",
+          "MonoMod.Utils": "22.7.31.1",
+          "SemanticVersioning": "2.0.2"
+        }
+      },
+      "HarmonyX": {
+        "type": "Transitive",
+        "resolved": "2.10.2",
+        "contentHash": "/5WwkxXX8mPsRuigQt957rJGx1f0dDQxk+bvk4yYITKFjXas9Em+O71zEP8X0ym8OFQQ2XH/2SxS4NC7vEC+Xg==",
+        "dependencies": {
+          "MonoMod.RuntimeDetour": "22.3.23.4"
+        }
+      },
+      "Microsoft.NETFramework.ReferenceAssemblies.net472": {
+        "type": "Transitive",
+        "resolved": "1.0.3",
+        "contentHash": "0E7evZXHXaDYYiLRfpyXvCh+yzM2rNTyuZDI+ZO7UUqSc6GfjePiXTdqJGtgIKUwdI81tzQKmaWprnUiPj9hAw=="
+      },
+      "Mono.Cecil": {
+        "type": "Transitive",
+        "resolved": "0.11.4",
+        "contentHash": "IC1h5g0NeJGHIUgzM1P82ld57knhP0IcQfrYITDPXlNpMYGUrsG5TxuaWTjaeqDNQMBDNZkB8L0rBnwsY6JHuQ=="
+      },
+      "MonoMod.RuntimeDetour": {
+        "type": "Transitive",
+        "resolved": "22.3.23.4",
+        "contentHash": "2nwwFfwYDSgUzhi+1MutTg1gyUgXoMS4+E04vHOFp84Vxs0oBkkn4mGAfhkr272y0j3vqIBzo2aT9pXRlCd/ZA==",
+        "dependencies": {
+          "Mono.Cecil": "0.11.4",
+          "MonoMod.Utils": "22.3.23.4"
+        }
+      },
+      "MonoMod.Utils": {
+        "type": "Transitive",
+        "resolved": "22.7.31.1",
+        "contentHash": "nI0E1oadXS1iMbfwfCzYF08C1jRQR9cnnHv66a4BSPd4sGu2p6g4BmctCWsdAB6oGKkSJUhcfHfxcfTsDyB94Q==",
+        "dependencies": {
+          "Mono.Cecil": "0.11.4"
+        }
+      },
+      "SemanticVersioning": {
+        "type": "Transitive",
+        "resolved": "2.0.2",
+        "contentHash": "4EQgYdNZ92SyaO7YFk6olVnebF5V+jrHyMUjvPq89tLeMo8NSfgDF+6Zwq/lgh9j/0yfQp9Lkm0ZA0rUATCZFA=="
+      },
+      "UnityEngine": {
+        "type": "Transitive",
+        "resolved": "5.6.1",
+        "contentHash": "uAhM+pBtZH7CvGCBQyT9CaksT9M4fzTCIMetYjOEocuFiQGF38uGgS8q5xUd1HddaeXwDG9VrMARHGz5IXhQLw=="
+      }
+    }
+  }
+}

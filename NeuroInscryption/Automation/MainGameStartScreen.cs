@@ -14,6 +14,7 @@ internal sealed class MainGameStartScreen : AutomationFlow
     public override IEnumerator Execute(object _)
     {
         NeuroMouse.SnapOffScreen();
+        // Allow manual control of game for stuff like changing settings
         yield break;
     }
 }

@@ -3,6 +3,7 @@ using HarmonyLib;
 
 namespace NeuroInscryption.Tweaks;
 
+#if DEBUG
 [HarmonyPatch]
 internal static class UnlockAllChallengesAndDecks
 {
@@ -14,3 +15,4 @@ internal static class UnlockAllChallengesAndDecks
         __result = true;
     }
 }
+#endif

@@ -1,0 +1,66 @@
+﻿name: Build
+
+on:
+  push:
+    branches:
+      - "*"
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8
+
+      - name: Restore NuGet packages
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Upload artifact (mod dll)
+        uses: actions/upload-artifact@v4
+        with:
+          name: NeuroInscryption
+          path: NeuroInscryption/bin/Release/net472/NeuroInscryption.dll
+
+      - name: Cache BepInEx download
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: BepInEx
+          key: BepInEx-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: BepInEx-
+
+      - name: Download BepInEx
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          BEPINEX_VERSION=$(grep '<PackageReference Include="BepInEx.Unity.Mono"' NeuroInscryption/NeuroInscryption.csproj | sed 's/.*Version="6.0.0-be.\([^"]*\)".*/\1/')
+          curl -o build_page.html https://builds.bepinex.dev/projects/bepinex_be
+          ARCHIVE_NAME=$(grep -o "BepInEx-Unity.Mono-win-x86-6.0.0-be.${BEPINEX_VERSION}+[^\"']*.zip" build_page.html)
+          curl -o BepInEx.zip https://builds.bepinex.dev/projects/bepinex_be/${BEPINEX_VERSION}/${ARCHIVE_NAME}
+          unzip BepInEx.zip -d BepInEx
+          chmod -R u+rwx BepInEx
+
+      - name: Create install archive
+        run: cp NeuroInscryption/bin/Release/net472/NeuroInscryption.dll BepInEx/BepInEx/plugins/NeuroInscryption.dll
+
+      - name: Upload artifact (install archive)
+        uses: actions/upload-artifact@v4
+        with:
+          name: NeuroInscryption+BepInEx
+          path: BepInEx
+
+      - name: Remove mod from cached folder
+        run: rm BepInEx/BepInEx/plugins/NeuroInscryption.dll
