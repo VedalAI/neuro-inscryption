@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
+using NeuroInscryption.Communication;
+using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Utilities;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace NeuroInscryption.Automation.API;
@@ -118,6 +121,18 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
     private static void ManualControlHandler()
     {
         if (!UnityEngine.Input.GetKeyDown(KeyCode.U)) return;
+
+        try
+        {
+            JsonSchema schema = new() { Type = JsonSchemaType.Object, OneOf = [] };
+            new PlayCardAction(PlayerHand.Instance).Apply(schema);
+            string outputschema = JsonConvert.SerializeObject(schema, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            Plugin.Logger.LogFatal(outputschema);
+        }
+        catch (Exception e)
+        {
+            Plugin.Logger.LogWarning(e);
+        }
 
         if (Instance.AllowManualInput)
         {

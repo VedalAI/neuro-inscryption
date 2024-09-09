@@ -2,8 +2,6 @@
 using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
-using Json.Schema;
-using Json.Schema.Generation;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Input;
 using UnityEngine;
