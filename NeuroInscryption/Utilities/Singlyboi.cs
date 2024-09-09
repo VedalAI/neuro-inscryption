@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace NeuroInscryption.Utilities;
 
-internal abstract class Singlyboi<T> : Singlyboi
+public abstract class Singlyboi<T> : Singlyboi
     where T : Singlyboi<T>
 {
     public static T Instance { get; private set; }
@@ -17,7 +17,7 @@ internal abstract class Singlyboi<T> : Singlyboi
     }
 }
 
-internal abstract class Singlyboi : MonoBehaviour
+public abstract class Singlyboi : MonoBehaviour
 {
     public static void AddAll(GameObject obj)
     {

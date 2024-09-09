@@ -8,7 +8,7 @@ using UnityEngine;
 namespace NeuroInscryption.Input;
 
 [HarmonyPatch]
-internal sealed class NeuroMouse : Singlyboi<NeuroMouse>
+public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 {
     public static void SnapTo(InteractableBase interactable)
     {

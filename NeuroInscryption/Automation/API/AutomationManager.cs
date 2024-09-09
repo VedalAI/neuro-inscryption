@@ -10,7 +10,7 @@ using UnityEngine;
 namespace NeuroInscryption.Automation.API;
 
 [HarmonyPatch]
-internal sealed class AutomationManager : Singlyboi<AutomationManager>
+public sealed class AutomationManager : Singlyboi<AutomationManager>
 {
     public bool AllowManualInput { get; private set; }
     private bool _wantsManualControl;

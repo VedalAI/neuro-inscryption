@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace NeuroInscryption.Automation.API;
 
-internal abstract class AutomationFlow<T> : AutomationFlow
+public abstract class AutomationFlow<T> : AutomationFlow
     where T : MonoBehaviour
 {
     protected virtual T GetTarget(object instanceOfHookedType) => (T)instanceOfHookedType;
@@ -20,7 +20,7 @@ internal abstract class AutomationFlow<T> : AutomationFlow
 }
 
 [HarmonyPatch]
-internal abstract class AutomationFlow
+public abstract class AutomationFlow
 {
     static AutomationFlow()
     {

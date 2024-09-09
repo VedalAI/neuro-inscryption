@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net462</TargetFramework>
         <LangVersion>preview</LangVersion>
 
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -9,13 +9,16 @@
 
         <DebugType>embedded</DebugType>
         <DebugSymbols>true</DebugSymbols>
-        
+
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="BepInEx.Unity.Mono" Version="6.0.0-be.700" />
         <PackageReference Include="Inscryption.GameLibs" Version="1.9.0-r.0" Publicize="true" />
+        <PackageReference Include="NJsonSchema" Version="11.0.2" Publicize="true" />
+        <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" />
+        <PackageReference Include="System.Text.Json" Version="6.0.0" />
         <PackageReference Include="UnityEngine.Modules" Version="2019.4.24" />
 
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
@@ -26,15 +29,26 @@
     <ItemGroup>
         <EmbeddedResource Include="Resources/**" />
         <EmbeddedResource Remove="Resources/**/*.cs" />
+
+        <EmbeddedResource Include="$(NuGetPackageRoot)namotion.reflection\3.1.1\lib\net462\Namotion.Reflection.dll" LinkBase="Resources\Assemblies" />
+        <EmbeddedResource Include="$(NuGetPackageRoot)newtonsoft.json\13.0.3\lib\net45\Newtonsoft.Json.dll" LinkBase="Resources\Assemblies" />
+        <EmbeddedResource Include="$(NuGetPackageRoot)njsonschema\11.0.2\lib\net462\NJsonSchema.dll" LinkBase="Resources\Assemblies" />
+        <EmbeddedResource Include="$(NuGetPackageRoot)njsonschema.annotations\11.0.2\lib\net462\NJsonSchema.Annotations.dll" LinkBase="Resources\Assemblies" />
+        <EmbeddedResource Include="$(NuGetPackageRoot)system.text.json\6.0.0\lib\net461\System.Text.Json.dll" LinkBase="Resources\Assemblies" />
+        <EmbeddedResource Include="$(NuGetPackageRoot)system.text.encodings.web\6.0.0\lib\net461\System.Text.Encodings.Web.dll" LinkBase="Resources\Assemblies" />
+    </ItemGroup>
+
+    <ItemGroup>
         <EmbeddedResource Remove="schizo\**" />
+        <EmbeddedResource Remove="Websocket\**" />
+        <Compile Remove="schizo\**" />
+        <Compile Remove="Websocket\**" />
+        <None Remove="schizo\**" />
+        <None Remove="Websocket\**" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Remove="schizo\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="schizo\**" />
-    </ItemGroup>
+    <Target Name="Copy" AfterTargets="Build" Condition="'$(Inscryption)' != ''">
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(Inscryption)/BepInEx/plugins/" UseSymboliclinksIfPossible="true" />
+    </Target>
 
 </Project>
