@@ -4,7 +4,7 @@ using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 
-namespace NeuroInscryption.API.Utilities;
+namespace NeuroInscryption.Utilities;
 
 internal abstract class Singlyboi<T> : Singlyboi
     where T : Singlyboi<T>

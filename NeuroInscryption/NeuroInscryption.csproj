@@ -26,6 +26,15 @@
     <ItemGroup>
         <EmbeddedResource Include="Resources/**" />
         <EmbeddedResource Remove="Resources/**/*.cs" />
+        <EmbeddedResource Remove="schizo\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="schizo\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="schizo\**" />
     </ItemGroup>
 
 </Project>

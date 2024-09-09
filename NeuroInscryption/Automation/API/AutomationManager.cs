@@ -2,16 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using DiskCardGame;
 using HarmonyLib;
-using NeuroInscryption.API.Input;
-using NeuroInscryption.API.Utilities;
+using NeuroInscryption.Utilities;
 using UnityEngine;
-using UnityEngine.Yoga;
 
-namespace NeuroInscryption.API.Automation;
+namespace NeuroInscryption.Automation.API;
 
+[HarmonyPatch]
 internal sealed class AutomationManager : Singlyboi<AutomationManager>
 {
+    public bool AllowManualInput { get; private set; }
+    private bool _wantsManualControl;
+
     private AutomationFlow _currentFlow;
     private Coroutine _currentFlowCoroutine;
 
@@ -52,25 +55,28 @@ internal sealed class AutomationManager : Singlyboi<AutomationManager>
 
         Plugin.Logger.LogInfo($"Changing flow from {_currentFlow?.GetType().Name} to {flow.GetType().Name}.");
 
-        // _currentFlow?.Interrupt();
-        if (_currentFlowCoroutine != null) StopCoroutine(_currentFlowCoroutine);
+        if (_currentFlowCoroutine != null)
+        {
+            StopCoroutine(_currentFlowCoroutine);
+            TryGiveManualControl();
+        }
 
         _currentFlow = flow;
         _currentFlowCoroutine = StartCoroutine(CoExecuteFlow(_currentFlow, instance));
     }
 
     // ReSharper disable once FunctionRecursiveOnAllPaths
-    private static IEnumerator CoExecuteFlow(AutomationFlow flow, object instance)
+    private IEnumerator CoExecuteFlow(AutomationFlow flow, object instance)
     {
         IEnumerator executeEnumerator = flow.Execute(instance);
 
-        yield return new WaitUntil(() => !NeuroMouse.AllowRegularInput);
+        yield return new WaitUntil(() => !AllowManualInput);
 
         while (executeEnumerator.MoveNext())
         {
             yield return executeEnumerator.Current;
 
-            if (NeuroMouse.AllowRegularInput)
+            if (AllowManualInput)
             {
                 yield return CoExecuteFlow(flow, instance); // Restart the flow after input is allowed again
                 yield break;
@@ -81,11 +87,22 @@ internal sealed class AutomationManager : Singlyboi<AutomationManager>
         {
             yield return null;
 
-            if (NeuroMouse.AllowRegularInput)
+            TryGiveManualControl();
+
+            if (AllowManualInput)
             {
                 yield return CoExecuteFlow(flow, instance); // Restart the flow after input is allowed again
                 yield break;
             }
+        }
+    }
+
+    private void TryGiveManualControl()
+    {
+        if (_wantsManualControl)
+        {
+            AllowManualInput = true;
+            _wantsManualControl = false;
         }
     }
 
@@ -94,5 +111,28 @@ internal sealed class AutomationManager : Singlyboi<AutomationManager>
     private static void Patch(object __instance, MethodInfo __originalMethod)
     {
         Instance.TryStartNewFlow(__originalMethod.FullDescription(), __instance);
+    }
+
+    [HarmonyPatch(typeof(InteractionCursor), nameof(InteractionCursor.UpdatePosition))]
+    [HarmonyPrefix]
+    private static void ManualControlHandler()
+    {
+        if (!UnityEngine.Input.GetKeyDown(KeyCode.U)) return;
+
+        if (Instance.AllowManualInput)
+        {
+            Instance.AllowManualInput = false;
+        }
+        else
+        {
+            if (Instance._currentFlow.AllowInterruption)
+            {
+                Instance.AllowManualInput = true;
+            }
+            else
+            {
+                Instance._wantsManualControl = true;
+            }
+        }
     }
 }

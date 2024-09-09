@@ -2,8 +2,8 @@
 using BepInEx.Logging;
 using BepInEx.Unity.Mono;
 using HarmonyLib;
-using NeuroInscryption.API.Utilities;
 using NeuroInscryption.Configuration;
+using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption;
 

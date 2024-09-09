@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NeuroInscryption.API.Input;
+namespace NeuroInscryption.Input;
 
 internal sealed class ClickHandler
 {

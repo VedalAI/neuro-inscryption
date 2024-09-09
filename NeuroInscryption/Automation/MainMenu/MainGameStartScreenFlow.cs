@@ -2,14 +2,16 @@
 using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
-using NeuroInscryption.API.Automation;
-using NeuroInscryption.API.Input;
+using NeuroInscryption.Automation.API;
+using NeuroInscryption.Input;
 
-namespace NeuroInscryption.Automation;
+namespace NeuroInscryption.Automation.MainMenu;
 
-internal sealed class MainGameStartScreen : AutomationFlow
+internal sealed class MainGameStartScreenFlow : AutomationFlow
 {
     public override MethodBase EnableHook => AccessTools.Method(typeof(StartScreenController), nameof(StartScreenController.Start));
+
+    public override bool AllowInterruption => true;
 
     public override IEnumerator Execute(object _)
     {

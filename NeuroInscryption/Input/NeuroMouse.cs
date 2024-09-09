@@ -1,16 +1,15 @@
 ﻿using System.Collections;
 using DiskCardGame;
 using HarmonyLib;
-using NeuroInscryption.API.Utilities;
+using NeuroInscryption.Automation.API;
+using NeuroInscryption.Utilities;
 using UnityEngine;
 
-namespace NeuroInscryption.API.Input;
+namespace NeuroInscryption.Input;
 
 [HarmonyPatch]
 internal sealed class NeuroMouse : Singlyboi<NeuroMouse>
 {
-    public static bool AllowRegularInput { get; private set; }
-
     public static void SnapTo(InteractableBase interactable)
     {
         _simulatedMousePosition = GetScreenPoint(interactable.transform.position);
@@ -28,7 +27,7 @@ internal sealed class NeuroMouse : Singlyboi<NeuroMouse>
 
         while (Vector2.Distance(_simulatedMousePosition, end) > 0.1f)
         {
-            _simulatedMousePosition = Vector2.MoveTowards(_simulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 1250 * Plugin.Config.MouseSpeedMultiplier.Value);
+            _simulatedMousePosition = Vector2.MoveTowards(_simulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 1750 * Plugin.Config.MouseSpeedMultiplier.Value);
             yield return null;
         }
 
@@ -68,15 +67,11 @@ internal sealed class NeuroMouse : Singlyboi<NeuroMouse>
     [HarmonyPrefix]
     private static bool CustomPosition(InteractionCursor __instance)
     {
-        if (UnityEngine.Input.GetKeyDown(KeyCode.U))
-        {
-            AllowRegularInput = !AllowRegularInput;
-        }
+        Cursor.lockState = CursorLockMode.None;
 
-        if (AllowRegularInput) return true;
+        if (AutomationManager.Instance.AllowManualInput) return true;
 
         Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.None;
 
         Vector2 worldPoint = __instance.rayCamera.ScreenToWorldPoint(_simulatedMousePosition);
         __instance.transform.position = new Vector3(worldPoint.x, worldPoint.y, __instance.rayCamera.nearClipPlane);
@@ -95,7 +90,7 @@ internal sealed class NeuroMouse : Singlyboi<NeuroMouse>
     [HarmonyPrefix]
     private static bool CustomGetButton(ref bool __result, Button button)
     {
-        if (AllowRegularInput) return true;
+        if (AutomationManager.Instance.AllowManualInput) return true;
         if (button != Button.Select && button != Button.AltSelect) return true;
 
         __result = button == Button.Select ? _leftClickHandler.Get() : _rightClickHandler.Get();
@@ -107,7 +102,7 @@ internal sealed class NeuroMouse : Singlyboi<NeuroMouse>
     [HarmonyPrefix]
     private static bool CustomGetButtonDown(ref bool __result, Button button)
     {
-        if (AllowRegularInput) return true;
+        if (AutomationManager.Instance.AllowManualInput) return true;
         if (button != Button.Select && button != Button.AltSelect) return true;
 
         __result = button == Button.Select ? _leftClickHandler.GetDown() : _rightClickHandler.GetDown();
@@ -119,7 +114,7 @@ internal sealed class NeuroMouse : Singlyboi<NeuroMouse>
     [HarmonyPrefix]
     private static bool CustomGetButtonUp(ref bool __result, Button button)
     {
-        if (AllowRegularInput) return true;
+        if (AutomationManager.Instance.AllowManualInput) return true;
         if (button != Button.Select && button != Button.AltSelect) return true;
 
         __result = button == Button.Select ? _leftClickHandler.GetUp() : _rightClickHandler.GetUp();

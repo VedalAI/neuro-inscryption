@@ -1,21 +1,20 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
-using NeuroInscryption.API.Automation;
-using NeuroInscryption.API.Input;
+using NeuroInscryption.Automation.API;
 using NeuroInscryption.Configuration;
+using NeuroInscryption.Input;
 using UnityEngine;
-using UnityEngine.Yoga;
-using Logger = HarmonyLib.Tools.Logger;
 
-namespace NeuroInscryption.Automation;
+namespace NeuroInscryption.Automation.MainMenu;
 
-internal sealed class ChallengesScreen : AutomationFlow<AscensionChallengeScreen>
+internal sealed class ChallengesScreenFlow : AutomationFlow<AscensionChallengeScreen>
 {
     public override MethodBase EnableHook => AccessTools.Method(typeof(AscensionChallengeScreen), nameof(AscensionChallengeScreen.OnEnable));
+
+    public override bool AllowInterruption => true;
 
     protected override IEnumerator Execute(AscensionChallengeScreen target)
     {

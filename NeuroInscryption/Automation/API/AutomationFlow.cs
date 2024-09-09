@@ -6,7 +6,7 @@ using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 
-namespace NeuroInscryption.API.Automation;
+namespace NeuroInscryption.Automation.API;
 
 internal abstract class AutomationFlow<T> : AutomationFlow
     where T : MonoBehaviour
@@ -33,6 +33,8 @@ internal abstract class AutomationFlow
     }
 
     public abstract MethodBase EnableHook { get; }
+
+    public virtual bool AllowInterruption => false;
 
     public virtual HarmonyPatchType PatchType => HarmonyPatchType.Postfix;
 

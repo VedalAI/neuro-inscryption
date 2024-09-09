@@ -2,15 +2,17 @@
 using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
-using NeuroInscryption.API.Automation;
-using NeuroInscryption.API.Input;
+using NeuroInscryption.Automation.API;
+using NeuroInscryption.Input;
 using UnityEngine;
 
-namespace NeuroInscryption.Automation;
+namespace NeuroInscryption.Automation.MainMenu;
 
-internal sealed class ChallengesConfirmScreen : AutomationFlow<AscensionChallengeConfirmScreen>
+internal sealed class ChallengesConfirmScreenFlow : AutomationFlow<AscensionChallengeConfirmScreen>
 {
     public override MethodBase EnableHook => AccessTools.Method(typeof(AscensionChallengeConfirmScreen), nameof(AscensionChallengeConfirmScreen.OnEnable));
+
+    public override bool AllowInterruption => true;
 
     protected override IEnumerator Execute(AscensionChallengeConfirmScreen target)
     {
