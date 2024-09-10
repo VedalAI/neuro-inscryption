@@ -41,7 +41,6 @@ jobs:
         with:
           path: BepInEx
           key: BepInEx-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: BepInEx-
 
       - name: Download BepInEx
         if: steps.cache.outputs.cache-hit != 'true'
