@@ -8,7 +8,7 @@ namespace NeuroInscryption.Communication.DTO;
 
 public sealed class CardDTO(PlayableCard card)
 {
-    public readonly string Name = $"{card.Info.DisplayedNameEnglish} ({(card.OpponentCard ? null : card.InHand ? PlayerHand.Instance.CardsInHand.IndexOf(card) : BoardManager.Instance.CardsOnBoard.IndexOf(card))})";
+    public readonly string Name = $"{card.Info.DisplayedNameEnglish} {(card.OpponentCard ? null : $"({(card.InHand ? PlayerHand.Instance.CardsInHand.IndexOf(card) : BoardManager.Instance.CardsOnBoard.IndexOf(card))})")}";
     public readonly int Health = card.Info.Health;
     public readonly string Power = CalculatePower(card);
     // sigils
