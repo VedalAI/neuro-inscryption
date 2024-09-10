@@ -1,4 +1,5 @@
-﻿using DiskCardGame;
+﻿using System.Linq;
+using DiskCardGame;
 using HarmonyLib;
 
 namespace NeuroInscryption.Tweaks;
@@ -13,6 +14,13 @@ internal static class UnlockAllChallengesAndDecks
     private static void Postfix(ref bool __result)
     {
         __result = true;
+    }
+
+    [HarmonyPatch(typeof(AscensionUnlockSchedule), nameof(AscensionUnlockSchedule.NumStarterDecksUnlocked))]
+    [HarmonyPostfix]
+    private static void Postfix(ref int __result)
+    {
+        __result = AscensionUnlockSchedule.instance.unlockTiers.Count(t => t.starterDeckUnlocked != null);
     }
 }
 #endif
