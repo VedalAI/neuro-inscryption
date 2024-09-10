@@ -12,12 +12,15 @@ using UnityEngine;
 
 namespace NeuroInscryption.Automation.Game;
 
-internal sealed class BattleFlow : AutomationFlow
+// ReSharper disable once InconsistentNaming
+internal sealed class SPLIT_CardBattleFlow : AutomationFlow
 {
     public override MethodBase EnableHook => AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TurnManager), nameof(TurnManager.PlayerTurn)));
 
     public override bool IsValid(object enumerator)
     {
+        if (!Plugin.Config.SplitCardBattleDecisions) return false;
+
         int state = enumerator.GetEnumeratorState();
         return state == 8;
     }
@@ -27,7 +30,7 @@ internal sealed class BattleFlow : AutomationFlow
         TurnManager turnManager = enumerator.GetEnumeratorThis<TurnManager>();
 
         JsonSchema responseSchema = JsonSchema.NewResponseSchema();
-        responseSchema.Apply<PlayCardAction>();
+        responseSchema.Apply<SPLIT_ChooseCardAction>();
 
         Decision decision = new()
         {

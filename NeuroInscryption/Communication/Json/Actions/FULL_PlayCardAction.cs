@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
 
 namespace NeuroInscryption.Communication.Json.Actions;
 
-internal sealed class PlayCardAction : ISchemaModifier
+// ReSharper disable once InconsistentNaming
+internal sealed class FULL_PlayCardAction : ISchemaModifier
 {
     public void Apply(JsonSchema schema)
     {
@@ -22,7 +22,6 @@ internal sealed class PlayCardAction : ISchemaModifier
             ApplyCard(playableCard, cardOptions);
         }
 
-        schema.OneOf ??= [];
         schema.OneOf.Add(new JsonSchema
         {
             Properties = new Dictionary<string, JsonSchema>

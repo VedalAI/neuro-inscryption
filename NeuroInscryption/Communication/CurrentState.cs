@@ -1,27 +1,20 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DiskCardGame;
+using NeuroInscryption.Communication.DTO;
 
 namespace NeuroInscryption.Communication;
 
 public static class CurrentState
 {
-    public static Dictionary<string, object> Board => new()
+    public static readonly BoardState Board = new();
+
+    public class BoardState
     {
-        ["scale"] = LifeManager.Instance.Balance,
-        ["bones"] = ResourcesManager.Instance.PlayerBones,
-        ["playerLives"] = RunState.Run.playerLives,
-        // ["playerTotem"]
-        // ["playerLanes"] = BoardManager.Instance.playerSlots
-        // ["opponentLanes"] = BoardManager.Instance.opponentSlots
-        // ["opponentQueueLanes"] = BoardManager.Instance.opponentQueueSlots
-        // ["items"]
-        // ["playerHand"]
-        // ["remainingDeck"]
-        // ["remainingSquirrels"] ?
-        // ["enemyTotem"]
-        // ["enemyLives"]
-        // ["boons"]
-        // ["isOpponentSurrendering"] ?
-        // ["bossAbilityDescription"] ?
-    };
+        public int Scale => LifeManager.Instance.Balance;
+        public int Bones => ResourcesManager.Instance.PlayerBones;
+        public int PlayerLives => RunState.Run.playerLives;
+        public List<CardDTO> PlayerHand => DiskCardGame.PlayerHand.Instance.CardsInHand.Select(CardDTO.Create).ToList();
+    }
+
 }
