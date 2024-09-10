@@ -1,11 +1,21 @@
 ﻿using System.Collections.Generic;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Json;
 
 public sealed class JsonSchema
 {
+    public static JsonSchema NewResponseSchema() => new()
+    {
+        Type = JsonSchemaType.Object,
+        Required = ["action", "data"],
+        Properties = new Dictionary<string, JsonSchema>
+        {
+            ["action"] = QJS.Type(JsonSchemaType.String),
+            ["data"] = QJS.Type(JsonSchemaType.Object),
+        }
+    };
+
     #region Unimplemented keywords
 
     // $schema
@@ -43,6 +53,8 @@ public sealed class JsonSchema
     // unevaluatedProperties
 
     #endregion
+
+    #region Keywords
 
     [JsonProperty("$ref")]
     public string Ref { get; set; }
@@ -135,4 +147,16 @@ public sealed class JsonSchema
 
     [JsonProperty("format")]
     public string Format { get; set; }
+
+    #endregion
+
+    public void Apply(ISchemaModifier modifier)
+    {
+        modifier.Apply(this);
+    }
+
+    public void Apply<T>() where T : ISchemaModifier, new()
+    {
+        Apply(new T());
+    }
 }

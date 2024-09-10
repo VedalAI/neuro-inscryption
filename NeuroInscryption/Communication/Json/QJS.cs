@@ -39,4 +39,12 @@ public static class QJS
             Enum = values.Cast<object>().ToList()
         };
     }
+
+    public static JsonSchema Type(JsonSchemaType type)
+    {
+        return new JsonSchema
+        {
+            Type = type
+        };
+    }
 }

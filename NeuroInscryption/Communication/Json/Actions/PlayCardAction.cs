@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
-using HarmonyLib;
-using NeuroInscryption.Communication.Json;
 
-namespace NeuroInscryption.Communication;
+namespace NeuroInscryption.Communication.Json.Actions;
 
-internal class PlayCardAction(PlayerHand hand) : ISchemaModifier
+internal sealed class PlayCardAction : ISchemaModifier
 {
     public void Apply(JsonSchema schema)
     {
+        if (PlayerHand.Instance.CardsInHand.Count == 0) return;
+
         JsonSchema cardOptions = new()
         {
             Type = JsonSchemaType.Object,
@@ -17,11 +17,12 @@ internal class PlayCardAction(PlayerHand hand) : ISchemaModifier
             OneOf = []
         };
 
-        foreach (PlayableCard playableCard in hand.CardsInHand)
+        foreach (PlayableCard playableCard in PlayerHand.Instance.CardsInHand)
         {
             ApplyCard(playableCard, cardOptions);
         }
 
+        schema.OneOf ??= [];
         schema.OneOf.Add(new JsonSchema
         {
             Properties = new Dictionary<string, JsonSchema>
@@ -29,7 +30,6 @@ internal class PlayCardAction(PlayerHand hand) : ISchemaModifier
                 ["action"] = QJS.Const("play_card"),
                 ["data"] = cardOptions
             },
-            Required = ["action", "data"]
         });
     }
 
@@ -49,7 +49,7 @@ internal class PlayCardAction(PlayerHand hand) : ISchemaModifier
             .Select(p => (p.index, p.slot.Card.HasAbility(Ability.TripleBlood) ? 3 : 1))
             .ToList();
 
-        if (card.Info.BonesCost > 0)
+        if (card.Info.BonesCost > 0 || card.Info.BloodCost == 0)
         {
             schema.OneOf.Add(new JsonSchema
             {
@@ -63,20 +63,28 @@ internal class PlayCardAction(PlayerHand hand) : ISchemaModifier
         }
         else
         {
-            int cost = card.Info.BloodCost;
-
-            foreach (List<int> sacrifice in GetSacrificeCombinations(sacrificableSlots, cost))
+            JsonSchema subschema = new()
             {
-                schema.OneOf.Add(new JsonSchema
+                Properties = new Dictionary<string, JsonSchema>
+                {
+                    ["card"] = QJS.Const(card.Info.DisplayedNameEnglish), // TODO: unique identifiers for cards
+                },
+                OneOf = []
+            };
+
+            foreach (List<int> sacrifice in GetSacrificeCombinations(sacrificableSlots, card.Info.BloodCost))
+            {
+                subschema.OneOf.Add(new JsonSchema
                 {
                     Properties = new Dictionary<string, JsonSchema>
                     {
-                        ["card"] = QJS.Const(card.Info.DisplayedNameEnglish), // TODO: unique identifiers for cards
                         ["sacrifices"] = QJS.Array(sacrifice),
                         ["lane"] = QJS.Enum([..availableSlots, ..sacrifice])
                     }
                 });
             }
+
+            schema.OneOf.Add(subschema);
         }
     }
 

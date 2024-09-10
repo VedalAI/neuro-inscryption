@@ -11,7 +11,7 @@ internal static class SkipIntroSequence
     [HarmonyPostfix]
     private static void RunIntroSequence(object __instance)
     {
-        ref int state = ref __instance.GetStateField();
+        int state = __instance.GetEnumeratorState();
 
         if (state == 18)
         {

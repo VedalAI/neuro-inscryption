@@ -1,20 +1,22 @@
-﻿using JetBrains.Annotations;
-using NeuroInscryption.Communication.Json;
+﻿using NeuroInscryption.Communication.Json;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication;
 
-public abstract class Decision
+public sealed class Decision
 {
     [JsonProperty("game")]
     private string Game => "Inscryption";
 
+    [JsonProperty("id")]
+    public required string Id { get; set; }
+
     [JsonProperty("state")]
-    protected abstract object State { get; }
+    public required object State { get; set; }
 
     [JsonProperty("query")]
-    protected abstract string Query { get; }
+    public required string Query { get; set; }
 
     [JsonProperty("responseSchema")]
-    protected abstract JsonSchema ResponseSchema { get; }
+    public required JsonSchema ResponseSchema { get; set; }
 }
