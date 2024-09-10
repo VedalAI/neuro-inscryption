@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
 
@@ -14,7 +15,6 @@ internal sealed class PlayCardAction : ISchemaModifier
         {
             Type = JsonSchemaType.Object,
             Required = ["card", "sacrifices", "lane"],
-            OneOf = []
         };
 
         foreach (PlayableCard playableCard in PlayerHand.Instance.CardsInHand)
@@ -56,7 +56,7 @@ internal sealed class PlayCardAction : ISchemaModifier
                 Properties = new Dictionary<string, JsonSchema>
                 {
                     ["card"] = QJS.Const(card.Info.DisplayedNameEnglish), // TODO: unique identifiers for cards
-                    ["sacrifices"] = QJS.EmptyArray,
+                    ["sacrifices"] = QJS.ConstEmptyArray,
                     ["lane"] = QJS.Enum(availableSlots)
                 }
             });
@@ -78,7 +78,7 @@ internal sealed class PlayCardAction : ISchemaModifier
                 {
                     Properties = new Dictionary<string, JsonSchema>
                     {
-                        ["sacrifices"] = QJS.Array(sacrifice),
+                        ["sacrifices"] = QJS.Const(sacrifice),
                         ["lane"] = QJS.Enum([..availableSlots, ..sacrifice])
                     }
                 });

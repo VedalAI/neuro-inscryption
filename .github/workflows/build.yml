@@ -37,7 +37,7 @@ jobs:
 
       - name: Cache BepInEx download
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: BepInEx
           key: BepInEx-${{ hashFiles('**/packages.lock.json') }}

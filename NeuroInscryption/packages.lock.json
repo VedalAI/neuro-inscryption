@@ -64,6 +64,12 @@
         "resolved": "2019.4.24",
         "contentHash": "Qrq0+YPa5oTk0ZUQEXB81IQJDNtKACTsFDq53BinxJEhSzH5B/6KE07G7BFUBwvj30lPMhX0OgAfTW7LCWPOow=="
       },
+      "WebSocketSharp": {
+        "type": "Direct",
+        "requested": "[1.0.3-rc11, )",
+        "resolved": "1.0.3-rc11",
+        "contentHash": "7VCF7f7zVMOvLGD8LeGS4DVXc8lOcB6kXnUMeTxigu+PMiU+6wW5Olq2gYrDU8vDRKOwFY+5RyBaLyzb8skEzA=="
+      },
       "BepInEx.Core": {
         "type": "Transitive",
         "resolved": "6.0.0-be.700",
