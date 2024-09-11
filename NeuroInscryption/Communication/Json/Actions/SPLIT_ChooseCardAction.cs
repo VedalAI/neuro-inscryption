@@ -16,7 +16,7 @@ internal sealed class SPLIT_ChooseCardAction : ISchemaModifier
             Properties = new Dictionary<string, JsonSchema>
             {
                 ["action"] = QJS.Const("choose_card_to_play"),
-                ["data"] = QJS.Enum(CurrentState.Board.PlayerHand.Where(c => c.IsPlayable == true).Select(c => c.Name))
+                ["data"] = QJS.Enum(GameState.Board.Current.PlayerHand.Where(c => c.IsPlayable == true).Select(c => c.Name))
             }
         });
     }

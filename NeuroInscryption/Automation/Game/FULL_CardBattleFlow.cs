@@ -9,6 +9,7 @@ using NeuroInscryption.Communication.Json.Actions;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
 using UnityEngine;
+using GameState = NeuroInscryption.Communication.GameState;
 
 namespace NeuroInscryption.Automation.Game;
 
@@ -35,7 +36,7 @@ internal sealed class FULL_CardBattleFlow : AutomationFlow
         Decision decision = new()
         {
             Id = "card_battle_turn",
-            State = CurrentState.Board,
+            State = GameState.Board.Current,
             Query = "Choose the next action to take during this card battle.",
             ResponseSchema = responseSchema
         };
