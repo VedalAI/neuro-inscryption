@@ -2,19 +2,19 @@
 
 namespace NeuroInscryption.Communication.DTO;
 
-public sealed class CardDTO
+public class CardDTO
 {
-    public readonly string Name;
-    public readonly int Health;
-    public readonly string Power;
+    public string Name { get; protected set; }
+    public int Health { get; protected set; }
+    public string Power { get; protected set; }
     // sigils
-    public readonly bool? IsPlayable;
-    public readonly string Cost;
-    public readonly bool? CanBeSacrificed;
-    public readonly string Tribes;
-    // public readonly string Traits = GetTraits(card);
+    public bool? IsPlayable { get; protected set; }
+    public string Cost { get; protected set; }
+    public bool? CanBeSacrificed { get; protected set; }
+    public string Tribes { get; protected set; }
+    // public string Traits = GetTraits(card);
     // specialAbilities
-    public readonly string Note;
+    public string Note { get; protected set; }
 
     public CardDTO(CardInfo cardInfo)
     {
@@ -26,16 +26,16 @@ public sealed class CardDTO
         Tribes = cardInfo.tribes.Count == 0 ? null : string.Join(", ", cardInfo.tribes);
     }
 
-    public CardDTO(CardInfo cardInfo, PlayableCard playableCard) : this(cardInfo)
+    protected CardDTO(CardInfo cardInfo, PlayableCard playableCard) : this(cardInfo)
     {
-        Name = $"{cardInfo.DisplayedNameEnglish} {(playableCard.OpponentCard ? null : $"({(playableCard.InHand ? PlayerHand.Instance.CardsInHand.IndexOf(playableCard) : BoardManager.Instance.CardsOnBoard.IndexOf(playableCard))})")}";
+        Name = $"{cardInfo.DisplayedNameEnglish}{(playableCard.OpponentCard ? null : $" ({(playableCard.InHand ? PlayerHand.Instance.CardsInHand.IndexOf(playableCard) : BoardManager.Instance.CardsOnBoard.IndexOf(playableCard))})")}";
         Power = CalculatePower(cardInfo, playableCard);
         IsPlayable = !playableCard.InHand ? null : playableCard.CanPlay();
 
         if (!playableCard.InHand) Cost = null;
         if (playableCard.OpponentCard) CanBeSacrificed = null;
 
-        if (GameState.Ijiraq.Current.PotentialIjiraqsInHand.Contains(playableCard)) Note = "Careful! This card or another identical card in your hand is a disguised Ijiraq!";
+        if (GameState.Ijiraq.Current.SuspiciousCardsInHand.Contains(playableCard)) Note = $"Careful! This card or another {cardInfo.DisplayedNameEnglish} card in your hand is a disguised Ijiraq!";
     }
 
     public CardDTO(PlayableCard card) : this(card.Info, card) { }
@@ -64,9 +64,9 @@ public sealed class CardDTO
             CardsInHand => Power is equal to the number of cards in your hand
             Ouroboros => Health and power increases by 1 permanently each time it dies or is sacrificed
             Shapeshifter => This card disguises itself as another card in the deck and only reveals itself after it is played // TODO Disguise Ijiraq in hand
-            SacrificesThisTurn,
-            SpawnLice,
-            GiantShip,
+            SacrificesThisTurn => Power is equal to the number of cards you've sacrificed this turn
+            SpawnLice => When played, automatically plays any Pelt Lice cards from your hand or deck in adjacent lanes
+            --- GiantShip,
          */
 
         foreach (SpecialTriggeredAbility ability in cardInfo.specialAbilities)

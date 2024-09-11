@@ -19,21 +19,18 @@ public static class GameState
 
         public int PlayerLives => RunState.Run.playerLives;
 
-        public Dictionary<string, CardDTO> PlayerLanes => BoardManager.Instance.playerSlots
-            .Select((slot, index) => (slot, index))
-            .ToDictionary(p => p.index.ToString(), p => !p.slot.Card ? null : new CardDTO(p.slot.Card));
+        public Dictionary<string, CardDTO> PlayerLanes => BoardManager.Instance.playerSlots.WithIndex()
+            .ToDictionary(p => p.index.ToString(), p => !p.item.Card ? null : new CardDTO(p.item.Card));
 
-        public Dictionary<string, CardDTO> OpponentLanes => BoardManager.Instance.opponentSlots
-            .Select((slot, index) => (slot, index))
-            .ToDictionary(p => p.index.ToString(), p => !p.slot.Card ? null : new CardDTO(p.slot.Card));
+        public Dictionary<string, CardDTO> OpponentLanes => BoardManager.Instance.opponentSlots.WithIndex()
+            .ToDictionary(p => p.index.ToString(), p => !p.item.Card ? null : new CardDTO(p.item.Card));
 
         public Dictionary<string, CardDTO> OpponentQueueLanes => BoardManager.Instance.opponentSlots
-            .Select(BoardManager.Instance.GetCardQueuedForSlot)
-            .Select((card, index) => (card, index))
-            .ToDictionary(p => p.index.ToString(), p => !p.card ? null : new CardDTO(p.card));
+            .Select(BoardManager.Instance.GetCardQueuedForSlot).WithIndex()
+            .ToDictionary(p => p.index.ToString(), p => !p.item ? null : new CardDTO(p.item));
 
         public List<CardDTO> PlayerHand => DiskCardGame.PlayerHand.Instance.CardsInHand
-            .Select(c => Ijiraq.Current.ExposableIjiraqs.Contains(c) ? new CardDTO(CardLoader.GetCardByName("Ijiraq"), c) : new CardDTO(c))
+            .Select(c => Ijiraq.Current.ExposableIjiraqs.Contains(c) ? new IjiraqDTO(c) : new CardDTO(c))
             .ToList();
 
         public List<CardDTO> RemainingDeck => CardDrawPiles.Instance.Deck.Cards
@@ -75,7 +72,7 @@ public static class GameState
         /// <summary>
         /// All cards in the player's hand that could be Ijiraqs.
         /// </summary>
-        public readonly List<PlayableCard> PotentialIjiraqsInHand;
+        public readonly List<PlayableCard> SuspiciousCardsInHand;
 
         /// <summary>
         /// All Ijiraqs in the deck.
@@ -111,10 +108,11 @@ public static class GameState
 
             ExposableIjiraqs = IjiraqsInHand
                 .Where(ijr => !CardDrawPiles.Instance.Deck.Cards.Any(card => card.IsIdentical(ijr.Info)))
-                .Where(ijr => !PlayerHand.Instance.cardsInHand.Any(card => card.Info.IsIdentical(ijr.Info)))
+                .Where(ijr => !PlayerHand.Instance.cardsInHand.Except([ijr]).Any(card => card.Info.IsIdentical(ijr.Info)))
                 .ToList();
 
-            PotentialIjiraqsInHand = PlayerHand.Instance.CardsInHand
+            SuspiciousCardsInHand = PlayerHand.Instance.CardsInHand
+                .Where(card => !CardDrawPiles.Instance.Deck.Cards.Any(deckCard => deckCard.IsIdentical(card.Info)))
                 .Where(card => IjiraqsInHand.Any(ijr => ijr.Info.IsIdentical(card.Info)))
                 .ToList();
 

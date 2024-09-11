@@ -27,7 +27,7 @@ internal static class UnlockAllChallengesAndDecks
     [HarmonyPostfix]
     private static void Postfix(AscensionChooseStarterDeckScreen __instance)
     {
-        __instance.deckIcons[0].Info.cards = [CardLoader.GetCardByName("Irajiq"), CardLoader.GetCardByName("Irajiq"), CardLoader.GetCardByName("Geck"), CardLoader.GetCardByName("Geck"), CardLoader.GetCardByName("Stoat"), CardLoader.GetCardByName("Stoat")];
+        __instance.deckIcons[0].Info.cards = [CardLoader.GetCardByName("Ijiraq"), CardLoader.GetCardByName("Ijiraq"), CardLoader.GetCardByName("Ijiraq"), CardLoader.GetCardByName("Geck"), CardLoader.GetCardByName("Geck"), CardLoader.GetCardByName("Stoat"), CardLoader.GetCardByName("Stoat")];
     }
 }
 #endif
