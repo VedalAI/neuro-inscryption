@@ -22,5 +22,12 @@ internal static class UnlockAllChallengesAndDecks
     {
         __result = AscensionUnlockSchedule.instance.unlockTiers.Count(t => t.starterDeckUnlocked != null);
     }
+
+    [HarmonyPatch(typeof(AscensionChooseStarterDeckScreen), nameof(AscensionChooseStarterDeckScreen.OnEnable))]
+    [HarmonyPostfix]
+    private static void Postfix(AscensionChooseStarterDeckScreen __instance)
+    {
+        __instance.deckIcons[0].Info.cards = [CardLoader.GetCardByName("Irajiq"), CardLoader.GetCardByName("Irajiq"), CardLoader.GetCardByName("Geck"), CardLoader.GetCardByName("Geck"), CardLoader.GetCardByName("Stoat"), CardLoader.GetCardByName("Stoat")];
+    }
 }
 #endif
