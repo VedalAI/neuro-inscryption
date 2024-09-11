@@ -1,13 +1,43 @@
-﻿using DiskCardGame;
+﻿using System.Collections.Generic;
+using System.Linq;
+using DiskCardGame;
+using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Communication.DTO;
+
+/* Special abilities
+    Cat => Transforms into Undead Cat after being sacrified 9 times
+    Ant => Power is equal to number of Ants
+    RandomCard => Transforms into a random card when drawn
+    Lammergeier => Power is equal to half the number of bones
+    --- TalkingCardChooser,
+    PackMule => Gives 4 cards in hand when this card dies
+    Mirror => Power is equal to the power of the card opposite this one
+    BellProximity => Power ranges from 4 to 1, depending on which lane you place it in and how close it is to the bell
+    --- CagedWolf,
+    TrapSpawner => Spawns a Leaping Trap in its place when it dies
+    GiantCard => Increases in power by 1 for each turn after you run out of cards
+    --- GiantMoon,
+    --- GreenMage,
+    JerseyDevil => Transforms into Hungry Child after being sacrified 13 times
+    Daus => If a card with the Chime trait is attacked, this card will attack the attacker
+    --- BountyHunter
+    --- BrokenCoinLeft,
+    --- BrokenCoinRight,
+    CardsInHand => Power is equal to the number of cards in your hand
+    Ouroboros => Health and power increases by 1 permanently each time it dies or is sacrificed
+    Shapeshifter => This card disguises itself as another card in the deck and only reveals itself after it is played // TODO Disguise Ijiraq in hand
+    SacrificesThisTurn => Power is equal to the number of cards you've sacrificed this turn
+    SpawnLice => When played, automatically plays any Pelt Lice cards from your hand or deck in adjacent lanes
+    --- GiantShip,
+ */
 
 public class CardDTO
 {
     public string Name { get; protected set; }
-    public int Health { get; protected set; }
+    public int? Health { get; protected set; }
     public string Power { get; protected set; }
-    // sigils
+    public List<string> Sigils { get; protected set; }
     public bool? IsPlayable { get; protected set; }
     public string Cost { get; protected set; }
     public bool? CanBeSacrificed { get; protected set; }
@@ -18,9 +48,16 @@ public class CardDTO
 
     public CardDTO(CardInfo cardInfo)
     {
+        if (cardInfo.name == "!STATIC!GLITCH")
+        {
+            Name = "Glitched Card";
+            return;
+        }
+
         Name = cardInfo.DisplayedNameEnglish;
         Health = cardInfo.Health;
         Power = CalculatePower(cardInfo);
+        Sigils = cardInfo.Abilities.Count == 0 ? null : cardInfo.Abilities.Select(a => a.GetRulebookStrings().name).ToList();
         Cost = cardInfo.BonesCost > 0 ? $"{cardInfo.BonesCost} bones" : $"{cardInfo.BloodCost} blood";
         CanBeSacrificed = cardInfo.Sacrificable || cardInfo.HasAbility(Ability.TripleBlood);
         Tribes = cardInfo.tribes.Count == 0 ? null : string.Join(", ", cardInfo.tribes);
@@ -42,33 +79,6 @@ public class CardDTO
 
     private static string CalculatePower(CardInfo cardInfo, PlayableCard cardInPlay = null)
     {
-        /*
-            Cat => Transforms into Undead Cat after being sacrified 9 times
-            Ant => Power is equal to number of Ants
-            RandomCard => Transforms into a random card when drawn
-            Lammergeier => Power is equal to half the number of bones
-            --- TalkingCardChooser,
-            PackMule => Gives 4 cards in hand when this card dies
-            Mirror => Power is equal to the power of the card opposite this one
-            BellProximity => Power ranges from 4 to 1, depending on which lane you place it in and how close it is to the bell
-            --- CagedWolf,
-            TrapSpawner => Spawns a Leaping Trap in its place when it dies
-            GiantCard => Increases in power by 1 for each turn after you run out of cards
-            --- GiantMoon,
-            --- GreenMage,
-            JerseyDevil => Transforms into Hungry Child after being sacrified 13 times
-            Daus => If a card with the Chime trait is attacked, this card will attack the attacker
-            --- BountyHunter
-            --- BrokenCoinLeft,
-            --- BrokenCoinRight,
-            CardsInHand => Power is equal to the number of cards in your hand
-            Ouroboros => Health and power increases by 1 permanently each time it dies or is sacrificed
-            Shapeshifter => This card disguises itself as another card in the deck and only reveals itself after it is played // TODO Disguise Ijiraq in hand
-            SacrificesThisTurn => Power is equal to the number of cards you've sacrificed this turn
-            SpawnLice => When played, automatically plays any Pelt Lice cards from your hand or deck in adjacent lanes
-            --- GiantShip,
-         */
-
         foreach (SpecialTriggeredAbility ability in cardInfo.specialAbilities)
         {
             switch (ability)

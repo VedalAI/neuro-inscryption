@@ -40,6 +40,13 @@ public static class GameState
 
         public string Note => !Ijiraq.Current.AnythingCouldBeIjiraq ? null : "Be careful, any card in your hand or deck could be a disguised Ijiraq.";
 
+        public Dictionary<string, string> SigilDescriptions => BoardManager.Instance.CardsOnBoard.Select(c => c.Info)
+            .Concat(DiskCardGame.PlayerHand.Instance.CardsInHand.Select(c => c.Info))
+            .Concat(CardDrawPiles.Instance.Deck.Cards)
+            .SelectMany(c => c.Abilities)
+            .Distinct()
+            .Select(a => a.GetRulebookStrings()).ToDictionary(t => t.name, t => t.description);
+
         // ["playerTotem"]
         // ["items"]
         // ["remainingDeck"]
