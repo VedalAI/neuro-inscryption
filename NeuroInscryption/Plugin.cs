@@ -12,8 +12,8 @@ namespace NeuroInscryption;
 public sealed partial class Plugin : BaseUnityPlugin
 {
     public static Harmony Harmony { get; } = new(Id);
-    public new static ManualLogSource Logger { get; private set; }
-    public new static ModConfig Config { get; private set; }
+    public new static ManualLogSource Logger { get; private set; } = null!;
+    public new static ModConfig Config { get; private set; } = null!;
 
     private void Awake()
     {

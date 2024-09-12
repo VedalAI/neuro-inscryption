@@ -8,7 +8,7 @@ namespace NeuroInscryption.Utilities;
 public abstract class Singlyboi<T> : Singlyboi
     where T : Singlyboi<T>
 {
-    public static T Instance { get; private set; }
+    public static T Instance { get; private set; } = null!;
 
     protected void Awake()
     {

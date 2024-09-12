@@ -1,13 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DiskCardGame;
+using UnityEngine;
 
 namespace NeuroInscryption.Utilities;
 
 public static class GameExtensions
 {
-    public static bool IsIdentical(this CardInfo card1, CardInfo card2)
+    public static bool IsIdentical(this CardInfo? card1, CardInfo? card2)
     {
+        if (card1 == null || card2 == null) return card1 == null && card2 == null;
+
         if (card1.DisplayedNameEnglish != card2.DisplayedNameEnglish) return false;
         if (card1.Attack != card2.Attack) return false;
         if (card1.Health != card2.Health) return false;
@@ -24,6 +28,10 @@ public static class GameExtensions
 
         return true;
     }
-}
 
-// TODO: Figure out cat and child 13 sacrifice count
+    public static bool TryGetSpecialAbility<T>(this PlayableCard card, SpecialTriggeredAbility ability, [NotNullWhen(true)] out T? behaviour) where T : SpecialCardBehaviour
+    {
+        behaviour = (T) card.TriggerHandler.specialAbilities.Find(t => t.Item1 == ability).Item2;
+        return behaviour != null;
+    }
+}

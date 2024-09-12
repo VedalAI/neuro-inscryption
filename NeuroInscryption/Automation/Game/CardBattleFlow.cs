@@ -34,7 +34,7 @@ public sealed class CardBattleFlow : AutomationFlow<object>
             Query = "Choose the next action to take during this card battle.",
             ResponseSchema = responseSchema
         };
-
+        
         GUIUtility.systemCopyBuffer = JsonConvert.SerializeObject(decision, new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore

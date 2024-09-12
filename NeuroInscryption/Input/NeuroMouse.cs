@@ -27,7 +27,7 @@ public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 
         while (Vector2.Distance(_simulatedMousePosition, end) > 0.1f)
         {
-            _simulatedMousePosition = Vector2.MoveTowards(_simulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 1750 * Plugin.Config.MouseSpeedMultiplier.Value);
+            _simulatedMousePosition = Vector2.MoveTowards(_simulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 2000 * Plugin.Config.MouseSpeedMultiplier.Value);
             yield return null;
         }
 

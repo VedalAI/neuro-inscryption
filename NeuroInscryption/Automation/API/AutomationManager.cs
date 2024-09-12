@@ -15,8 +15,8 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
     public bool AllowManualInput { get; private set; }
     private bool _wantsManualControl;
 
-    private AutomationFlow _currentFlow;
-    private Coroutine _currentFlowCoroutine;
+    private AutomationFlow? _currentFlow;
+    private Coroutine? _currentFlowCoroutine;
 
     private new void Awake()
     {
@@ -125,7 +125,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         }
         else
         {
-            if (Instance._currentFlow.AllowInterruption)
+            if (Instance._currentFlow?.AllowInterruption ?? true)
             {
                 Instance.AllowManualInput = true;
             }

@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Json;
 
+[PublicAPI]
 public sealed class JsonSchema
 {
     public static JsonSchema NewResponseSchema() => new()
@@ -108,49 +110,49 @@ public sealed class JsonSchema
     #region Keywords
 
     [JsonProperty("$ref")]
-    public string Ref { get; set; }
+    public string? Ref { get; set; }
 
     [JsonProperty("$defs")]
-    private Dictionary<string, JsonSchema> _defs;
+    private Dictionary<string, JsonSchema>? _defs;
 
     [JsonProperty("$anchor")]
-    public string Anchor { get; set; }
+    public string? Anchor { get; set; }
 
     [JsonProperty("anyOf")]
-    private List<JsonSchema> _anyOf;
+    private List<JsonSchema>? _anyOf;
 
     [JsonProperty("oneOf")]
-    private List<JsonSchema> _oneOf;
+    private List<JsonSchema>? _oneOf;
 
     [JsonProperty("allOf")]
-    private List<JsonSchema> _allOf;
+    private List<JsonSchema>? _allOf;
 
     [JsonProperty("not")]
-    public JsonSchema Not { get; set; }
+    public JsonSchema? Not { get; set; }
 
     [JsonProperty("properties")]
-    private Dictionary<string, JsonSchema> _properties;
+    private Dictionary<string, JsonSchema>? _properties;
 
     [JsonProperty("additionalProperties")]
     public bool? AdditionalProperties { get; set; }
 
     [JsonProperty("items")]
-    public JsonSchema Items { get; set; }
+    public JsonSchema? Items { get; set; }
 
     [JsonProperty("type")]
-    private string _type;
+    private string? _type;
 
     [JsonProperty("enum")]
-    private List<object> _enum;
+    private List<object>? _enum;
 
     [JsonProperty("const")]
-    public object Const { get; set; }
+    public object? Const { get; set; }
 
     [JsonProperty("minLength")]
     public int? MinLength { get; set; }
 
     [JsonProperty("pattern")]
-    public string Pattern { get; set; }
+    public string? Pattern { get; set; }
 
     [JsonProperty("maxLength")]
     public int? MaxLength { get; set; }
@@ -168,10 +170,10 @@ public sealed class JsonSchema
     public int? Minimum { get; set; }
 
     [JsonProperty("dependentRequired")]
-    private Dictionary<string, List<string>> _dependentRequired;
+    private Dictionary<string, List<string>>? _dependentRequired;
 
     [JsonProperty("required")]
-    private List<string> _required;
+    private List<string>? _required;
 
     [JsonProperty("minItems")]
     public int? MinItems { get; set; }
@@ -183,7 +185,7 @@ public sealed class JsonSchema
     public bool? UniqueItems { get; set; }
 
     [JsonProperty("format")]
-    public string Format { get; set; }
+    public string? Format { get; set; }
 
     #endregion
 

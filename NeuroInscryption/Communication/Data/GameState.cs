@@ -5,6 +5,7 @@ using DiskCardGame;
 using JetBrains.Annotations;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
+using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data;
 
@@ -21,13 +22,13 @@ public static class GameState
 
         public readonly int PlayerLives = RunState.Run.playerLives;
 
-        public readonly Dictionary<string, CardData> PlayerLanes = BoardManager.Instance.playerSlots.WithIndex()
+        public readonly Dictionary<string, CardData?> PlayerLanes = BoardManager.Instance.playerSlots.WithIndex()
             .ToDictionary(p => p.index.ToString(), p => !p.item.Card ? null : new CardData(p.item.Card));
 
-        public readonly Dictionary<string, CardData> OpponentLanes = BoardManager.Instance.opponentSlots.WithIndex()
+        public readonly Dictionary<string, CardData?> OpponentLanes = BoardManager.Instance.opponentSlots.WithIndex()
             .ToDictionary(p => p.index.ToString(), p => !p.item.Card ? null : new CardData(p.item.Card));
 
-        public readonly Dictionary<string, CardData> OpponentQueueLanes = BoardManager.Instance.opponentSlots
+        public readonly Dictionary<string, CardData?> OpponentQueueLanes = BoardManager.Instance.opponentSlots
             .Select(BoardManager.Instance.GetCardQueuedForSlot).WithIndex()
             .ToDictionary(p => p.index.ToString(), p => !p.item ? null : new CardData(p.item));
 
@@ -42,14 +43,15 @@ public static class GameState
 
         // TODO: Standardize card ids so that empty lanes are taken into account in the index calculation
 
-        public readonly string Note = !Ijiraq.Current.AnythingCouldBeIjiraq ? null : "Be careful, any card in your hand or deck could be a disguised Ijiraq.";
+        [JsonProperty("Note")]
+        private readonly string? _note = !Ijiraq.Current.AnythingCouldBeIjiraq ? null : "Be careful, any card in your hand or deck could be a disguised Ijiraq.";
 
-        public readonly Dictionary<string, string> SigilDescriptions = AllCardsInPlay
+        public readonly Dictionary<string, string>? SigilDescriptions = AllCardsInPlay
             .SelectMany(c => c.GetAllRelevantSigilStrings()).Distinct()
             .ToDictionary(s => s.Name, t => t.Description)
             .NullIfEmpty();
 
-        public readonly Dictionary<string, string> TraitDescriptions = AllCardsInPlay
+        public readonly Dictionary<string, string>? TraitDescriptions = AllCardsInPlay
             .SelectMany(c => c.GetAllRelevantTraitStrings()).Distinct()
             .ToDictionary(t => t.Name, t => t.Description)
             .NullIfEmpty();
@@ -128,7 +130,7 @@ public static class GameState
                 .ToList();
 
             _ijiraqsInDeck = CardDrawPiles.Instance.Deck.Cards
-                .Where(cardInfo => cardInfo.specialAbilities.Contains(SpecialTriggeredAbility.Shapeshifter))
+                .Where(cardInfo => cardInfo.SpecialAbilities.Contains(SpecialTriggeredAbility.Shapeshifter))
                 .ToList();
         }
     }

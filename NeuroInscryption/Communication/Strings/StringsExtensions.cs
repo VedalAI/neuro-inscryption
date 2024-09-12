@@ -14,7 +14,12 @@ public static class StringsExtensions
             _ => deconstruct(AbilitiesUtil.GetInfo(ability))
         };
 
-        static Describable deconstruct(AbilityInfo info) => (info.rulebookName, info.LocalizedRulebookDescription.Replace("[creature]", Localization.Translate("a card bearing this sigil")));
+        static Describable deconstruct(AbilityInfo info)
+        {
+            string description = info.LocalizedRulebookDescription.Replace("[creature]", Localization.Translate("a card bearing this sigil"));
+            if (char.IsLower(description[0])) description = char.ToUpper(description[0]) + description[1..];
+            return (info.rulebookName, description);
+        }
     }
 
     private static Describable GetStrings(this Trait trait)
@@ -44,7 +49,7 @@ public static class StringsExtensions
             SpecialTriggeredAbility.Mirror => ("Mirror", "The power of a card bearing this trait is equal to the power of the card opposite it."),
             SpecialTriggeredAbility.BellProximity => ("Leftmost", "The power of a card bearing this trait ranges from 4 to 1, depending on which lane you place it in."),
             SpecialTriggeredAbility.TrapSpawner => ("Trap Spawner", "When a card bearing this trait dies, a Leaping Trap (0 power, 1 health, Steel Trap and Mighty Leap sigils) is played in its place."),
-            SpecialTriggeredAbility.JerseyDevil => ("Child 13", "A card bearing this trait transforms back and forth between [0 power] and [2 power with Flying sigil] each time it is sacrificed. After being sacrificed 13 times, it transforms into a Hungry Child (0 power, 1 health)."),
+            SpecialTriggeredAbility.JerseyDevil => ("Child 13", "A card bearing this trait transforms back and forth between [0 base power] and [2 base power with Airborne sigil] each time it is sacrificed. After being sacrificed 13 times, it transforms into a Hungry Child (0 power, 1 health)."),
             SpecialTriggeredAbility.Daus => ("Daus", "If a card bearing the Chime trait is attacked, a card bearing this trait will attack the attacker."),
             SpecialTriggeredAbility.CardsInHand => ("Card Counter", "The power of a card bearing this trait is equal to the number of cards in your hand."),
             SpecialTriggeredAbility.Ouroboros => ("Ouroboros", "The power and health of a card bearing this trait permanently increases by 1 each time it dies or is sacrificed."),
@@ -62,8 +67,8 @@ public static class StringsExtensions
         List<Describable> result = [];
 
         result.AddRange(cardInfo.Abilities.Select(a => a.GetStrings()).Where(a => !string.IsNullOrEmpty(a.Name)));
-        if (cardInfo.specialAbilities.Contains(SpecialTriggeredAbility.JerseyDevil)) result.Add(Ability.Flying.GetStrings());
-        if (cardInfo.specialAbilities.Contains(SpecialTriggeredAbility.TrapSpawner)) result.AddRange([Ability.SteelTrap.GetStrings(), Ability.Reach.GetStrings()]);
+        if (cardInfo.SpecialAbilities.Contains(SpecialTriggeredAbility.JerseyDevil)) result.Add(Ability.Flying.GetStrings());
+        if (cardInfo.SpecialAbilities.Contains(SpecialTriggeredAbility.TrapSpawner)) result.AddRange([Ability.SteelTrap.GetStrings(), Ability.Reach.GetStrings()]);
 
         result.Sort();
         return result;
@@ -74,12 +79,14 @@ public static class StringsExtensions
         List<Describable> result = [];
 
         result.AddRange(cardInfo.traits.Select(t => t.GetStrings()).Where(t => !string.IsNullOrEmpty(t.Name)));
-        result.AddRange(cardInfo.specialAbilities.Select(a => a.GetStrings()).Where(a => !string.IsNullOrEmpty(a.Name)));
+        result.AddRange(cardInfo.SpecialAbilities.Select(a => a.GetStrings()).Where(a => !string.IsNullOrEmpty(a.Name)));
         if (cardInfo.name.ToLowerInvariant().Contains("bell")) result.Add(ChimeTrait);
 
-        if (GameFlowManager.Instance.CurrentGameState == DiskCardGame.GameState.CardBattle)
+        if (GameFlowManager.Instance.CurrentGameState == GameState.CardBattle)
         {
-            result.RemoveAll(t => t.Name is "Poisonous" or "Black Goat" or "Worthless Sacrifice"); // boon lord and campfire stuff we don't care about
+            result.RemoveAll(t => t.Name == Trait.KillsSurvivors.GetStrings().Name ||
+                                  t.Name == Trait.Goat.GetStrings().Name ||
+                                  t.Name == Trait.Pelt.GetStrings().Name); // boon lord and campfire stuff we don't care about while in a card battle
         }
 
         result.Sort();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,29 +17,29 @@ public static class ResourceManager
     private static readonly Assembly _assembly = Assembly.GetExecutingAssembly();
     private static readonly Dictionary<string, object> _cache = [];
 
-    public static Assembly GetAssembly(string name)
+    private static Assembly? GetAssembly(string name)
     {
         string targetedName = name + ".dll";
 
-        if (TryGetCached(targetedName, out Assembly cached)) return cached;
+        if (TryGetCached(targetedName, out Assembly? cached)) return cached;
 
-        byte[] buffer = GetEmbeddedBytes(targetedName, false);
+        byte[]? buffer = GetEmbeddedBytes(targetedName, false);
         if (buffer == null) return null;
 
         Assembly assembly = Assembly.Load(buffer);
         return Cache(targetedName, assembly);
     }
 
-    public static byte[] GetEmbeddedBytes(string name, bool throwIfNotFound)
+    private static byte[]? GetEmbeddedBytes(string name, bool throwIfNotFound)
     {
-        string path = _assembly.GetManifestResourceNames().FirstOrDefault(n => n.Contains(name));
+        string? path = _assembly.GetManifestResourceNames().FirstOrDefault(n => n.Contains(name));
         if (path == null) return !throwIfNotFound ? null : throw new FileNotFoundException($"Embedded resource {name} not found");
 
         Stream manifestResourceStream = _assembly.GetManifestResourceStream(path)!;
         return manifestResourceStream.ReadFully();
     }
 
-    private static bool TryGetCached<T>(string name, out T value) where T : class
+    private static bool TryGetCached<T>(string name, [NotNullWhen(true)] out T? value) where T : class
     {
         if (!_cache.TryGetValue(name, out object cachedObject))
         {
@@ -50,7 +51,7 @@ public static class ResourceManager
         return true;
     }
 
-    private static T Cache<T>(string name, T obj)
+    private static T Cache<T>(string name, T obj) where T : notnull
     {
         _cache.Add(name, obj);
         return obj;
