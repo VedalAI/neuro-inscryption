@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
+using JetBrains.Annotations;
 using NeuroInscryption.Communication.DTO;
+using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Communication;
 
 public static class GameState
 {
+    [PublicAPI]
     public class Board
     {
         public static Board Current => new();
@@ -40,12 +43,13 @@ public static class GameState
 
         public string Note => !Ijiraq.Current.AnythingCouldBeIjiraq ? null : "Be careful, any card in your hand or deck could be a disguised Ijiraq.";
 
-        public Dictionary<string, string> SigilDescriptions => BoardManager.Instance.CardsOnBoard.Select(c => c.Info)
-            .Concat(DiskCardGame.PlayerHand.Instance.CardsInHand.Select(c => c.Info))
-            .Concat(CardDrawPiles.Instance.Deck.Cards)
-            .SelectMany(c => c.Abilities)
-            .Distinct()
-            .Select(a => a.GetRulebookStrings()).ToDictionary(t => t.name, t => t.description);
+        public Dictionary<string, string> SigilDescriptions => AllCardsInPlay
+            .SelectMany(c => c.GetAllRelevantSigilStrings()).Distinct()
+            .ToDictionary(s => s.Name, t => t.Description);
+
+        public Dictionary<string, string> TraitDescriptions => AllCardsInPlay
+            .SelectMany(c => c.GetAllRelevantTraitStrings()).Distinct()
+            .ToDictionary(t => t.Name, t => t.Description);
 
         // ["playerTotem"]
         // ["items"]
@@ -56,16 +60,14 @@ public static class GameState
         // ["boons"]
         // ["isOpponentSurrendering"] ?
         // ["bossAbilityDescription"] ?
+
+        private static IEnumerable<CardInfo> AllCardsInPlay => BoardManager.Instance.CardsOnBoard.Select(c => c.Info)
+            .Concat(DiskCardGame.PlayerHand.Instance.CardsInHand.Select(c => c.Info))
+            .Concat(CardDrawPiles.Instance.Deck.Cards);
     }
 
-    public class Ijiraq
+    internal class Ijiraq
     {
-        /// <summary>
-        /// All Ijiraqs in the player's hand that are disguised as other cards.<br/>
-        /// Ijiraqs disguised as Ijiraqs are ignored.
-        /// </summary>
-        public readonly List<PlayableCard> IjiraqsInHand;
-
         /// <summary>
         /// All cards in the player's deck that should be faked as Ijiraqs.
         /// </summary>
@@ -84,20 +86,20 @@ public static class GameState
         /// <summary>
         /// All Ijiraqs in the deck.
         /// </summary>
-        public readonly List<CardInfo> IjiraqsInDeck;
+        private readonly List<CardInfo> _ijiraqsInDeck;
 
-        public bool AnythingCouldBeIjiraq => IjiraqsInDeck.Count > 0 || FakeIjiraqsInDeck.Count > 0;
+        public bool AnythingCouldBeIjiraq => _ijiraqsInDeck.Count > 0 || FakeIjiraqsInDeck.Count > 0;
 
         public static Ijiraq Current => new();
 
         private Ijiraq()
         {
-            IjiraqsInHand = PlayerHand.Instance.CardsInHand
+            List<PlayableCard> ijiraqsInHand = PlayerHand.Instance.CardsInHand
                 .Where(card => card.gameObject.GetComponent<Shapeshifter>())
                 .Where(card => !string.Equals(card.Info.DisplayedNameEnglish, "Ijiraq", StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
-            List<PlayableCard> tempIjiraqsToFake = [..IjiraqsInHand];
+            List<PlayableCard> tempIjiraqsToFake = [..ijiraqsInHand];
             FakeIjiraqsInDeck = [];
             foreach (CardInfo cardInDeck in CardDrawPiles.Instance.Deck.Cards)
             {
@@ -113,17 +115,17 @@ public static class GameState
                 }
             }
 
-            ExposableIjiraqs = IjiraqsInHand
+            ExposableIjiraqs = ijiraqsInHand
                 .Where(ijr => !CardDrawPiles.Instance.Deck.Cards.Any(card => card.IsIdentical(ijr.Info)))
                 .Where(ijr => !PlayerHand.Instance.cardsInHand.Except([ijr]).Any(card => card.Info.IsIdentical(ijr.Info)))
                 .ToList();
 
             SuspiciousCardsInHand = PlayerHand.Instance.CardsInHand
                 .Where(card => !CardDrawPiles.Instance.Deck.Cards.Any(deckCard => deckCard.IsIdentical(card.Info)))
-                .Where(card => IjiraqsInHand.Any(ijr => ijr.Info.IsIdentical(card.Info)))
+                .Where(card => ijiraqsInHand.Any(ijr => ijr.Info.IsIdentical(card.Info)))
                 .ToList();
 
-            IjiraqsInDeck = CardDrawPiles.Instance.Deck.Cards
+            _ijiraqsInDeck = CardDrawPiles.Instance.Deck.Cards
                 .Where(cardInfo => cardInfo.specialAbilities.Contains(SpecialTriggeredAbility.Shapeshifter))
                 .ToList();
         }

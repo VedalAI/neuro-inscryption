@@ -24,11 +24,6 @@ internal static class GameExtensions
 
         return true;
     }
-
-    public static (string name, string description) GetRulebookStrings(this Ability ability)
-    {
-        if (ability == Ability.SubmergeSquid) return ("Kraken Waterborne", "A card bearing this sigil submerges itself during its opponent's turn. While submerged, opposing creatures attack its owner directly. After emerging, this card will turn into a random Tentacle card.");
-        AbilityInfo x = AbilitiesUtil.GetInfo(ability);
-        return (x.rulebookName, x.LocalizedRulebookDescription.Replace("[creature]", Localization.Translate("a card bearing this sigil")));
-    }
 }
+
+// TODO: Figure out cat and child 13 sacrifice count

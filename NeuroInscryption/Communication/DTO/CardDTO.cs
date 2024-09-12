@@ -1,62 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
-using NeuroInscryption.Utilities;
+using JetBrains.Annotations;
+using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Communication.DTO;
 
-/* Traits
-    ? EatsWarrens
-    ? FeedsStoat,
-    ? LikesHoney,
-    ? Wolf,
-    ? Bear,
-    ? Juvenile,
-    ? ProtectsCub,
-    ? Undead,
-    ? Structure,
-    ? Blind,
-    Ant => This card contributes to the power of Ant cards
-    --- Terrain,
-    ? Pelt,
-    Uncuttable => This card is immune to the Scissors, Fish Hook and Skinning Knife items
-    --- SatisfiesRingTrial,
-    Giant => Increases in power by 1 for each turn after you run out of cards TODO Or is this special ability?
-    ? Gem,
-    ? Fused,
-    [Only at campfire] KillsSurvivors => If this card dies during the second campfire upgrade, the upgrade will be without risk for the rest of the run
-    [Only at boon lord sacrifice] Goat => If this card is sacrificed, you will get a Boon of the Bone Lord instead of a Minor Boon of the Bone Lord
-    --- DeathcardCreationNonOption,
-    Lice => If a Pelt is played, this card will be played automatically next to it
- */
-
-/* Special abilities
-    [On board] Cat => Transforms into Undead Cat after being sacrified 9 times
-    Ant => Power is equal to number of Ants
-    RandomCard => Transforms into a random card when drawn
-    Lammergeier => Power is equal to half the number of bones
-    --- TalkingCardChooser,
-    PackMule => Gives 4 cards in hand when this card dies
-    Mirror => Power is equal to the power of the card opposite this one
-    BellProximity => Power ranges from 4 to 1, depending on which lane you place it in and how close it is to the bell
-    --- CagedWolf,
-    TrapSpawner => Spawns a Leaping Trap in its place when it dies
-    GiantCard => Increases in power by 1 for each turn after you run out of cards
-    --- GiantMoon,
-    --- GreenMage,
-    [On board] JerseyDevil => Transforms into Hungry Child after being sacrified 13 times
-    Daus => If a card with the Chime trait is attacked, this card will attack the attacker
-    --- BountyHunter
-    --- BrokenCoinLeft,
-    --- BrokenCoinRight,
-    CardsInHand => Power is equal to the number of cards in your hand
-    Ouroboros => Health and power increases by 1 permanently each time it dies or is sacrificed
-    Shapeshifter => This card disguises itself as another card in the deck and only reveals itself after it is played // TODO Disguise Ijiraq in hand
-    SacrificesThisTurn => Power is equal to the number of cards you've sacrificed this turn
-    [Only if Lice in Deck] SpawnLice => When played, automatically plays any Pelt Lice cards from your hand or deck in adjacent lanes
-    --- GiantShip,
- */
-
+[PublicAPI]
 public class CardDTO
 {
     public string Name { get; protected set; }
@@ -67,8 +17,7 @@ public class CardDTO
     public string Cost { get; protected set; }
     public bool? CanBeSacrificed { get; protected set; }
     public string Tribes { get; protected set; }
-    // public string Traits = GetTraits(card);
-    // specialAbilities
+    public List<string> Traits { get; protected set; }
     public string Note { get; protected set; }
 
     public CardDTO(CardInfo cardInfo)
@@ -82,10 +31,11 @@ public class CardDTO
         Name = cardInfo.DisplayedNameEnglish;
         Health = cardInfo.Health;
         Power = CalculatePower(cardInfo);
-        Sigils = cardInfo.Abilities.Count == 0 ? null : cardInfo.Abilities.Select(a => a.GetRulebookStrings().name).ToList();
+        Sigils = cardInfo.Abilities.Count == 0 ? null : cardInfo.GetAllRelevantSigilStrings().Select(s => s.Name).ToList();
         Cost = cardInfo.BonesCost > 0 ? $"{cardInfo.BonesCost} bones" : $"{cardInfo.BloodCost} blood";
         CanBeSacrificed = cardInfo.Sacrificable || cardInfo.HasAbility(Ability.TripleBlood);
         Tribes = cardInfo.tribes.Count == 0 ? null : string.Join(", ", cardInfo.tribes);
+        Traits = cardInfo.GetAllRelevantTraitStrings().Select(t => t.Name).ToList();
     }
 
     protected CardDTO(CardInfo cardInfo, PlayableCard playableCard) : this(cardInfo)

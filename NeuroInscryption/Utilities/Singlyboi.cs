@@ -1,5 +1,4 @@
-﻿extern alias JetBrains;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
