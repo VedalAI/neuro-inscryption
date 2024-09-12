@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
 using JetBrains.Annotations;
-using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 
-namespace NeuroInscryption.Communication;
+namespace NeuroInscryption.Communication.Data;
 
 public static class GameState
 {
@@ -53,7 +52,6 @@ public static class GameState
 
         // ["playerTotem"]
         // ["items"]
-        // ["remainingDeck"]
         // ["remainingSquirrels"] ?
         // ["enemyTotem"]
         // ["enemyLives"]
@@ -66,7 +64,7 @@ public static class GameState
             .Concat(CardDrawPiles.Instance.Deck.Cards);
     }
 
-    internal class Ijiraq
+    public class Ijiraq
     {
         /// <summary>
         /// All cards in the player's deck that should be faked as Ijiraqs.

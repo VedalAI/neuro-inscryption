@@ -2,7 +2,7 @@
 
 namespace NeuroInscryption.Utilities;
 
-internal static class PatchExtensions
+public static class PatchExtensions
 {
     public static ref int GetEnumeratorState(this object instance)
     {

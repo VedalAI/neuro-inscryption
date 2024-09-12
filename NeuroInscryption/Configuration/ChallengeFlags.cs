@@ -2,7 +2,7 @@
 
 namespace NeuroInscryption.Configuration;
 
-internal enum ChallengeFlags
+public enum ChallengeFlags
 {
     None = 0,
     NoHook = 1 << 1,
@@ -22,7 +22,7 @@ internal enum ChallengeFlags
     FinalBoss = 1 << 15,
 }
 
-internal static class ChallengeFlagsExtensions
+public static class ChallengeFlagsExtensions
 {
     public static bool Includes(this ChallengeFlags flags, AscensionChallenge challenge, bool isSecondAppearance)
     {

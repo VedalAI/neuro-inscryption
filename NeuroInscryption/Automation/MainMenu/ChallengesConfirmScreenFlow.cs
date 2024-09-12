@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
-internal sealed class ChallengesConfirmScreenFlow : AutomationFlow<AscensionChallengeConfirmScreen>
+public sealed class ChallengesConfirmScreenFlow : AutomationFlowNoParam<AscensionChallengeConfirmScreen>
 {
     public override MethodBase EnableHook => AccessTools.Method(typeof(AscensionChallengeConfirmScreen), nameof(AscensionChallengeConfirmScreen.OnEnable));
 

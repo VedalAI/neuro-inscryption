@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
-internal sealed class ChallengesScreenFlow : AutomationFlow<AscensionChallengeScreen>
+public sealed class ChallengesScreenFlow : AutomationFlowNoParam<AscensionChallengeScreen>
 {
     public override MethodBase EnableHook => AccessTools.Method(typeof(AscensionChallengeScreen), nameof(AscensionChallengeScreen.OnEnable));
 

@@ -6,7 +6,7 @@ namespace NeuroInscryption.Tweaks;
 
 #if DEBUG
 [HarmonyPatch]
-internal static class UnlockAllChallengesAndDecks
+public static class UnlockAllChallengesAndDecks
 {
     [HarmonyPatch(typeof(AscensionUnlockSchedule), nameof(AscensionUnlockSchedule.ChallengeIsUnlockedForLevel))]
     [HarmonyPatch(typeof(AscensionUnlockSchedule), nameof(AscensionUnlockSchedule.StarterDeckIsUnlockedForLevel))]

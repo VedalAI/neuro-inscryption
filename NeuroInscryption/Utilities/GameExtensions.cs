@@ -4,7 +4,7 @@ using DiskCardGame;
 
 namespace NeuroInscryption.Utilities;
 
-internal static class GameExtensions
+public static class GameExtensions
 {
     public static bool IsIdentical(this CardInfo card1, CardInfo card2)
     {

@@ -29,7 +29,7 @@ public static class ResourceManager
         return Cache(targetedName, assembly);
     }
 
-    internal static byte[] GetEmbeddedBytes(string name, bool throwIfNotFound)
+    public static byte[] GetEmbeddedBytes(string name, bool throwIfNotFound)
     {
         string path = _assembly.GetManifestResourceNames().FirstOrDefault(n => n.Contains(name));
         if (path == null) return !throwIfNotFound ? null : throw new FileNotFoundException($"Embedded resource {name} not found");

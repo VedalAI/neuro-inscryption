@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
+using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Communication.Json.Actions;
 
-internal sealed class ChooseCardAction : ISchemaModifier
+public sealed class ChooseCardAction : ISchemaModifier
 {
     public void Apply(JsonSchema schema)
     {

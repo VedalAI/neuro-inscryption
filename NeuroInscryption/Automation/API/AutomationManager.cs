@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
-using NeuroInscryption.Communication;
-using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Utilities;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace NeuroInscryption.Automation.API;
@@ -43,14 +40,14 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         }
     }
 
-    private void TryStartNewFlow(string id, object instance)
+    private void TryStartNewFlow(string id, object instance, object[] parameters)
     {
         if (!_flowCache.TryGetValue(id, out AutomationFlow flow))
         {
             throw new ArgumentException($"No flow with method ID \"{id}\" found.");
         }
 
-        if (!flow.IsValid(instance))
+        if (!flow.IsValid(instance, parameters))
         {
             Plugin.Logger.LogDebug($"Skipping change to flow {flow.GetType().Name} since current instance is not valid.");
             return;
@@ -65,13 +62,13 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         }
 
         _currentFlow = flow;
-        _currentFlowCoroutine = StartCoroutine(CoExecuteFlow(_currentFlow, instance));
+        _currentFlowCoroutine = StartCoroutine(CoExecuteFlow(_currentFlow, instance, parameters));
     }
 
     // ReSharper disable once FunctionRecursiveOnAllPaths
-    private IEnumerator CoExecuteFlow(AutomationFlow flow, object instance)
+    private IEnumerator CoExecuteFlow(AutomationFlow flow, object instance, object[] parameters)
     {
-        IEnumerator executeEnumerator = flow.Execute(instance);
+        IEnumerator executeEnumerator = flow.Execute(instance, parameters);
 
         yield return new WaitUntil(() => !AllowManualInput);
 
@@ -81,7 +78,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
 
             if (AllowManualInput)
             {
-                yield return CoExecuteFlow(flow, instance); // Restart the flow after input is allowed again
+                yield return CoExecuteFlow(flow, instance, parameters); // Restart the flow after input is allowed again
                 yield break;
             }
         }
@@ -94,7 +91,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
 
             if (AllowManualInput)
             {
-                yield return CoExecuteFlow(flow, instance); // Restart the flow after input is allowed again
+                yield return CoExecuteFlow(flow, instance, parameters); // Restart the flow after input is allowed again
                 yield break;
             }
         }
@@ -111,9 +108,9 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
 
     private readonly Dictionary<string, AutomationFlow> _flowCache = [];
 
-    private static void Patch(object __instance, MethodInfo __originalMethod)
+    private static void Patch(object __instance, MethodInfo __originalMethod, object[] __args)
     {
-        Instance.TryStartNewFlow(__originalMethod.FullDescription(), __instance);
+        Instance.TryStartNewFlow(__originalMethod.FullDescription(), __instance, __args);
     }
 
     [HarmonyPatch(typeof(InteractionCursor), nameof(InteractionCursor.UpdatePosition))]

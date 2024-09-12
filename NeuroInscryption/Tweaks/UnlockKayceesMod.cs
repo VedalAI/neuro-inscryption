@@ -4,7 +4,7 @@ using HarmonyLib;
 namespace NeuroInscryption.Tweaks;
 
 [HarmonyPatch]
-internal static class UnlockKayceesMod
+public static class UnlockKayceesMod
 {
     [HarmonyPatch(typeof(SaveFile), nameof(SaveFile.IsAscension), MethodType.Getter)]
     [HarmonyPrefix]

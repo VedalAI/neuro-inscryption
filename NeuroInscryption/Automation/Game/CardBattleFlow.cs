@@ -9,26 +9,22 @@ using NeuroInscryption.Communication.Json.Actions;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
 using UnityEngine;
-using GameState = NeuroInscryption.Communication.GameState;
+using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
 
-internal sealed class CardBattleFlow : AutomationFlow
+public sealed class CardBattleFlow : AutomationFlowNoParam<object>
 {
     public override MethodBase EnableHook => AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TurnManager), nameof(TurnManager.PlayerTurn)));
 
-    public override bool IsValid(object enumerator)
+    protected override bool IsValid(object enumerator)
     {
-        if (!Plugin.Config.SplitCardBattleDecisions) return false;
-
         int state = enumerator.GetEnumeratorState();
         return state == 8;
     }
 
-    public override IEnumerator Execute(object enumerator)
+    protected override IEnumerator Execute(object enumerator)
     {
-        TurnManager turnManager = enumerator.GetEnumeratorThis<TurnManager>();
-
         JsonSchema responseSchema = JsonSchema.NewResponseSchema();
         responseSchema.Apply<ChooseCardAction>();
 
@@ -39,6 +35,10 @@ internal sealed class CardBattleFlow : AutomationFlow
             Query = "Choose the next action to take during this card battle.",
             ResponseSchema = responseSchema
         };
+
+        // TODO: Send decision
+        // TODO: Get back card name
+        // TODO: Click card
 
         GUIUtility.systemCopyBuffer = JsonConvert.SerializeObject(decision, new JsonSerializerSettings
         {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NeuroInscryption.Input;
 
-internal sealed class ClickHandler
+public sealed class ClickHandler
 {
     private enum ClickState
     {

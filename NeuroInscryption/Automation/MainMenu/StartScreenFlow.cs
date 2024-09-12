@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
-internal sealed class StartScreenFlow : AutomationFlow<AscensionStartScreen>
+public sealed class StartScreenFlow : AutomationFlowNoParam<AscensionStartScreen>
 {
     public override MethodBase EnableHook => AccessTools.Method(typeof(AscensionStartScreen), nameof(AscensionStartScreen.OnEnable));
 

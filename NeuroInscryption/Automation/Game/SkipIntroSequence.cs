@@ -5,7 +5,7 @@ using NeuroInscryption.Utilities;
 namespace NeuroInscryption.Automation.Game;
 
 [HarmonyPatch]
-internal static class SkipIntroSequence
+public static class SkipIntroSequence
 {
     [HarmonyPatch(typeof(RunIntroSequencer), nameof(RunIntroSequencer.RunIntroSequence), MethodType.Enumerator)]
     [HarmonyPostfix]
