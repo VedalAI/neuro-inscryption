@@ -13,14 +13,13 @@ using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
 
-public sealed class CardBattleFlow : AutomationFlowNoParam<object>
+public sealed class CardBattleFlow : AutomationFlow<object>
 {
     public override MethodBase EnableHook => AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TurnManager), nameof(TurnManager.PlayerTurn)));
 
     protected override bool IsValid(object enumerator)
     {
-        int state = enumerator.GetEnumeratorState();
-        return state == 8;
+        return enumerator.GetEnumeratorState() == 8;
     }
 
     protected override IEnumerator Execute(object enumerator)
@@ -36,14 +35,14 @@ public sealed class CardBattleFlow : AutomationFlowNoParam<object>
             ResponseSchema = responseSchema
         };
 
-        // TODO: Send decision
-        // TODO: Get back card name
-        // TODO: Click card
-
         GUIUtility.systemCopyBuffer = JsonConvert.SerializeObject(decision, new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore
         });
+
+        // TODO: Send decision
+        // TODO: Get back card name
+        // TODO: Click card
 
         yield break;
     }

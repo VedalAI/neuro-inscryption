@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using DiskCardGame;
 using JetBrains.Annotations;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
+using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data;
 
@@ -19,39 +21,55 @@ public class CardData
     public bool? CanBeSacrificed { get; protected set; }
     public string Tribes { get; protected set; }
     public List<string> Traits { get; protected set; }
-    public string Note { get; protected set; }
+    [JsonProperty]
+    private string Note => _maybeIjiraq ? $"Careful! This card or another {TargetCard.DisplayedNameEnglish} card in your hand is a disguised Ijiraq!" : null;
 
-    public CardData(CardInfo cardInfo)
+    [JsonIgnore]
+    public CardInfo TargetCard { get; private set; }
+    private bool _maybeIjiraq;
+
+    public CardData(CardInfo targetCard)
     {
-        if (cardInfo.name == "!STATIC!GLITCH")
+        TargetCard = targetCard;
+
+        if (targetCard.name == "!STATIC!GLITCH")
         {
             Name = "Glitched Card";
             return;
         }
 
-        Name = cardInfo.DisplayedNameEnglish;
-        Health = cardInfo.Health;
-        Power = CalculatePower(cardInfo);
-        Sigils = cardInfo.GetAllRelevantSigilStrings().Select(s => s.Name).ToList().NullIfEmpty();
-        Cost = cardInfo.BonesCost > 0 ? $"{cardInfo.BonesCost} bones" : $"{cardInfo.BloodCost} blood";
-        CanBeSacrificed = cardInfo.Sacrificable || cardInfo.HasAbility(Ability.TripleBlood);
-        Tribes = cardInfo.tribes.Count == 0 ? null : string.Join(", ", cardInfo.tribes);
-        Traits = cardInfo.GetAllRelevantTraitStrings().Select(t => t.Name).ToList().NullIfEmpty();
+        Name = targetCard.DisplayedNameEnglish;
+        Health = targetCard.Health;
+        Power = CalculatePower(targetCard);
+        Sigils = targetCard.GetAllRelevantSigilStrings().Select(s => s.Name).ToList().NullIfEmpty();
+        Cost = targetCard.BonesCost > 0 ? $"{targetCard.BonesCost} bones" : $"{targetCard.BloodCost} blood";
+        CanBeSacrificed = targetCard.Sacrificable || targetCard.HasAbility(Ability.TripleBlood);
+        Tribes = targetCard.tribes.Count == 0 ? null : string.Join(", ", targetCard.tribes);
+        Traits = targetCard.GetAllRelevantTraitStrings().Select(t => t.Name).ToList().NullIfEmpty();
     }
 
-    protected CardData(CardInfo cardInfo, PlayableCard playableCard) : this(cardInfo)
+    protected CardData(CardInfo targetCard, PlayableCard playableCard) : this(targetCard)
     {
-        Name = $"{cardInfo.DisplayedNameEnglish}{(playableCard.OpponentCard ? null : $" ({(playableCard.InHand ? 12 + PlayerHand.Instance.CardsInHand.IndexOf(playableCard) : BoardManager.Instance.CardsOnBoard.IndexOf(playableCard))})")}";
-        Power = CalculatePower(cardInfo, playableCard);
+        Name = $"{targetCard.DisplayedNameEnglish}{(playableCard.OpponentCard ? null : $" ({(playableCard.InHand ? 12 + PlayerHand.Instance.CardsInHand.IndexOf(playableCard) : BoardManager.Instance.CardsOnBoard.IndexOf(playableCard))})")}";
+        Power = CalculatePower(targetCard, playableCard);
         IsPlayable = !playableCard.InHand ? null : playableCard.CanPlay();
 
         if (!playableCard.InHand) Cost = null;
         if (playableCard.OpponentCard) CanBeSacrificed = null;
 
-        if (GameState.Ijiraq.Current.SuspiciousCardsInHand.Contains(playableCard)) Note = $"Careful! This card or another {cardInfo.DisplayedNameEnglish} card in your hand is a disguised Ijiraq!";
+        if (GameState.Ijiraq.Current.SuspiciousCardsInHand.Contains(playableCard)) _maybeIjiraq = true;
     }
 
     public CardData(PlayableCard card) : this(card.Info, card) { }
+
+    public string GetDescription()
+    {
+        StringBuilder sb = new($"[{Name}, {Power} power, {Health} health");
+        if (Sigils != null) sb.Append($", {string.Join(", ", Sigils)}");
+        if (_maybeIjiraq) sb.Append(", maybe Ijiraq");
+        sb.Append($", Cost of {Cost}]");
+        return sb.ToString();
+    }
 
     private static string CalculatePower(CardInfo cardInfo, PlayableCard cardInPlay = null)
     {
