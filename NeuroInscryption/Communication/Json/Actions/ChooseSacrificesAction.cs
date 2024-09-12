@@ -2,10 +2,13 @@
 using System.Linq;
 using DiskCardGame;
 using NeuroInscryption.Utilities;
+using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Communication.Json.Actions;
 
-public sealed class ChooseSacrificesAction(PlayableCard cardToPlay) : ISchemaModifier
+using Sacrifice = (string name, int blood);
+
+public sealed class ChooseSacrificesAction(PlayableCard cardToPlay, GameState.Board state) : ISchemaModifier
 {
     public void Apply(JsonSchema schema)
     {
@@ -19,37 +22,28 @@ public sealed class ChooseSacrificesAction(PlayableCard cardToPlay) : ISchemaMod
         });
     }
 
-    private static List<List<int>> GetSacrificeCombinations(int bloodCost)
+    private IEnumerable<List<string>> GetSacrificeCombinations(int bloodCost)
     {
-        List<(int index, int blood)> sacrificableSlots = BoardManager.Instance.playerSlots
-            .WithIndex()
-            .Where(p => p.item.Card && p.item.Card.CanBeSacrificed)
-            .Select(p => (p.index, p.item.Card.HasAbility(Ability.TripleBlood) ? 3 : 1))
+        List<Sacrifice> sacrificableSlots = BoardManager.Instance.playerSlots
+            .Where(p => p.Card && p.Card.CanBeSacrificed)
+            .Select(p => (state.PlayerLanes.Values.First(c => c?.TargetCard == p.Card).Name, p.Card.HasAbility(Ability.TripleBlood) ? 3 : 1))
             .ToList();
 
-        List<List<int>> combinations = [];
-        List<int> currentCombination = [];
-        int currentBlood = 0;
-
-        backtracking(0);
-        return combinations;
-
-        void backtracking(int index)
+        List<List<Sacrifice>> possibilities = DontOpenJumpscareWarning.GenerateAllPermutationsOfSubsets(sacrificableSlots);
+        for (int i = 0; i < possibilities.Count; i++)
         {
-            if (currentBlood >= bloodCost)
-            {
-                combinations.Add([..currentCombination]);
-                return;
-            }
+            List<Sacrifice> possibility = possibilities[i];
+            int beforeLast = possibility.Take(possibility.Count - 1).Sum(p => p.blood);
+            int totalBlood = possibility.Sum(p => p.blood);
 
-            for (int i = index; i < sacrificableSlots.Count; i++)
+            bool ok = beforeLast < bloodCost && bloodCost <= totalBlood;
+            if (!ok)
             {
-                currentCombination.Add(sacrificableSlots[i].index);
-                currentBlood += sacrificableSlots[i].blood;
-                backtracking(i + 1);
-                currentCombination.RemoveAt(currentCombination.Count - 1);
-                currentBlood -= sacrificableSlots[i].blood;
+                possibilities.RemoveAt(i);
+                i--;
             }
         }
+
+        return possibilities.Select(p => p.Select(s => s.name).ToList());
     }
 }

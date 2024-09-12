@@ -15,40 +15,44 @@ public static class GameState
     {
         public static Board Current => new();
 
-        public int Scale => LifeManager.Instance.Balance;
+        public readonly int Scale = LifeManager.Instance.Balance;
 
-        public int Bones => ResourcesManager.Instance.PlayerBones;
+        public readonly int Bones = ResourcesManager.Instance.PlayerBones;
 
-        public int PlayerLives => RunState.Run.playerLives;
+        public readonly int PlayerLives = RunState.Run.playerLives;
 
-        public Dictionary<string, CardData> PlayerLanes => BoardManager.Instance.playerSlots.WithIndex()
+        public readonly Dictionary<string, CardData> PlayerLanes = BoardManager.Instance.playerSlots.WithIndex()
             .ToDictionary(p => p.index.ToString(), p => !p.item.Card ? null : new CardData(p.item.Card));
 
-        public Dictionary<string, CardData> OpponentLanes => BoardManager.Instance.opponentSlots.WithIndex()
+        public readonly Dictionary<string, CardData> OpponentLanes = BoardManager.Instance.opponentSlots.WithIndex()
             .ToDictionary(p => p.index.ToString(), p => !p.item.Card ? null : new CardData(p.item.Card));
 
-        public Dictionary<string, CardData> OpponentQueueLanes => BoardManager.Instance.opponentSlots
+        public readonly Dictionary<string, CardData> OpponentQueueLanes = BoardManager.Instance.opponentSlots
             .Select(BoardManager.Instance.GetCardQueuedForSlot).WithIndex()
             .ToDictionary(p => p.index.ToString(), p => !p.item ? null : new CardData(p.item));
 
-        public List<CardData> PlayerHand => DiskCardGame.PlayerHand.Instance.CardsInHand
+        public readonly List<CardData> PlayerHand = DiskCardGame.PlayerHand.Instance.CardsInHand
             .Select(c => Ijiraq.Current.ExposableIjiraqs.Contains(c) ? new IjiraqCardData(c) : new CardData(c))
             .ToList();
 
-        public List<CardData> RemainingDeck => CardDrawPiles.Instance.Deck.Cards
+        public readonly List<CardData> RemainingDeck = CardDrawPiles.Instance.Deck.Cards
             .Select(c => Ijiraq.Current.FakeIjiraqsInDeck.Contains(c) ? CardLoader.GetCardByName("Ijiraq") : c)
             .Select(c => new CardData(c))
             .ToList();
 
-        public string Note => !Ijiraq.Current.AnythingCouldBeIjiraq ? null : "Be careful, any card in your hand or deck could be a disguised Ijiraq.";
+        // TODO: Standardize card ids so that empty lanes are taken into account in the index calculation
 
-        public Dictionary<string, string> SigilDescriptions => AllCardsInPlay
+        public readonly string Note = !Ijiraq.Current.AnythingCouldBeIjiraq ? null : "Be careful, any card in your hand or deck could be a disguised Ijiraq.";
+
+        public readonly Dictionary<string, string> SigilDescriptions = AllCardsInPlay
             .SelectMany(c => c.GetAllRelevantSigilStrings()).Distinct()
-            .ToDictionary(s => s.Name, t => t.Description);
+            .ToDictionary(s => s.Name, t => t.Description)
+            .NullIfEmpty();
 
-        public Dictionary<string, string> TraitDescriptions => AllCardsInPlay
+        public readonly Dictionary<string, string> TraitDescriptions = AllCardsInPlay
             .SelectMany(c => c.GetAllRelevantTraitStrings()).Distinct()
-            .ToDictionary(t => t.Name, t => t.Description);
+            .ToDictionary(t => t.Name, t => t.Description)
+            .NullIfEmpty();
 
         // ["playerTotem"]
         // ["items"]

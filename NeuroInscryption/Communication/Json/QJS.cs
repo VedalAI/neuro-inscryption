@@ -32,8 +32,8 @@ public static class QJS
 
     public static JsonSchema Enum(IEnumerable<string> values) => Enum<string>(values);
     public static JsonSchema Enum(IEnumerable<int> values) => Enum<int>(values);
-    public static JsonSchema Enum(IEnumerable<IEnumerable<string>> values) => Enum<IEnumerable<string>>(values);
-    public static JsonSchema Enum(IEnumerable<IEnumerable<int>> values) => Enum<IEnumerable<int>>(values);
+    public static JsonSchema Enum(IEnumerable<List<string>> values) => Enum<List<string>>(values);
+    public static JsonSchema Enum(IEnumerable<List<int>> values) => Enum<List<int>>(values);
 
     public static JsonSchema Type(JsonSchemaType type)
     {

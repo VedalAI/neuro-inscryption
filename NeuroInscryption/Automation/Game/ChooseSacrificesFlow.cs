@@ -25,13 +25,13 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 
     protected override IEnumerator Execute(object enumerator)
     {
+        GameState.Board state = GameState.Board.Current;
         PlayableCard card = BoardManager.Instance.CurrentSacrificeDemandingCard;
 
         JsonSchema responseSchema = JsonSchema.NewResponseSchema();
-        responseSchema.Apply(new ChooseSacrificesAction(card));
+        responseSchema.Apply(new ChooseSacrificesAction(card, state));
 
-        GameState.Board state = GameState.Board.Current;
-        CardData cardData = state.PlayerHand.Find(c => c.TargetCard == card.Info);
+        CardData cardData = state.PlayerHand.Find(c => c.TargetCard == card);
 
         Decision decision = new()
         {

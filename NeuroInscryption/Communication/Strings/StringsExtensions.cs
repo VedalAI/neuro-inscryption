@@ -79,7 +79,7 @@ public static class StringsExtensions
 
         if (GameFlowManager.Instance.CurrentGameState == DiskCardGame.GameState.CardBattle)
         {
-            result.RemoveAll(t => t.Name is "Poisonous" or "Black Goat"); // boon lord stuff we don't care about
+            result.RemoveAll(t => t.Name is "Poisonous" or "Black Goat" or "Worthless Sacrifice"); // boon lord and campfire stuff we don't care about
         }
 
         result.Sort();

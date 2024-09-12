@@ -22,15 +22,17 @@ public class CardData
     public string Tribes { get; protected set; }
     public List<string> Traits { get; protected set; }
     [JsonProperty]
-    private string Note => _maybeIjiraq ? $"Careful! This card or another {TargetCard.DisplayedNameEnglish} card in your hand is a disguised Ijiraq!" : null;
+    private string Note => _maybeIjiraq ? $"Careful! This card or another {TargetCardInfo.DisplayedNameEnglish} card in your hand is a disguised Ijiraq!" : null;
 
     [JsonIgnore]
-    public CardInfo TargetCard { get; private set; }
+    public CardInfo TargetCardInfo { get; private set; }
+    [JsonIgnore]
+    public PlayableCard TargetCard { get; private set; }
     private bool _maybeIjiraq;
 
     public CardData(CardInfo targetCard)
     {
-        TargetCard = targetCard;
+        TargetCardInfo = targetCard;
 
         if (targetCard.name == "!STATIC!GLITCH")
         {
@@ -50,6 +52,8 @@ public class CardData
 
     protected CardData(CardInfo targetCard, PlayableCard playableCard) : this(targetCard)
     {
+        TargetCard = playableCard;
+
         Name = $"{targetCard.DisplayedNameEnglish}{(playableCard.OpponentCard ? null : $" ({(playableCard.InHand ? 12 + PlayerHand.Instance.CardsInHand.IndexOf(playableCard) : BoardManager.Instance.CardsOnBoard.IndexOf(playableCard))})")}";
         Power = CalculatePower(targetCard, playableCard);
         IsPlayable = !playableCard.InHand ? null : playableCard.CanPlay();
