@@ -4,8 +4,9 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication;
+using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Json;
-using NeuroInscryption.Communication.Json.Actions;
+using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -24,17 +25,19 @@ public sealed class CardBattleFlow : AutomationFlow<object>
 
     protected override IEnumerator Execute(object enumerator)
     {
+        GameState.Board state = GameState.Board.Calculate();
+
         JsonSchema responseSchema = JsonSchema.NewResponseSchema();
-        responseSchema.Apply<ChooseCardAction>();
+        responseSchema.Apply(new ChooseCardAction(state));
 
         Decision decision = new()
         {
             Id = "card_battle_turn",
-            State = GameState.Board.Current,
-            Query = "Choose the next action to take during this card battle.",
+            State = state,
+            Query = DecisionStrings.CardBattleDecision,
             ResponseSchema = responseSchema
         };
-        
+
         GUIUtility.systemCopyBuffer = JsonConvert.SerializeObject(decision, new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore

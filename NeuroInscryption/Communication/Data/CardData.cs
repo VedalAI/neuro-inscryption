@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using DiskCardGame;
 using JetBrains.Annotations;
 using NeuroInscryption.Communication.Strings;
@@ -10,108 +11,209 @@ using Newtonsoft.Json;
 namespace NeuroInscryption.Communication.Data;
 
 [PublicAPI]
-public class CardData
+public sealed class CardData
 {
-    public string Name { get; protected set; }
-    public int? Health { get; protected set; }
-    public string? Power { get; protected set; }
-    public List<string>? Sigils { get; protected set; }
-    public bool? IsPlayable { get; protected set; }
-    public string? Cost { get; protected set; }
-    public bool? CanBeSacrificed { get; protected set; }
-    public int? TimesSacrificed { get; protected set; }
-    public string? Tribes { get; protected set; }
-    public List<string>? Traits { get; protected set; }
+    private static readonly HashSet<Ability> _immediateAbilities = [Ability.DrawRabbits, Ability.CreateDams, Ability.Tutor, Ability.DrawCopy, Ability.CorpseEater, Ability.DrawAnt, Ability.RandomConsumable, Ability.CreateEgg];
+    private static readonly HashSet<Trait> _nonImmediateTraits = [Trait.Ant, Trait.Pelt, Trait.Uncuttable, Trait.Giant, Trait.KillsSurvivors, Trait.Goat, Trait.Lice];
+    private static readonly HashSet<SpecialTriggeredAbility> _nonImmediateAbilities = [SpecialTriggeredAbility.Cat, SpecialTriggeredAbility.JerseyDevil, SpecialTriggeredAbility.Daus, SpecialTriggeredAbility.Ouroboros];
+
+    public readonly string Name;
+
+    public readonly int? Health;
+
+    public readonly string? Power;
+
+    [JsonProperty("Sigils")]
+    private List<string>? SigilNames => Sigils.Select(d => d.Name).ToList().NullIfEmpty();
+
+    public readonly bool? IsPlayable;
+
+    public readonly string? Cost;
+
+    public readonly bool? CanBeSacrificed;
+
+    public readonly int? TimesSacrificed;
+
+    public readonly string? Tribes;
+
+    [JsonProperty("Traits")]
+    private List<string>? TraitNames => Traits.Select(d => d.Name).ToList().NullIfEmpty();
+
     [JsonProperty]
-    private string? Note => _maybeIjiraq ? $"Careful! This card or another {TargetCardInfo.DisplayedNameEnglish} card in your hand is a disguised Ijiraq!" : null;
+    private string? Note => _maybeIjiraq ? string.Format(CardStrings.IjiraqNarrowedDown, TargetCardInfo.DisplayedNameEnglish) : null;
+
+    // Excluded from JSON
 
     [JsonIgnore]
-    public CardInfo TargetCardInfo { get; private set; }
-    [JsonIgnore]
-    public PlayableCard? TargetCard { get; private set; }
-    private bool _maybeIjiraq;
+    public readonly List<SigilData> Sigils;
 
-    public CardData(CardInfo targetCard)
+    [JsonIgnore]
+    public readonly List<SigilData> RelevantSigils;
+
+    [JsonIgnore]
+    public readonly List<TraitData> Traits;
+
+    [JsonIgnore]
+    public readonly CardInfo TargetCardInfo;
+
+    [JsonIgnore]
+    public readonly PlayableCard? TargetCard;
+
+    private readonly GameState.Board _state;
+
+    private readonly bool _maybeIjiraq;
+
+    private CardData(CardInfo cardInfo, GameState.Board state)
     {
-        TargetCardInfo = targetCard;
+        _state = state;
+        TargetCardInfo = cardInfo;
 
-        if (targetCard.name == "!STATIC!GLITCH")
+        if (TargetCardInfo.name == "!STATIC!GLITCH")
         {
             Name = "Glitched Card";
+            Sigils = [];
+            RelevantSigils = [];
+            Traits = [];
             return;
         }
 
-        Name = targetCard.DisplayedNameEnglish;
-        Health = targetCard.Health;
-        Power = CalculatePower(targetCard);
-        Sigils = targetCard.GetAllRelevantSigilStrings().Select(s => s.Name).ToList().NullIfEmpty();
-        Cost = targetCard.BonesCost > 0 ? $"{targetCard.BonesCost} bones" : $"{targetCard.BloodCost} blood";
-        CanBeSacrificed = targetCard.Sacrificable || targetCard.HasAbility(Ability.TripleBlood);
-        Tribes = targetCard.tribes.Count == 0 ? null : string.Join(", ", targetCard.tribes);
-        Traits = targetCard.GetAllRelevantTraitStrings().Select(t => t.Name).ToList().NullIfEmpty();
+        if (_state.Ijiraq.FakeIjiraqsInDeck.Contains(TargetCardInfo))
+        {
+            TargetCardInfo = CardLoader.GetCardByName("Ijiraq");
+        }
+
+        Name = TargetCardInfo.DisplayedNameEnglish;
+        Health = TargetCardInfo.Health;
+        Power = CalculatePower();
+        Sigils = GetSigils(false);
+        RelevantSigils = GetSigils(true);
+        Cost = TargetCardInfo.BonesCost > 0 ? string.Format(CardStrings.BonesCost, TargetCardInfo.BonesCost) : string.Format(CardStrings.BloodCost, TargetCardInfo.BloodCost);
+        CanBeSacrificed = TargetCardInfo.Sacrificable || TargetCardInfo.HasAbility(Ability.TripleBlood);
+        Tribes = TargetCardInfo.tribes.Count == 0 ? null : string.Join(CardStrings.InfoSeparator, TargetCardInfo.tribes);
+        Traits = GetTraits();
     }
 
-    protected CardData(CardInfo targetCard, PlayableCard playableCard) : this(targetCard)
+    private CardData(PlayableCard card, GameState.Board state) : this(card.Info, state)
     {
-        TargetCard = playableCard;
+        TargetCard = card;
 
-        Name = $"{targetCard.DisplayedNameEnglish}{(playableCard.OpponentCard ? null : $" ({(playableCard.InHand ? 12 + PlayerHand.Instance.CardsInHand.IndexOf(playableCard) : BoardManager.Instance.CardsOnBoard.IndexOf(playableCard))})")}";
-        Power = CalculatePower(targetCard, playableCard);
-        IsPlayable = !playableCard.InHand ? null : playableCard.CanPlay();
+        Name = $"{TargetCard.Info.DisplayedNameEnglish}{(TargetCard.OpponentCard ? null : $" ({(TargetCard.InHand ? 12 + PlayerHand.Instance.CardsInHand.IndexOf(TargetCard) : BoardManager.Instance.CardsOnBoard.IndexOf(TargetCard))})")}";
+        Power = CalculatePower();
+        IsPlayable = !TargetCard.InHand ? null : TargetCard.CanPlay();
 
-        if (!playableCard.InHand) Cost = null;
-        if (playableCard.OpponentCard) CanBeSacrificed = null;
+        if (!TargetCard.InHand) Cost = null;
+        if (TargetCard.OpponentCard) CanBeSacrificed = null;
 
-        if (GameState.Ijiraq.Current.SuspiciousCardsInHand.Contains(playableCard)) _maybeIjiraq = true;
-        if (playableCard.TryGetSpecialAbility(SpecialTriggeredAbility.Cat, out Cat? cat)) TimesSacrificed = cat.sacrificeCount;
-        if (playableCard.TryGetSpecialAbility(SpecialTriggeredAbility.JerseyDevil, out JerseyDevil? child13)) TimesSacrificed = child13.sacrificeCount;
+        if (TargetCard.TryGetSpecialAbility(SpecialTriggeredAbility.Cat, out Cat? cat)) TimesSacrificed = cat.sacrificeCount;
+        if (TargetCard.TryGetSpecialAbility(SpecialTriggeredAbility.JerseyDevil, out JerseyDevil? child13)) TimesSacrificed = child13.sacrificeCount;
+
+        if (_state.Ijiraq.ExposableIjiraqs.Contains(TargetCard))
+        {
+            CardInfo ijiraq = CardLoader.GetCardByName("Ijiraq");
+
+            Name = ijiraq.DisplayedNameEnglish;
+            Health = ijiraq.Health;
+            Power = ijiraq.Attack.ToString();
+            if (TargetCard.Info.BonesCost > 0) Cost = string.Format(CardStrings.IjiraqBonesCost, TargetCard.Info.BonesCost);
+            CanBeSacrificed = true;
+            Tribes = null;
+
+            Sigils.RemoveAll(data => !_immediateAbilities.Contains(data.Sigil));
+            Sigils.Add(Ability.PreventAttack);
+
+            Traits.RemoveAll(data => data.TryGetTrait(out Trait trait) && _nonImmediateTraits.Contains(trait));
+            Traits.RemoveAll(data => data.TryGetAbility(out SpecialTriggeredAbility ability) && _nonImmediateAbilities.Contains(ability));
+            Traits.Add(SpecialTriggeredAbility.Shapeshifter!);
+
+            // TODO: Totem Sigils
+        }
+        else if (_state.Ijiraq.SuspiciousCardsInHand.Contains(TargetCard))
+        {
+            _maybeIjiraq = true;
+        }
     }
 
-    public CardData(PlayableCard card) : this(card.Info, card) { }
+    [return: NotNullIfNotNull(nameof(cardInfo))]
+    public static CardData? Create(CardInfo? cardInfo, GameState.Board state) => cardInfo != null ? new CardData(cardInfo, state) : null;
+
+    [return: NotNullIfNotNull(nameof(card))]
+    public static CardData? Create(PlayableCard? card, GameState.Board state) => card != null ? new CardData(card, state) : null;
 
     public string GetDescription()
     {
-        StringBuilder sb = new($"[{Name}, {Power} power, {Health} health");
-        if (Sigils != null) sb.Append($", {string.Join(", ", Sigils)}");
-        if (_maybeIjiraq) sb.Append(", maybe Ijiraq");
-        sb.Append($", cost of {Cost}]");
-        return sb.ToString();
+        return string.Format(CardStrings.Description,
+            Name,
+            Power,
+            Health,
+            SigilNames != null ? CardStrings.InfoSeparator + string.Join(CardStrings.InfoSeparator, SigilNames) : "",
+            _maybeIjiraq ? CardStrings.InfoSeparator + CardStrings.IjiraqNarrowedDownShortDescription : "",
+            Cost
+        );
     }
 
-    private static string CalculatePower(CardInfo cardInfo, PlayableCard? cardInPlay = null)
+    private string CalculatePower()
     {
-        foreach (SpecialTriggeredAbility ability in cardInfo.SpecialAbilities)
+        foreach (SpecialTriggeredAbility ability in TargetCardInfo.SpecialAbilities)
         {
             switch (ability)
             {
                 case SpecialTriggeredAbility.Ant:
-                    return $"Equal to the number of ants on your side of the board (currently {BoardManager.Instance.playerSlots.Where(s => s.Card && s.Card.Info.traits.Contains(Trait.Ant))})";
+                    return string.Format(PowerStrings.Ant, BoardManager.Instance.playerSlots.Where(s => s.Card && s.Card.Info.traits.Contains(Trait.Ant)));
 
                 case SpecialTriggeredAbility.Lammergeier:
-                    return $"Equal to half the number of bones you have (currently {GameState.Board.Current.Bones} bones, meaning {GameState.Board.Current.Bones / 2} damage)";
+                    return string.Format(PowerStrings.Lammergeier, _state.Bones, _state.Bones / 2);
 
                 case SpecialTriggeredAbility.SacrificesThisTurn:
-                    return $"Equal to the number of cards you've sacrificed this turn (currently {BoardManager.Instance.SacrificesMadeThisTurn})";
+                    return string.Format(PowerStrings.SacrificesThisTurn, BoardManager.Instance.SacrificesMadeThisTurn);
 
                 case SpecialTriggeredAbility.Mirror:
-                {
-                    string result = "Equal to the power of the card opposite this one";
-                    if (cardInPlay != null && !cardInPlay.InHand) result += $" (currently {cardInPlay.Attack})";
-                    return result;
-                }
+                    return string.Format(TargetCard != null && !TargetCard.InHand ? PowerStrings.MirrorInPlay : PowerStrings.Mirror, TargetCard?.Attack);
 
                 case SpecialTriggeredAbility.BellProximity:
-                {
-                    string result = "Ranges from 4 to 1, depending on which lane you place it in. Lane 0 means 4 attack, lane 1 means 3 attack, lane 2 means 2 attack and lane 3 means 1 attack.";
-                    if (cardInPlay != null && !cardInPlay.InHand) result += $" (currently {cardInPlay.Attack})";
-                    return result;
-                }
+                    return string.Format(TargetCard != null && !TargetCard.InHand ? PowerStrings.BellProximityInPlay : PowerStrings.BellProximity, TargetCard?.Attack);
 
                 case SpecialTriggeredAbility.CardsInHand:
-                    return $"Equal to the number of cards in your hand (currently {GameState.Board.Current.PlayerHand.Count})";
+                    return string.Format(PowerStrings.CardsInHand, _state.PlayerHand.Count);
             }
         }
 
-        return cardInfo.Attack.ToString();
+        return TargetCardInfo.Attack.ToString();
+    }
+
+    private List<SigilData> GetSigils(bool includeTangential)
+    {
+        List<SigilData> result = [];
+
+        result.AddRange(TargetCardInfo.Abilities.Select(SigilData.Create));
+
+        if (includeTangential)
+        {
+            if (TargetCardInfo.specialAbilities.Contains(SpecialTriggeredAbility.JerseyDevil)) result.Add(Ability.Flying);
+            if (TargetCardInfo.specialAbilities.Contains(SpecialTriggeredAbility.TrapSpawner)) result.AddRange([Ability.SteelTrap, Ability.Reach]);
+            if (TargetCardInfo.Abilities.Contains(Ability.BeesOnHit)) result.Add(Ability.Flying);
+            if (TargetCardInfo.Abilities.Contains(Ability.Reach)) result.Add(Ability.Flying);
+        }
+
+        result = result.Distinct().ToList();
+        result.Sort();
+        return result;
+    }
+
+    private List<TraitData> GetTraits()
+    {
+        List<TraitData> result = [];
+
+        result.AddRange(TargetCardInfo.traits.Select(TraitData.Create).Where(t => t != null)!);
+        result.AddRange(TargetCardInfo.specialAbilities.Select(TraitData.Create).Where(t => t != null)!);
+        if (TargetCardInfo.name.ToLowerInvariant().Contains("bell")) result.Add(TraitData.Create(TraitStrings.Chime));
+
+        if (GameFlowManager.Instance.CurrentGameState == DiskCardGame.GameState.CardBattle)
+        {
+            // boon lord and campfire stuff we don't care about while in a card battle
+            result.RemoveAll(t => t == Trait.KillsSurvivors || t == Trait.Goat || t == Trait.Pelt);
+        }
+
+        result.Sort();
+        return result;
     }
 }

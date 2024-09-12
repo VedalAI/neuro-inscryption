@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
+using NeuroInscryption.Communication.Json;
 using GameState = NeuroInscryption.Communication.Data.GameState;
 
-namespace NeuroInscryption.Communication.Json.Actions;
+namespace NeuroInscryption.Communication.Actions;
 
-public sealed class ChooseCardAction : ISchemaModifier
+public sealed class ChooseCardAction(GameState.Board state) : ISchemaModifier
 {
     public void Apply(JsonSchema schema)
     {
@@ -16,7 +17,7 @@ public sealed class ChooseCardAction : ISchemaModifier
             Properties = new Dictionary<string, JsonSchema>
             {
                 ["action"] = QJS.Const("choose_card_to_play"),
-                ["data"] = QJS.Enum(GameState.Board.Current.PlayerHand.Where(c => c.IsPlayable == true).Select(c => c.Name))
+                ["data"] = QJS.Enum(state.PlayerHand.Where(c => c.IsPlayable == true).Select(c => c.Name))
             }
         });
     }

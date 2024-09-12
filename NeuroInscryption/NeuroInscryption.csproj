@@ -32,11 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Remove="schizo\**" />
         <Compile Remove="schizo\**" />
-        <None Remove="schizo\**" />
-        <Compile Remove="Communication\Json\Actions\FULL_PlayCardAction.cs" />
-        <Compile Remove="Automation\Game\FULL_CardBattleFlow.cs" />
     </ItemGroup>
 
     <Target Name="Copy" AfterTargets="Build" Condition="'$(Inscryption)' != ''">

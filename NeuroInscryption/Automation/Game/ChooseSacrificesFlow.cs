@@ -4,9 +4,10 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication;
+using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Json;
-using NeuroInscryption.Communication.Json.Actions;
+using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -25,7 +26,7 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 
     protected override IEnumerator Execute(object enumerator)
     {
-        GameState.Board state = GameState.Board.Current;
+        GameState.Board state = GameState.Board.Calculate();
         PlayableCard card = BoardManager.Instance.CurrentSacrificeDemandingCard;
 
         JsonSchema responseSchema = JsonSchema.NewResponseSchema();
@@ -37,7 +38,7 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
         {
             Id = "card_sacrifice_choice",
             State = state,
-            Query = $"You have chosen to play {cardData.GetDescription()}. Choose which cards to sacrifice for it.",
+            Query = string.Format(DecisionStrings.ChooseSacrificesDecision, cardData.GetDescription()),
             ResponseSchema = responseSchema
         };
 

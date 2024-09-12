@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace NeuroInscryption.Communication.Strings;
+namespace NeuroInscryption.Communication.Data;
 
-public readonly record struct Describable(string Name, string Description) : IComparable<Describable>
+public record Describable(string Name, string Description) : IComparable<Describable>
 {
     public static implicit operator Describable((string name, string description) tuple) => new(tuple.name, tuple.description);
 
