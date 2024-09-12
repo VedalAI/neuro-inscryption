@@ -13,8 +13,7 @@ using GameState = NeuroInscryption.Communication.GameState;
 
 namespace NeuroInscryption.Automation.Game;
 
-// ReSharper disable once InconsistentNaming
-internal sealed class SPLIT_CardBattleFlow : AutomationFlow
+internal sealed class CardBattleFlow : AutomationFlow
 {
     public override MethodBase EnableHook => AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TurnManager), nameof(TurnManager.PlayerTurn)));
 
@@ -31,7 +30,7 @@ internal sealed class SPLIT_CardBattleFlow : AutomationFlow
         TurnManager turnManager = enumerator.GetEnumeratorThis<TurnManager>();
 
         JsonSchema responseSchema = JsonSchema.NewResponseSchema();
-        responseSchema.Apply<SPLIT_ChooseCardAction>();
+        responseSchema.Apply<ChooseCardAction>();
 
         Decision decision = new()
         {

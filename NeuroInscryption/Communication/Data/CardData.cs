@@ -3,11 +3,12 @@ using System.Linq;
 using DiskCardGame;
 using JetBrains.Annotations;
 using NeuroInscryption.Communication.Strings;
+using NeuroInscryption.Utilities;
 
-namespace NeuroInscryption.Communication.DTO;
+namespace NeuroInscryption.Communication.Data;
 
 [PublicAPI]
-public class CardDTO
+public class CardData
 {
     public string Name { get; protected set; }
     public int? Health { get; protected set; }
@@ -20,7 +21,7 @@ public class CardDTO
     public List<string> Traits { get; protected set; }
     public string Note { get; protected set; }
 
-    public CardDTO(CardInfo cardInfo)
+    public CardData(CardInfo cardInfo)
     {
         if (cardInfo.name == "!STATIC!GLITCH")
         {
@@ -31,14 +32,14 @@ public class CardDTO
         Name = cardInfo.DisplayedNameEnglish;
         Health = cardInfo.Health;
         Power = CalculatePower(cardInfo);
-        Sigils = cardInfo.Abilities.Count == 0 ? null : cardInfo.GetAllRelevantSigilStrings().Select(s => s.Name).ToList();
+        Sigils = cardInfo.GetAllRelevantSigilStrings().Select(s => s.Name).ToList().NullIfEmpty();
         Cost = cardInfo.BonesCost > 0 ? $"{cardInfo.BonesCost} bones" : $"{cardInfo.BloodCost} blood";
         CanBeSacrificed = cardInfo.Sacrificable || cardInfo.HasAbility(Ability.TripleBlood);
         Tribes = cardInfo.tribes.Count == 0 ? null : string.Join(", ", cardInfo.tribes);
-        Traits = cardInfo.GetAllRelevantTraitStrings().Select(t => t.Name).ToList();
+        Traits = cardInfo.GetAllRelevantTraitStrings().Select(t => t.Name).ToList().NullIfEmpty();
     }
 
-    protected CardDTO(CardInfo cardInfo, PlayableCard playableCard) : this(cardInfo)
+    protected CardData(CardInfo cardInfo, PlayableCard playableCard) : this(cardInfo)
     {
         Name = $"{cardInfo.DisplayedNameEnglish}{(playableCard.OpponentCard ? null : $" ({(playableCard.InHand ? 12 + PlayerHand.Instance.CardsInHand.IndexOf(playableCard) : BoardManager.Instance.CardsOnBoard.IndexOf(playableCard))})")}";
         Power = CalculatePower(cardInfo, playableCard);
@@ -50,7 +51,7 @@ public class CardDTO
         if (GameState.Ijiraq.Current.SuspiciousCardsInHand.Contains(playableCard)) Note = $"Careful! This card or another {cardInfo.DisplayedNameEnglish} card in your hand is a disguised Ijiraq!";
     }
 
-    public CardDTO(PlayableCard card) : this(card.Info, card) { }
+    public CardData(PlayableCard card) : this(card.Info, card) { }
 
     private static string CalculatePower(CardInfo cardInfo, PlayableCard cardInPlay = null)
     {

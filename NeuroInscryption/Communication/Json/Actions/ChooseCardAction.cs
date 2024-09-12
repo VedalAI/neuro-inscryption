@@ -4,8 +4,7 @@ using DiskCardGame;
 
 namespace NeuroInscryption.Communication.Json.Actions;
 
-// ReSharper disable once InconsistentNaming
-internal sealed class SPLIT_ChooseCardAction : ISchemaModifier
+internal sealed class ChooseCardAction : ISchemaModifier
 {
     public void Apply(JsonSchema schema)
     {

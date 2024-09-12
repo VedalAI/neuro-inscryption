@@ -22,11 +22,11 @@ public static class StringsExtensions
         return trait switch
         {
             Trait.Ant => ("Ant", "A card with this trait contributes to the power of cards with the Ant Power trait."),
-            Trait.Pelt => ("Meaningless Sacrifice", "If a card with this trait is sacrificed to the Bone Lord, you will not receive any boon."),
+            Trait.Pelt => ("Worthless Sacrifice", "If a card with this trait is sacrificed to the Bone Lord, you will not receive any boon."),
             Trait.Uncuttable => ("Uncuttable", "A card with this trait cannot be cut or hooked using items."),
             Trait.Giant => ("Final Boss", "A card with this trait increases its power by 1 for each turn after you run out of cards."),
             Trait.KillsSurvivors => ("Poisonous", "If a card with this trait perishes at the campfire, the campfire upgrade will be without risk for the rest of the run."),
-            Trait.Goat => ("Worthy Sacrifice", "If a card with this trait is sacrificed to the Bone Lord, you will receive a better boon."),
+            Trait.Goat => ("Black Goat", "If a card with this trait is sacrificed to the Bone Lord, you will receive a better boon."),
             Trait.Lice => ("Lice", "If a card with the Pelt trait is played, this card will be played automatically next to it if possible."),
             _ => default
         };
@@ -76,6 +76,11 @@ public static class StringsExtensions
         result.AddRange(cardInfo.traits.Select(t => t.GetStrings()).Where(t => !string.IsNullOrEmpty(t.Name)));
         result.AddRange(cardInfo.specialAbilities.Select(a => a.GetStrings()).Where(a => !string.IsNullOrEmpty(a.Name)));
         if (cardInfo.name.ToLowerInvariant().Contains("bell")) result.Add(ChimeTrait);
+
+        if (GameFlowManager.Instance.CurrentGameState == DiskCardGame.GameState.CardBattle)
+        {
+            result.RemoveAll(t => t.Name is "Poisonous" or "Black Goat"); // boon lord stuff we don't care about
+        }
 
         result.Sort();
         return result;

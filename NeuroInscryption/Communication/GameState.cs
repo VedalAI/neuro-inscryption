@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
 using JetBrains.Annotations;
-using NeuroInscryption.Communication.DTO;
+using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 
@@ -22,23 +22,23 @@ public static class GameState
 
         public int PlayerLives => RunState.Run.playerLives;
 
-        public Dictionary<string, CardDTO> PlayerLanes => BoardManager.Instance.playerSlots.WithIndex()
-            .ToDictionary(p => p.index.ToString(), p => !p.item.Card ? null : new CardDTO(p.item.Card));
+        public Dictionary<string, CardData> PlayerLanes => BoardManager.Instance.playerSlots.WithIndex()
+            .ToDictionary(p => p.index.ToString(), p => !p.item.Card ? null : new CardData(p.item.Card));
 
-        public Dictionary<string, CardDTO> OpponentLanes => BoardManager.Instance.opponentSlots.WithIndex()
-            .ToDictionary(p => p.index.ToString(), p => !p.item.Card ? null : new CardDTO(p.item.Card));
+        public Dictionary<string, CardData> OpponentLanes => BoardManager.Instance.opponentSlots.WithIndex()
+            .ToDictionary(p => p.index.ToString(), p => !p.item.Card ? null : new CardData(p.item.Card));
 
-        public Dictionary<string, CardDTO> OpponentQueueLanes => BoardManager.Instance.opponentSlots
+        public Dictionary<string, CardData> OpponentQueueLanes => BoardManager.Instance.opponentSlots
             .Select(BoardManager.Instance.GetCardQueuedForSlot).WithIndex()
-            .ToDictionary(p => p.index.ToString(), p => !p.item ? null : new CardDTO(p.item));
+            .ToDictionary(p => p.index.ToString(), p => !p.item ? null : new CardData(p.item));
 
-        public List<CardDTO> PlayerHand => DiskCardGame.PlayerHand.Instance.CardsInHand
-            .Select(c => Ijiraq.Current.ExposableIjiraqs.Contains(c) ? new IjiraqDTO(c) : new CardDTO(c))
+        public List<CardData> PlayerHand => DiskCardGame.PlayerHand.Instance.CardsInHand
+            .Select(c => Ijiraq.Current.ExposableIjiraqs.Contains(c) ? new IjiraqCardData(c) : new CardData(c))
             .ToList();
 
-        public List<CardDTO> RemainingDeck => CardDrawPiles.Instance.Deck.Cards
+        public List<CardData> RemainingDeck => CardDrawPiles.Instance.Deck.Cards
             .Select(c => Ijiraq.Current.FakeIjiraqsInDeck.Contains(c) ? CardLoader.GetCardByName("Ijiraq") : c)
-            .Select(c => new CardDTO(c))
+            .Select(c => new CardData(c))
             .ToList();
 
         public string Note => !Ijiraq.Current.AnythingCouldBeIjiraq ? null : "Be careful, any card in your hand or deck could be a disguised Ijiraq.";
