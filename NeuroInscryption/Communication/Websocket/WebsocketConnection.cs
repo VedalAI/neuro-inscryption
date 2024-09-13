@@ -83,7 +83,6 @@ public sealed class WebsocketConnection : Singlyboi<WebsocketConnection>
     public static void Send(WsMessage wsMessage)
     {
         string message = wsMessage.SerializeToJson();
-        Plugin.Logger.LogInfo("Enqueuing message " + message);
         _messageQueue.Enqueue(message);
     }
 

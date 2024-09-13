@@ -10,12 +10,12 @@ namespace NeuroInscryption.Input;
 [HarmonyPatch]
 public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 {
-    public static void SnapTo(InteractableBase interactable)
+    public static void SnapTo(Component interactable)
     {
         _simulatedMousePosition = GetScreenPoint(interactable.transform.position);
     }
 
-    public static IEnumerator MoveTo(InteractableBase interactable, float mouseSpeedMultiplier = 1)
+    public static IEnumerator MoveTo(Component interactable, float mouseSpeedMultiplier = 1)
     {
         if (_simulatedMousePosition == default)
         {

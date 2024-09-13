@@ -12,6 +12,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Communication.Websocket;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
+using UnityEngine;
 using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
@@ -58,8 +59,9 @@ public sealed class CardBattleFlow : AutomationFlow<object>
         if (action.Match(chooseCardAction, out string? card))
         {
             PlayableCard target = state.PlayerHand.Find(c => c.Name == card).TargetCard!;
+            Plugin.Logger.LogWarning("Moving to card " + target);
 
-            yield return NeuroMouse.MoveTo(target);
+            yield return NeuroMouse.MoveTo(target.Anim.cardRenderer);
             NeuroMouse.ClickOnce();
         }
     }
