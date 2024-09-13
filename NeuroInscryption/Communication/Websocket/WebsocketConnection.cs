@@ -12,7 +12,7 @@ namespace NeuroInscryption.Communication.Websocket;
 [HarmonyPatch]
 public sealed class WebsocketConnection : Singlyboi<WebsocketConnection>
 {
-    private static readonly Queue<WsMessage> _messageQueue = [];
+    private static readonly Queue<string> _messageQueue = [];
     private static readonly Dictionary<string, List<Action<JToken?>>> _subscriptions = [];
     private static WebSocket? _socket;
 
@@ -55,7 +55,7 @@ public sealed class WebsocketConnection : Singlyboi<WebsocketConnection>
             Plugin.Logger.LogError("Websocket connection has been closed!");
             StartCoroutine(Reconnect());
         };
-        _socket.Connect();
+        _socket.ConnectAsync();
     }
 
     private void Update()
@@ -64,12 +64,15 @@ public sealed class WebsocketConnection : Singlyboi<WebsocketConnection>
         {
             while (_messageQueue.Count > 0)
             {
-                WsMessage message = _messageQueue.Dequeue();
-                _socket.SendAsync(message.SerializeToJson(), success =>
+                string message = _messageQueue.Dequeue();
+
+                Plugin.Logger.LogMessage("Sending ws message " + message);
+
+                _socket.SendAsync(message, success =>
                 {
                     if (!success)
                     {
-                        Plugin.Logger.LogError("Failed to send ws message " + message.SerializeToJson());
+                        Plugin.Logger.LogError("Failed to send ws message " + message);
                         _messageQueue.Enqueue(message);
                     }
                 });
@@ -79,7 +82,9 @@ public sealed class WebsocketConnection : Singlyboi<WebsocketConnection>
 
     public static void Send(WsMessage wsMessage)
     {
-        _messageQueue.Enqueue(wsMessage);
+        string message = wsMessage.SerializeToJson();
+        Plugin.Logger.LogInfo("Enqueuing message " + message);
+        _messageQueue.Enqueue(message);
     }
 
     public static void SubscribeOnce(string command, Action<JToken?> callback)

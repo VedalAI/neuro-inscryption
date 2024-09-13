@@ -30,7 +30,7 @@ public static class GameExtensions
 
     public static bool TryGetSpecialAbility<T>(this PlayableCard card, SpecialTriggeredAbility ability, [NotNullWhen(true)] out T? behaviour) where T : SpecialCardBehaviour
     {
-        behaviour = (T) card.TriggerHandler.specialAbilities.Find(t => t.Item1 == ability).Item2;
+        behaviour = (T?) card.TriggerHandler.specialAbilities.Find(t => t?.Item1 == ability)?.Item2;
         return behaviour != null;
     }
 }

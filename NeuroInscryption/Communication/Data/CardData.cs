@@ -62,7 +62,7 @@ public sealed class CardData
 
     private readonly bool _maybeIjiraq;
 
-    private CardData(CardInfo cardInfo, GameState.Board state)
+    private CardData(CardInfo cardInfo, GameState.Board state, int? deckIndex = null)
     {
         _state = state;
         TargetCardInfo = cardInfo;
@@ -76,7 +76,7 @@ public sealed class CardData
             return;
         }
 
-        if (_state.Ijiraq.FakeIjiraqsInDeck.Contains(TargetCardInfo))
+        if (deckIndex != null && _state.Ijiraq.FakeIjiraqsInDeck.Contains(deckIndex.Value))
         {
             TargetCardInfo = CardLoader.GetCardByName("Ijiraq");
         }
@@ -133,7 +133,7 @@ public sealed class CardData
     }
 
     [return: NotNullIfNotNull(nameof(cardInfo))]
-    public static CardData? Create(CardInfo? cardInfo, GameState.Board state) => cardInfo != null ? new CardData(cardInfo, state) : null;
+    public static CardData? CreateFromDeck(CardInfo? cardInfo, int deckIndex, GameState.Board state) => cardInfo != null ? new CardData(cardInfo, state) : null;
 
     [return: NotNullIfNotNull(nameof(card))]
     public static CardData? Create(PlayableCard? card, GameState.Board state) => card != null ? new CardData(card, state) : null;

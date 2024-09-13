@@ -51,7 +51,7 @@ public static class GameState
             OpponentQueueLanes = BoardManager.Instance.opponentSlots.Select(BoardManager.Instance.GetCardQueuedForSlot).ToIndexedDictionary(card => CardData.Create(card, this))!;
 
             PlayerHand = DiskCardGame.PlayerHand.Instance.CardsInHand.Select(c => CardData.Create(c, this)).ToList();
-            RemainingDeck = CardDrawPiles.Instance.Deck.Cards.Select(c => CardData.Create(c, this)).ToList();
+            RemainingDeck = CardDrawPiles.Instance.Deck.Cards.Select((c, i) => CardData.CreateFromDeck(c, i, this)).ToList();
 
             List<CardData> allCardsInPlay = [..PlayerLanes.Values, ..OpponentLanes.Values, ..OpponentQueueLanes.Values, ..PlayerHand, ..RemainingDeck];
             allCardsInPlay.RemoveAll(data => data == null);
@@ -82,7 +82,7 @@ public static class GameState
             /// <summary>
             /// All cards in the player's deck that should be faked as Ijiraqs.
             /// </summary>
-            public readonly List<CardInfo> FakeIjiraqsInDeck;
+            public readonly List<int> FakeIjiraqsInDeck;
 
             /// <summary>
             /// All Ijiraqs in the player's hand that should be exposed as Ijiraqs.
@@ -112,14 +112,16 @@ public static class GameState
 
                 List<PlayableCard> tempIjiraqsToFake = [..ijiraqsInHand];
                 FakeIjiraqsInDeck = [];
-                foreach (CardInfo cardInDeck in CardDrawPiles.Instance.Deck.Cards)
+                for (int deckIndex = 0; deckIndex < CardDrawPiles.Instance.Deck.Cards.Count; deckIndex++)
                 {
+                    CardInfo cardInDeck = CardDrawPiles.Instance.Deck.Cards[deckIndex];
+
                     foreach (PlayableCard ijiraq in tempIjiraqsToFake)
                     {
                         // If this card in the deck is the same as the Ijiraq disguise, then we fake this card as being an Ijiraq
                         if (cardInDeck.IsIdentical(ijiraq.Info))
                         {
-                            FakeIjiraqsInDeck.Add(cardInDeck);
+                            FakeIjiraqsInDeck.Add(deckIndex);
                             tempIjiraqsToFake.Remove(ijiraq);
                             break;
                         }

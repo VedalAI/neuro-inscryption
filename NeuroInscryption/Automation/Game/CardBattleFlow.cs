@@ -20,6 +20,8 @@ public sealed class CardBattleFlow : AutomationFlow<object>
 {
     public override MethodBase EnableHook => AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TurnManager), nameof(TurnManager.PlayerTurn)));
 
+    public override bool AllowInterruption => true;
+
     protected override bool IsValid(object enumerator)
     {
         return enumerator.GetEnumeratorState() == 8;
