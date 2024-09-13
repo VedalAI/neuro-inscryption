@@ -1,15 +1,17 @@
 ﻿using System.Collections;
+using System.Linq;
 using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Json;
+using NeuroInscryption.Communication.Messages.Incoming;
+using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
+using NeuroInscryption.Communication.Websocket;
+using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
-using Newtonsoft.Json;
-using UnityEngine;
 using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
@@ -27,8 +29,10 @@ public sealed class CardBattleFlow : AutomationFlow<object>
     {
         GameState.Board state = GameState.Board.Calculate();
 
+        ChooseCardAction chooseCardAction = new(state);
+
         JsonSchema responseSchema = JsonSchema.NewResponseSchema();
-        responseSchema.Apply(new ChooseCardAction(state));
+        responseSchema.Apply(chooseCardAction);
 
         Decision decision = new()
         {
@@ -38,15 +42,23 @@ public sealed class CardBattleFlow : AutomationFlow<object>
             ResponseSchema = responseSchema
         };
 
-        GUIUtility.systemCopyBuffer = JsonConvert.SerializeObject(decision, new JsonSerializerSettings
+        Response<Action> response = decision.Send();
+        yield return response;
+        Action? action = response.Result;
+
+        if (action == null)
         {
-            NullValueHandling = NullValueHandling.Ignore
-        });
+            Plugin.Logger.LogFatal("Received invalid action, something broke along the way, I am sorry but IDK what do to. Restarting flow I guess...");
+            yield return Execute(enumerator);
+            yield break;
+        }
 
-        // TODO: Send decision
-        // TODO: Get back card name
-        // TODO: Click card
+        if (action.Match(chooseCardAction, out string? card))
+        {
+            PlayableCard target = state.PlayerHand.Find(c => c.Name == card).TargetCard!;
 
-        yield break;
+            yield return NeuroMouse.MoveTo(target);
+            NeuroMouse.ClickOnce();
+        }
     }
 }

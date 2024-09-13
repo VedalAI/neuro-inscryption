@@ -1,9 +1,11 @@
 ﻿using NeuroInscryption.Communication.Json;
+using NeuroInscryption.Communication.Messages.Incoming;
+using NeuroInscryption.Communication.Websocket;
 using Newtonsoft.Json;
 
-namespace NeuroInscryption.Communication;
+namespace NeuroInscryption.Communication.Messages.Outgoing;
 
-public sealed class Decision
+public sealed class Decision : MessageBuilder<Action>
 {
     [JsonProperty("game")]
     private string Game => "Inscryption";
@@ -19,4 +21,7 @@ public sealed class Decision
 
     [JsonProperty("responseSchema")]
     public required JsonSchema ResponseSchema { get; set; }
+
+    protected override WsMessage GetMessage() => new("decision", this);
+    protected override string ResponseCommand => "action";
 }

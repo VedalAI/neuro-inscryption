@@ -1,6 +1,4 @@
-﻿using HarmonyLib;
-
-namespace NeuroInscryption.Communication.Strings;
+﻿namespace NeuroInscryption.Communication.Strings;
 
 public static class CardStrings
 {

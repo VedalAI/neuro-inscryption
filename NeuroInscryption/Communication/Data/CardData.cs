@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DiskCardGame;
@@ -13,7 +12,7 @@ namespace NeuroInscryption.Communication.Data;
 [PublicAPI]
 public sealed class CardData
 {
-    private static readonly HashSet<Ability> _immediateAbilities = [Ability.DrawRabbits, Ability.CreateDams, Ability.Tutor, Ability.DrawCopy, Ability.CorpseEater, Ability.DrawAnt, Ability.RandomConsumable, Ability.CreateEgg];
+    private static readonly HashSet<Ability> _immediateSigils = [Ability.DrawRabbits, Ability.CreateDams, Ability.Tutor, Ability.DrawCopy, Ability.CorpseEater, Ability.DrawAnt, Ability.RandomConsumable, Ability.CreateEgg];
     private static readonly HashSet<Trait> _nonImmediateTraits = [Trait.Ant, Trait.Pelt, Trait.Uncuttable, Trait.Giant, Trait.KillsSurvivors, Trait.Goat, Trait.Lice];
     private static readonly HashSet<SpecialTriggeredAbility> _nonImmediateAbilities = [SpecialTriggeredAbility.Cat, SpecialTriggeredAbility.JerseyDevil, SpecialTriggeredAbility.Daus, SpecialTriggeredAbility.Ouroboros];
 
@@ -118,7 +117,7 @@ public sealed class CardData
             CanBeSacrificed = true;
             Tribes = null;
 
-            Sigils.RemoveAll(data => !_immediateAbilities.Contains(data.Sigil));
+            Sigils.RemoveAll(data => !_immediateSigils.Contains(data.Sigil));
             Sigils.Add(Ability.PreventAttack);
 
             Traits.RemoveAll(data => data.TryGetTrait(out Trait trait) && _nonImmediateTraits.Contains(trait));
