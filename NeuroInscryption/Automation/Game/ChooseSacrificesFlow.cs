@@ -21,7 +21,7 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(BoardManager), nameof(BoardManager.ChooseSacrificesForCard))),
-            IsValid = context => context.GetInstance().GetEnumeratorState() == 1
+            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 1
         }
     ];
 

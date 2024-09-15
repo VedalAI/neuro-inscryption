@@ -14,7 +14,7 @@ public sealed class NewRunConfirmScreenFlow : AutomationFlow<AscensionMenuScreen
         new()
         {
             Method = AccessTools.Method(typeof(AscensionMenuScreenTransition), nameof(AscensionMenuScreenTransition.OnEnable)),
-            IsValid = context => context.GetInstance<AscensionMenuScreenTransition>().name == "AscensionNewRunConfirmScreen"
+            IsValid = context => context.GetInstance<AscensionMenuScreenTransition>()!.name == "AscensionNewRunConfirmScreen"
         }
     ];
 

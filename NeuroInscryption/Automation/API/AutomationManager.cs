@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
+using JetBrains.Annotations;
 using NeuroInscryption.Utilities;
 using UnityEngine;
 
@@ -33,10 +34,10 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
                 switch (hook.PatchType)
                 {
                     case HarmonyPatchType.Prefix:
-                        Plugin.Harmony.Patch(hook.Method, new HarmonyMethod(typeof(AutomationManager), nameof(Patch)));
+                        Plugin.Harmony.Patch(hook.Method, GetPatchMethod(hook));
                         break;
                     case HarmonyPatchType.Postfix:
-                        Plugin.Harmony.Patch(hook.Method, postfix: new HarmonyMethod(typeof(AutomationManager), nameof(Patch)));
+                        Plugin.Harmony.Patch(hook.Method, postfix: GetPatchMethod(hook));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -126,11 +127,6 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         }
     }
 
-    private static void Patch(MethodInfo __originalMethod, object __instance, object __result, object[] __args)
-    {
-        Instance.TryStartNewFlow(__originalMethod.FullDescription(), new HarmonyContext(__originalMethod, __instance, __result, __args));
-    }
-
     [HarmonyPatch(typeof(InteractionCursor), nameof(InteractionCursor.UpdatePosition))]
     [HarmonyPrefix]
     private static void ManualControlHandler()
@@ -153,4 +149,65 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
             }
         }
     }
+
+    #region Patch methods
+
+    private static HarmonyMethod GetPatchMethod(FlowHook hook)
+    {
+        string name = $"Patch{hook.PatchType}";
+        if (hook.Method.IsStatic) name += "Static";
+        if (hook.Method.ReturnType == typeof(void)) name += "Void";
+
+        return new HarmonyMethod(AccessTools.Method(typeof(AutomationManager), name));
+    }
+
+    [UsedImplicitly]
+    private static void PatchPrefixStaticVoid(MethodInfo __originalMethod, object[] __args)
+    {
+        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, null, null, __args));
+    }
+
+    [UsedImplicitly]
+    private static void PatchPrefixStatic(MethodInfo __originalMethod, object __result, object[] __args)
+    {
+        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, null, __result, __args));
+    }
+
+    [UsedImplicitly]
+    private static void PatchPrefixVoid(MethodInfo __originalMethod, object __instance, object[] __args)
+    {
+        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, __instance, null, __args));
+    }
+
+    [UsedImplicitly]
+    private static void PatchPrefix(MethodInfo __originalMethod, object __instance, object __result, object[] __args)
+    {
+        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, __instance, __result, __args));
+    }
+
+    [UsedImplicitly]
+    private static void PatchPostfixStaticVoid(MethodInfo __originalMethod, object[] __args)
+    {
+        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, null, null, __args));
+    }
+
+    [UsedImplicitly]
+    private static void PatchPostfixStatic(MethodInfo __originalMethod, object __result, object[] __args)
+    {
+        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, null, __result, __args));
+    }
+
+    [UsedImplicitly]
+    private static void PatchPostfixVoid(MethodInfo __originalMethod, object __instance, object[] __args)
+    {
+        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, __instance, null, __args));
+    }
+
+    [UsedImplicitly]
+    private static void PatchPostfix(MethodInfo __originalMethod, object __instance, object __result, object[] __args)
+    {
+        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, __instance, __result, __args));
+    }
+
+    #endregion
 }

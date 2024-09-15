@@ -10,6 +10,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Communication.Websocket;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
+using UnityEngine;
 using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
@@ -21,7 +22,7 @@ public class CardBattleFlow : AutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TurnManager), nameof(TurnManager.PlayerTurn))),
-            IsValid = context => context.GetInstance().GetEnumeratorState() == 8,
+            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 8,
         },
         new()
         {
@@ -34,6 +35,8 @@ public class CardBattleFlow : AutomationFlow<object>
 
     protected override IEnumerator Execute(object enumerator)
     {
+        yield return new WaitForSeconds(1);
+
         GameState.Board state = GameState.Board.Calculate();
 
         ChooseCardAction chooseCardAction = new(state);
