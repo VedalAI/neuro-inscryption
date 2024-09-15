@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using System.Linq;
-using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
@@ -12,21 +10,27 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Communication.Websocket;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
-using UnityEngine;
 using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
 
-public sealed class CardBattleFlow : AutomationFlow<object>
+public class CardBattleFlow : AutomationFlow<object>
 {
-    public override MethodBase EnableHook => AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TurnManager), nameof(TurnManager.PlayerTurn)));
+    public override FlowHook[] Hooks =>
+    [
+        new()
+        {
+            Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TurnManager), nameof(TurnManager.PlayerTurn))),
+            IsValid = context => context.GetInstance().GetEnumeratorState() == 8,
+        },
+        new()
+        {
+            Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(PlayerHand), nameof(PlayerHand.SelectSlotForCard))),
+            IsValid = context => context.GetResult<bool>() == false && BoardManager.Instance.CancelledSacrifice,
+        }
+    ];
 
     public override bool AllowInterruption => true;
-
-    protected override bool IsValid(object enumerator)
-    {
-        return enumerator.GetEnumeratorState() == 8;
-    }
 
     protected override IEnumerator Execute(object enumerator)
     {
@@ -61,7 +65,7 @@ public sealed class CardBattleFlow : AutomationFlow<object>
             PlayableCard target = state.PlayerHand.Find(c => c.Name == card).TargetCard!;
             Plugin.Logger.LogWarning("Moving to card " + target);
 
-            yield return NeuroMouse.MoveTo(target.Anim.cardRenderer);
+            yield return NeuroMouse.MoveTo(target);
             NeuroMouse.ClickOnce();
         }
     }

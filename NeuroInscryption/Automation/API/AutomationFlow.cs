@@ -10,6 +10,8 @@ namespace NeuroInscryption.Automation.API;
 [HarmonyPatch]
 public abstract class AutomationFlow
 {
+    public static IReadOnlyList<AutomationFlow> Flows { get; private set; }
+
     static AutomationFlow()
     {
         Flows = Assembly.GetExecutingAssembly().GetTypes()
@@ -20,25 +22,17 @@ public abstract class AutomationFlow
             .ToList();
     }
 
-    public abstract MethodBase EnableHook { get; }
+    public abstract FlowHook[] Hooks { get; }
 
-    public virtual bool AllowInterruption => false;
+    public abstract bool AllowInterruption { get; }
 
-    public virtual HarmonyPatchType PatchType => HarmonyPatchType.Postfix;
-
-    public virtual bool IsValid(object instanceOfHookedType, object[] parameters) => true;
-
-    public abstract IEnumerator Execute(object instanceOfHookedType, object[] parameters);
-
-    public static IReadOnlyList<AutomationFlow> Flows { get; private set; }
+    public abstract IEnumerator Execute(HarmonyContext context);
 }
 
 public abstract class AutomationFlow<T> : AutomationFlow
 {
     protected virtual T GetTarget(object instanceOfHookedType) => (T)instanceOfHookedType;
-    protected virtual bool IsValid(T target) => true;
     protected abstract IEnumerator Execute(T target);
 
-    public sealed override bool IsValid(object instanceOfHookedType, object[] parameters) => IsValid(GetTarget(instanceOfHookedType));
-    public sealed override IEnumerator Execute(object instanceOfHookedType, object[] parameters) => Execute(GetTarget(instanceOfHookedType));
+    public sealed override IEnumerator Execute(HarmonyContext context) => Execute(GetTarget(context.GetInstance<T>()!));
 }

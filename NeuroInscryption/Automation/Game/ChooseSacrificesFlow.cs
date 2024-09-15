@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
@@ -17,12 +16,16 @@ namespace NeuroInscryption.Automation.Game;
 
 public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 {
-    public override MethodBase EnableHook => AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(BoardManager), nameof(BoardManager.ChooseSacrificesForCard)));
+    public override FlowHook[] Hooks =>
+    [
+        new()
+        {
+            Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(BoardManager), nameof(BoardManager.ChooseSacrificesForCard))),
+            IsValid = context => context.GetInstance().GetEnumeratorState() == 1
+        }
+    ];
 
-    protected override bool IsValid(object target)
-    {
-        return target.GetEnumeratorState() == 1;
-    }
+    public override bool AllowInterruption => true;
 
     protected override IEnumerator Execute(object enumerator)
     {

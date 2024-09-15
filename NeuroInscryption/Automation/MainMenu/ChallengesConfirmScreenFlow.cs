@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
@@ -10,7 +9,13 @@ namespace NeuroInscryption.Automation.MainMenu;
 
 public sealed class ChallengesConfirmScreenFlow : AutomationFlow<AscensionChallengeConfirmScreen>
 {
-    public override MethodBase EnableHook => AccessTools.Method(typeof(AscensionChallengeConfirmScreen), nameof(AscensionChallengeConfirmScreen.OnEnable));
+    public override FlowHook[] Hooks =>
+    [
+        new()
+        {
+            Method = AccessTools.Method(typeof(AscensionChallengeConfirmScreen), nameof(AscensionChallengeConfirmScreen.OnEnable))
+        }
+    ];
 
     public override bool AllowInterruption => true;
 

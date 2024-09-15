@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Reflection;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
@@ -10,14 +9,16 @@ namespace NeuroInscryption.Automation.MainMenu;
 
 public sealed class NewRunConfirmScreenFlow : AutomationFlow<AscensionMenuScreenTransition>
 {
-    public override MethodBase EnableHook => AccessTools.Method(typeof(AscensionMenuScreenTransition), nameof(AscensionMenuScreenTransition.OnEnable));
+    public override FlowHook[] Hooks =>
+    [
+        new()
+        {
+            Method = AccessTools.Method(typeof(AscensionMenuScreenTransition), nameof(AscensionMenuScreenTransition.OnEnable)),
+            IsValid = context => context.GetInstance<AscensionMenuScreenTransition>().name == "AscensionNewRunConfirmScreen"
+        }
+    ];
 
     public override bool AllowInterruption => true;
-
-    protected override bool IsValid(AscensionMenuScreenTransition target)
-    {
-        return target.name == "AscensionNewRunConfirmScreen";
-    }
 
     protected override IEnumerator Execute(AscensionMenuScreenTransition target)
     {

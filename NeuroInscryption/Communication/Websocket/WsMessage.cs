@@ -2,7 +2,7 @@
 
 namespace NeuroInscryption.Communication.Websocket;
 
-public record class WsMessage
+public record WsMessage
 {
     [JsonProperty("command")]
     public readonly string Command;
