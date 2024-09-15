@@ -1,10 +1,13 @@
-﻿using BepInEx;
+﻿using System.Runtime.CompilerServices;
+using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.Mono;
+using Cysharp.Threading.Tasks;
 using HarmonyLib;
 using NeuroInscryption.Configuration;
 using NeuroInscryption.Resources;
 using NeuroInscryption.Utilities;
+using UnityEngine.LowLevel;
 
 namespace NeuroInscryption;
 
@@ -21,8 +24,16 @@ public sealed partial class Plugin : BaseUnityPlugin
         Config = new ModConfig(base.Config);
 
         ResourceManager.InjectAssemblies();
+        InitializeUniTask();
         Singlyboi.AddAll(gameObject);
 
         Harmony.PatchAll();
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void InitializeUniTask()
+    {
+        PlayerLoopSystem loop = PlayerLoop.GetCurrentPlayerLoop();
+        PlayerLoopHelper.Initialize(ref loop);
     }
 }

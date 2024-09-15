@@ -16,8 +16,8 @@ public sealed class Response<T> : CustomYieldInstruction where T : class, new()
         if (typeof(ICustomIncomingMessageHandler).IsAssignableFrom(typeof(T)))
         {
             T result = new();
-            bool success = ((ICustomIncomingMessageHandler) result).SetJsonData(messageData);
-            if (success) Result = result;
+            ((ICustomIncomingMessageHandler) result).SetJsonData(messageData);
+            Result = result;
         }
         else
         {

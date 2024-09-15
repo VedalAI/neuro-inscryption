@@ -1,5 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using NeuroInscryption.Communication.Actions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Messages.Incoming;
@@ -9,14 +11,12 @@ public class Action : ICustomIncomingMessageHandler
     public string? ActionName { get; private set; }
     public JToken? ActionData { get; private set; }
 
-    bool ICustomIncomingMessageHandler.SetJsonData(JToken? data)
+    void ICustomIncomingMessageHandler.SetJsonData(JToken? data)
     {
-        if (data == null) return false;
+        if (data == null) throw new JsonReaderException("Received invalid JSON data for action message");
 
         ActionName = data["action"]?.Value<string>();
         ActionData = data["data"];
-
-        return !string.IsNullOrWhiteSpace(ActionName);
     }
 
     public bool Match<TResponse>(IAction<TResponse> iAction, [NotNullWhen(true)] out TResponse? response)
@@ -28,5 +28,10 @@ public class Action : ICustomIncomingMessageHandler
         }
 
         return iAction.Deserialize(this, out response);
+    }
+
+    public void ThrowInvalid()
+    {
+        throw new InvalidOperationException($"Received action '{ActionName}' which did not match possible expected actions.");
     }
 }

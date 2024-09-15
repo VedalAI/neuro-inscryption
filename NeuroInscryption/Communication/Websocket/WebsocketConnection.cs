@@ -66,7 +66,7 @@ public sealed class WebsocketConnection : Singlyboi<WebsocketConnection>
             {
                 string message = _messageQueue.Dequeue();
 
-                Plugin.Logger.LogMessage("Sending ws message " + message);
+                Plugin.Logger.LogInfo("Sending ws message " + message);
 
                 _socket.SendAsync(message, success =>
                 {
@@ -96,7 +96,7 @@ public sealed class WebsocketConnection : Singlyboi<WebsocketConnection>
     {
         try
         {
-            Plugin.Logger.LogInfo("Received message " + msg.Data);
+            Plugin.Logger.LogMessage("Received message " + msg.Data);
 
             JObject message = JObject.Parse(msg.Data);
             string? command = message["command"]?.Value<string>();

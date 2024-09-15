@@ -1,11 +1,11 @@
-﻿using System.Collections;
-using System.Linq;
+﻿using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Configuration;
 using NeuroInscryption.Input;
-using UnityEngine;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
@@ -19,9 +19,9 @@ public sealed class ChallengesScreenFlow : AutomationFlow<AscensionChallengeScre
         }
     ];
 
-    protected override IEnumerator Execute(AscensionChallengeScreen target)
+    protected override async UniTask ExecuteAsync(AscensionChallengeScreen target, CancellationToken ct)
     {
-        yield return new WaitForSeconds(1);
+        await UniTask.Delay(1000, cancellationToken: ct);
 
         ChallengeFlags enabledChallenges = Plugin.Config.Challenges.Value;
 
@@ -30,16 +30,16 @@ public sealed class ChallengesScreenFlow : AutomationFlow<AscensionChallengeScre
         {
             if (enabledChallenges.Includes(icon.Info.challengeType, seenDifficulty) != icon.activatedRenderer.enabled)
             {
-                yield return NeuroMouse.MoveTo(icon);
-                yield return new WaitForSeconds(0.2f);
+                await NeuroMouse.MoveToAsync(icon, ct);
+                await UniTask.Delay(200, cancellationToken: ct);
                 NeuroMouse.ClickOnce();
             }
 
             if (icon.Info.challengeType == AscensionChallenge.BaseDifficulty) seenDifficulty = true;
         }
 
-        yield return NeuroMouse.MoveTo(target.continueButton);
-        yield return new WaitForSeconds(0.5f);
+        await NeuroMouse.MoveToAsync(target.continueButton, ct);
+        await UniTask.Delay(500, cancellationToken: ct);
         NeuroMouse.ClickOnce();
     }
 }

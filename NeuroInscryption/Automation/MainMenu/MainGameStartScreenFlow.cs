@@ -1,11 +1,12 @@
-﻿using System.Collections;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
-public sealed class MainGameStartScreenFlow : AutomationFlow<object>
+public sealed class MainGameStartScreenFlow : AutomationFlow
 {
     public override FlowHook[] Hooks =>
     [
@@ -15,9 +16,9 @@ public sealed class MainGameStartScreenFlow : AutomationFlow<object>
         }
     ];
 
-    protected override IEnumerator Execute(object _)
+    public override UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct)
     {
         // Allow manual control of game for stuff like changing settings
-        yield break;
+        return UniTask.CompletedTask;
     }
 }

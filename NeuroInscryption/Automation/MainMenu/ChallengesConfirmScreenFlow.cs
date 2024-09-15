@@ -1,9 +1,9 @@
-﻿using System.Collections;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Input;
-using UnityEngine;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
@@ -17,10 +17,10 @@ public sealed class ChallengesConfirmScreenFlow : AutomationFlow<AscensionChalle
         }
     ];
 
-    protected override IEnumerator Execute(AscensionChallengeConfirmScreen target)
+    protected override async UniTask ExecuteAsync(AscensionChallengeConfirmScreen target, CancellationToken ct)
     {
-        yield return NeuroMouse.MoveTo(target.continueButton);
-        yield return new WaitForSeconds(0.5f);
+        await NeuroMouse.MoveToAsync(target.continueButton, ct);
+        await UniTask.Delay(500, cancellationToken: ct);
         NeuroMouse.ClickOnce();
     }
 }

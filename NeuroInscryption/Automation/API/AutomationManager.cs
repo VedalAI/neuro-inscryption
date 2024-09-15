@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using DiskCardGame;
@@ -16,12 +15,26 @@ using LinkedFlowHook = (FlowHook hook, AutomationFlow flow);
 public sealed class AutomationManager : Singlyboi<AutomationManager>
 {
     private readonly Dictionary<string, List<LinkedFlowHook>> _flowCache = [];
+    private readonly FlowRunner _flowRunner = new();
 
-    public bool AllowManualInput { get; private set; }
-    private bool _wantsManualControl;
-
-    private AutomationFlow? _currentFlow;
-    private Coroutine? _currentFlowCoroutine;
+    private bool _allowManualInput;
+    public bool AllowManualInput
+    {
+        get => _allowManualInput;
+        private set
+        {
+            if (_allowManualInput == value) return;
+            if (value)
+            {
+                _flowRunner.CancelCurrentFlow();
+            }
+            else
+            {
+                _flowRunner.RestartLastFlow();
+            }
+            _allowManualInput = value;
+        }
+    }
 
     private new void Awake()
     {
@@ -73,57 +86,14 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
             }
             changed = true;
 
-            Plugin.Logger.LogInfo($"Changing flow from {_currentFlow?.GetType().Name} to {linked.flow.GetType().Name}.");
-
-            if (_currentFlowCoroutine != null)
-            {
-                StopCoroutine(_currentFlowCoroutine);
-                TryGiveManualControl();
-            }
-
-            _currentFlow = linked.flow;
-            _currentFlowCoroutine = StartCoroutine(CoExecuteFlow(_currentFlow, context));
-        }
-    }
-
-    // ReSharper disable once FunctionRecursiveOnAllPaths
-    private IEnumerator CoExecuteFlow(AutomationFlow flow, HarmonyContext context)
-    {
-        IEnumerator executeEnumerator = flow.Execute(context);
-
-        yield return new WaitUntil(() => !AllowManualInput);
-
-        while (executeEnumerator.MoveNext())
-        {
-            yield return executeEnumerator.Current;
-
             if (AllowManualInput)
             {
-                yield return CoExecuteFlow(flow, context); // Restart the flow after input is allowed again
-                yield break;
+                _flowRunner.QueueFlow(linked.flow, context);
             }
-        }
-
-        while (true)
-        {
-            yield return null;
-
-            TryGiveManualControl();
-
-            if (AllowManualInput)
+            else
             {
-                yield return CoExecuteFlow(flow, context); // Restart the flow after input is allowed again
-                yield break;
+                _flowRunner.StartFlow(linked.flow, context);
             }
-        }
-    }
-
-    private void TryGiveManualControl()
-    {
-        if (_wantsManualControl)
-        {
-            AllowManualInput = true;
-            _wantsManualControl = false;
         }
     }
 
@@ -133,21 +103,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
     {
         if (!UnityEngine.Input.GetKeyDown(KeyCode.U)) return;
 
-        if (Instance.AllowManualInput)
-        {
-            Instance.AllowManualInput = false;
-        }
-        else
-        {
-            if (/*Instance._currentFlow?.AllowInterruption ??*/ true)
-            {
-                Instance.AllowManualInput = true;
-            }
-            /*else
-            {
-                Instance._wantsManualControl = true;
-            }*/
-        }
+        Instance.AllowManualInput = !Instance.AllowManualInput;
     }
 
     #region Patch methods

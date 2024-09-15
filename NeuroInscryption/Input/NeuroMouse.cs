@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
@@ -10,44 +12,33 @@ namespace NeuroInscryption.Input;
 [HarmonyPatch]
 public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 {
-    public static IEnumerator MoveTo(InteractableBase interactable, float mouseSpeedMultiplier = 1)
+    public static async UniTask MoveToAsync(InteractableBase interactable, CancellationToken ct = default, float mouseSpeedMultiplier = 1)
     {
+        if (!interactable) throw new ArgumentNullException(nameof(interactable));
+
         Vector2 end = GetCursorPosition(interactable);
 
         while (Vector2.Distance(_simulatedMousePosition, end) > 0.1f)
         {
-            if (AutomationManager.Instance.AllowManualInput) yield break;
-
             _simulatedMousePosition = Vector2.MoveTowards(_simulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 5 * Plugin.Config.MouseSpeedMultiplier.Value);
-            yield return null;
+            await UniTask.Yield(ct);
         }
 
         _simulatedMousePosition = end;
 
-        if (InteractionCursor.Instance.RaycastForInteractable<InteractableBase>(~LayerMask.GetMask(InteractionCursor.Instance.excludedLayers.ToArray()), InteractionCursor.Instance.transform.position) != interactable)
+        InteractionCursor cursor = InteractionCursor.Instance;
+        int layerMask = ~LayerMask.GetMask(cursor.excludedLayers.ToArray());
+        if (cursor.RaycastForInteractable<InteractableBase>(layerMask, cursor.transform.position) != interactable)
         {
             Plugin.Logger.LogError("Failed to move mouse to interactable, retrying...");
-            yield return MoveTo(interactable, mouseSpeedMultiplier * 2);
+            await MoveToAsync(interactable, ct, mouseSpeedMultiplier * 2);
         }
     }
 
     public static void ClickOnce(bool alt = false)
     {
-        StartHolding(alt);
-        StopHolding(alt);
-    }
-
-    public static void StartHolding(bool alt = false)
-    {
         ClickHandler target = !alt ? _leftClickHandler : _rightClickHandler;
-
         target.Enqueue(true);
-    }
-
-    public static void StopHolding(bool alt = false)
-    {
-        ClickHandler target = !alt ? _leftClickHandler : _rightClickHandler;
-
         target.Enqueue(false);
     }
 

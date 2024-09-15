@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using HarmonyLib;
 
 namespace NeuroInscryption.Automation.API;
@@ -24,13 +25,12 @@ public abstract class AutomationFlow
 
     public abstract FlowHook[] Hooks { get; }
 
-    public abstract IEnumerator Execute(HarmonyContext context);
+    public abstract UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct);
 }
 
 public abstract class AutomationFlow<T> : AutomationFlow
 {
-    protected virtual T GetTarget(object instanceOfHookedType) => (T)instanceOfHookedType;
-    protected abstract IEnumerator Execute(T target);
+    protected abstract UniTask ExecuteAsync(T target, CancellationToken ct);
 
-    public sealed override IEnumerator Execute(HarmonyContext context) => Execute(GetTarget(context.GetInstance<T>()!));
+    public sealed override UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct) => ExecuteAsync(context.GetInstance<T>()!, ct);
 }
