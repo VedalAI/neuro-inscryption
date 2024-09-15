@@ -6,7 +6,7 @@ namespace NeuroInscryption.Communication.Websocket;
 
 public sealed class Response<T> : CustomYieldInstruction where T : class, new()
 {
-    public Response(string expectedCommand)
+    public void SubscribeTo(string expectedCommand)
     {
         WebsocketConnection.SubscribeOnce(expectedCommand, OnMessageReceived);
     }

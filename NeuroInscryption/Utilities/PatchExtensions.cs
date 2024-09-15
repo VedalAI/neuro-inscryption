@@ -4,18 +4,12 @@ namespace NeuroInscryption.Utilities;
 
 public static class PatchExtensions
 {
-    public static ref int GetEnumeratorState(this object instance)
+    public static T GetEnumeratorField<T>(this object instance, string fieldName)
     {
-        return ref AccessTools.FieldRefAccess<object, int>(instance, AccessTools.Field(instance.GetType(), "<>1__state"));
+        return (T) AccessTools.Field(instance.GetType(), fieldName).GetValue(instance);
     }
 
-    public static ref object GetEnumeratorCurrent(this object instance)
-    {
-        return ref AccessTools.FieldRefAccess<object, object>(instance, AccessTools.Field(instance.GetType(), "<>2__current"));
-    }
-
-    public static T GetEnumeratorThis<T>(this object instance)
-    {
-        return (T) AccessTools.Field(instance.GetType(), "<>4__this").GetValue(instance);
-    }
+    public static int GetEnumeratorState(this object instance) => instance.GetEnumeratorField<int>("<>1__state");
+    public static object GetEnumeratorCurrent(this object instance) => instance.GetEnumeratorField<object>("<>2__current");
+    public static T GetEnumeratorThis<T>(this object instance) => instance.GetEnumeratorField<T>("<>4__this");
 }

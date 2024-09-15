@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
@@ -27,18 +28,23 @@ public class CardBattleFlow : AutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(PlayerHand), nameof(PlayerHand.SelectSlotForCard))),
-            IsValid = context => context.GetResult<bool>() == false && BoardManager.Instance.CancelledSacrifice,
+            IsValid = context => context.GetResult<bool>() == false && context.GetInstance()!.GetEnumeratorField<bool>("<cardWasPlayed>5__2") == false,
         }
     ];
 
     protected override IEnumerator Execute(object enumerator)
     {
-        yield return new WaitForSeconds(1);
+        Plugin.Logger.LogWarning(enumerator.GetType().Name);
+        if (enumerator.GetType().Name.Contains(nameof(PlayerHand.SelectSlotForCard)))
+        {
+            yield return new WaitForSeconds(1f); // time it takes for the card to go back in the hand
+        }
 
         GameState.Board state = GameState.Board.Calculate();
 
         ChooseCardAction chooseCardAction = new(state);
 
+        // TODO: Move this somewhere else so i dont need to write it every time
         JsonSchema responseSchema = JsonSchema.NewResponseSchema();
         responseSchema.Apply(chooseCardAction);
 
@@ -54,21 +60,26 @@ public class CardBattleFlow : AutomationFlow<object>
         yield return response;
         Action? action = response.Result;
 
+        // TODO: Move this somewhere else somehow so i dont need to copy paste it every time
         if (action == null)
         {
-            Plugin.Logger.LogFatal("Received invalid action, something broke along the way, I am sorry but IDK what do to. Restarting flow I guess...");
+            Plugin.Logger.LogError("Received invalid action, something broke along the way, I am sorry but IDK what do to. Restarting flow I guess...");
             yield return Execute(enumerator);
             yield break;
         }
 
         if (action.Match(chooseCardAction, out string? card))
         {
-            PlayableCard target = state.PlayerHand.Find(c => c.Name == card).TargetCard!;
-            Plugin.Logger.LogWarning("Moving to card " + target);
+            PlayableCard target = state.PlayerLanes.Values.First(c => c?.Name == card)!.TargetCard!;
 
             yield return NeuroMouse.MoveTo(target);
             yield return new WaitForSeconds(0.5f);
             NeuroMouse.ClickOnce();
+        }
+        else
+        {
+            Plugin.Logger.LogError("Received action which did not match possible expected actions. Flow will be restarted.");
+            yield return Execute(enumerator);
         }
     }
 }

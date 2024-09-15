@@ -11,7 +11,8 @@ public abstract class MessageBuilder<T> where T : class, new()
     public Response<T> Send()
     {
         WebsocketConnection.Send(GetMessage());
-        Response<T> response = new(ResponseCommand);
+        Response<T> response = new();
+        response.SubscribeTo(ResponseCommand);
         return response;
     }
 }

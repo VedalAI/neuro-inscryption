@@ -10,11 +10,6 @@ namespace NeuroInscryption.Input;
 [HarmonyPatch]
 public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 {
-    public static void SnapTo(InteractableBase interactable)
-    {
-        _simulatedMousePosition = GetCursorPosition(interactable);
-    }
-
     public static IEnumerator MoveTo(InteractableBase interactable, float mouseSpeedMultiplier = 1)
     {
         Vector2 end = GetCursorPosition(interactable);
@@ -28,6 +23,12 @@ public sealed class NeuroMouse : Singlyboi<NeuroMouse>
         }
 
         _simulatedMousePosition = end;
+
+        if (InteractionCursor.Instance.RaycastForInteractable<InteractableBase>(~LayerMask.GetMask(InteractionCursor.Instance.excludedLayers.ToArray()), InteractionCursor.Instance.transform.position) != interactable)
+        {
+            Plugin.Logger.LogError("Failed to move mouse to interactable, retrying...");
+            yield return MoveTo(interactable, mouseSpeedMultiplier * 2);
+        }
     }
 
     public static void ClickOnce(bool alt = false)

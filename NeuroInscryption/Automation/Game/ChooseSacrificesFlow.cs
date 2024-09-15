@@ -1,14 +1,17 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions;
-using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Json;
+using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
+using NeuroInscryption.Communication.Websocket;
+using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
-using Newtonsoft.Json;
 using UnityEngine;
 using GameState = NeuroInscryption.Communication.Data.GameState;
 
@@ -30,28 +33,46 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
         GameState.Board state = GameState.Board.Calculate();
         PlayableCard card = BoardManager.Instance.CurrentSacrificeDemandingCard;
 
-        JsonSchema responseSchema = JsonSchema.NewResponseSchema();
-        responseSchema.Apply(new ChooseSacrificesAction(card, state));
+        ChooseSacrificesAction chooseSacrificesAction = new(card, state);
 
-        CardData cardData = state.PlayerHand.Find(c => c.TargetCard == card);
+        JsonSchema responseSchema = JsonSchema.NewResponseSchema();
+        responseSchema.Apply(chooseSacrificesAction);
 
         Decision decision = new()
         {
             Id = "card_sacrifice_choice",
             State = state,
-            Query = string.Format(DecisionStrings.ChooseSacrificesDecision, cardData.GetDescription()),
+            Query = string.Format(DecisionStrings.ChooseSacrificesDecision, state.PlayerHand.Find(c => c.TargetCard == card).GetDescription()),
             ResponseSchema = responseSchema
         };
 
-        GUIUtility.systemCopyBuffer = JsonConvert.SerializeObject(decision, new JsonSerializerSettings
+        Response<Action> response = decision.Send();
+        yield return response;
+        Action? action = response.Result;
+
+        if (action == null)
         {
-            NullValueHandling = NullValueHandling.Ignore
-        });
+            Plugin.Logger.LogError("Received invalid action, something broke along the way, I am sorry but IDK what do to. Restarting flow I guess...");
+            yield return Execute(enumerator);
+            yield break;
+        }
 
-        // TODO: Send decision
-        // TODO: Get back sacrifices
-        // TODO: Click cards
+        if (action.Match(chooseSacrificesAction, out IEnumerable<string>? sacrifices))
+        {
+            IEnumerable<PlayableCard> targets = sacrifices.Select(sacrifice => state.PlayerHand.Find(c => c.Name == sacrifice).TargetCard!);
 
-        yield break;
+            foreach (PlayableCard target in targets)
+            {
+                yield return NeuroMouse.MoveTo(target);
+                yield return new WaitForSeconds(0.5f);
+                NeuroMouse.ClickOnce();
+                yield return new WaitForSeconds(0.25f);
+            }
+        }
+        else
+        {
+            Plugin.Logger.LogError("Received action which did not match possible expected actions. Flow will be restarted.");
+            yield return Execute(enumerator);
+        }
     }
 }
