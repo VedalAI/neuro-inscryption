@@ -15,7 +15,7 @@ using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
 
-public sealed class ChooseSacrificesFlow : AutomationFlow
+public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 {
     public override FlowHook[] Hooks =>
     [
@@ -26,20 +26,20 @@ public sealed class ChooseSacrificesFlow : AutomationFlow
         }
     ];
 
-    public override async UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(object _, CancellationToken ct)
     {
         GameState.Board state = GameState.Board.Calculate();
         PlayableCard card = BoardManager.Instance.CurrentSacrificeDemandingCard;
 
-        ChooseSacrificesAction chooseSacrificesAction = new(card, state);
+        SacrificeAction sacrificeAction = new(card, state);
 
         string query = string.Format(DecisionStrings.ChooseSacrificesDecision, state.PlayerHand.Find(c => c.TargetCard == card).GetDescription());
         Decision decision = new("card_sacrifice_choice", state, query);
-        decision.AddAction(chooseSacrificesAction);
+        decision.AddAction(sacrificeAction);
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(chooseSacrificesAction, out IEnumerable<string>? sacrifices))
+        if (action.Match(sacrificeAction, out IEnumerable<string>? sacrifices))
         {
             IEnumerable<PlayableCard> targets = sacrifices.Select(sacrifice => state.PlayerLanes.Values.First(c => c?.Name == sacrifice)!.TargetCard!);
 

@@ -10,7 +10,7 @@ namespace NeuroInscryption.Communication.Actions;
 
 using Sacrifice = (string name, int blood);
 
-public sealed class ChooseSacrificesAction(PlayableCard cardToPlay, GameState.Board state) : IAction<IEnumerable<string>>
+public sealed class SacrificeAction(PlayableCard cardToPlay, GameState.Board state) : IAction<IEnumerable<string>>
 {
     private const string _actionName = "choose_sacrifices";
 

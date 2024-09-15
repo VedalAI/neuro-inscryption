@@ -2,7 +2,7 @@
 using Cysharp.Threading.Tasks;
 using NeuroInscryption.Communication.Websocket;
 
-namespace NeuroInscryption.Communication.Messages;
+namespace NeuroInscryption.Communication.Messages.Outgoing;
 
 public abstract class OutgoingMessage<TResponse> where TResponse : class, new()
 {

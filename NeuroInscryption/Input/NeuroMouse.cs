@@ -12,7 +12,7 @@ namespace NeuroInscryption.Input;
 [HarmonyPatch]
 public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 {
-    public static async UniTask MoveToAsync(InteractableBase interactable, CancellationToken ct = default, float mouseSpeedMultiplier = 1)
+    public static async UniTask MoveToAsync(InteractableBase interactable, CancellationToken ct = default, float mouseSpeedMultiplier = 1, int tries = 10)
     {
         if (!interactable) throw new ArgumentNullException(nameof(interactable));
 
@@ -21,17 +21,21 @@ public sealed class NeuroMouse : Singlyboi<NeuroMouse>
         while (Vector2.Distance(_simulatedMousePosition, end) > 0.1f)
         {
             _simulatedMousePosition = Vector2.MoveTowards(_simulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 5 * Plugin.Config.MouseSpeedMultiplier.Value);
+            end = GetCursorPosition(interactable);
             await UniTask.Yield(ct);
         }
 
         _simulatedMousePosition = end;
 
+        if (tries <= 0) return;
+
         InteractionCursor cursor = InteractionCursor.Instance;
         int layerMask = ~LayerMask.GetMask(cursor.excludedLayers.ToArray());
-        if (cursor.RaycastForInteractable<InteractableBase>(layerMask, cursor.transform.position) != interactable)
+        InteractableBase? raycastHit = cursor.RaycastForInteractable<InteractableBase>(layerMask, cursor.transform.position);
+        if (!CursorReachedTarget(interactable, raycastHit))
         {
-            Plugin.Logger.LogError("Failed to move mouse to interactable, retrying...");
-            await MoveToAsync(interactable, ct, mouseSpeedMultiplier * 2);
+            Plugin.Logger.LogError($"Failed to move mouse to interactable {interactable} (instead found {raycastHit}), retrying...");
+            await MoveToAsync(interactable, ct, mouseSpeedMultiplier * 2, tries - 1);
         }
     }
 
@@ -119,6 +123,17 @@ public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 
     #endregion
 
+    private static bool CursorReachedTarget(InteractableBase target, InteractableBase? currentHit)
+    {
+        if (currentHit == null) return false;
+
+        if (target is CardSlot slot1 && currentHit is PlayableCard card1) return slot1.Card == card1;
+        if (target is PlayableCard card2 && currentHit is CardSlot slot2) return slot2.Card == card2;
+
+        return target == currentHit;
+    }
+
+    // TODO: More natural cursor positioning
     private static Vector2 GetCursorPosition(InteractableBase interactable)
     {
         Vector3 position;

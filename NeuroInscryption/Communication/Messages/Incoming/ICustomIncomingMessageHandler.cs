@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace NeuroInscryption.Communication.Messages;
+namespace NeuroInscryption.Communication.Messages.Incoming;
 
 public interface ICustomIncomingMessageHandler
 {

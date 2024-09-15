@@ -25,7 +25,7 @@ public class CardBattleFlow : AutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(PlayerHand), nameof(PlayerHand.SelectSlotForCard))),
-            IsValid = context => context.GetResult<bool>() == false && context.GetInstance()!.GetEnumeratorField<bool>("<cardWasPlayed>5__2") == false,
+            IsValid = context => context.GetResult<bool>() == false,
         }
     ];
 
@@ -36,16 +36,18 @@ public class CardBattleFlow : AutomationFlow<object>
             await UniTask.Delay(1000, cancellationToken: ct); // time it takes for the card to go back in the hand
         }
 
+        ViewManager.Instance.SwitchToView(BoardManager.Instance.DefaultView);
+
         GameState.Board state = GameState.Board.Calculate();
 
-        ChooseCardAction chooseCardAction = new(state);
+        PlayCardAction playCardAction = new(state);
 
         Decision decision = new("card_battle_turn", state, DecisionStrings.CardBattleDecision);
-        decision.AddAction(chooseCardAction);
+        decision.AddAction(playCardAction);
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(chooseCardAction, out string? card))
+        if (action.Match(playCardAction, out string? card))
         {
             PlayableCard target = state.PlayerHand.Find(c => c.Name == card).TargetCard!;
 

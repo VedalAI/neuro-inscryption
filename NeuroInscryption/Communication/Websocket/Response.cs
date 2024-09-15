@@ -1,4 +1,4 @@
-﻿using NeuroInscryption.Communication.Messages;
+﻿using NeuroInscryption.Communication.Messages.Incoming;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
