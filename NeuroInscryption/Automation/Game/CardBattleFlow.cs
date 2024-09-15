@@ -31,8 +31,6 @@ public class CardBattleFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool AllowInterruption => true;
-
     protected override IEnumerator Execute(object enumerator)
     {
         yield return new WaitForSeconds(1);
@@ -69,6 +67,7 @@ public class CardBattleFlow : AutomationFlow<object>
             Plugin.Logger.LogWarning("Moving to card " + target);
 
             yield return NeuroMouse.MoveTo(target);
+            yield return new WaitForSeconds(0.5f);
             NeuroMouse.ClickOnce();
         }
     }

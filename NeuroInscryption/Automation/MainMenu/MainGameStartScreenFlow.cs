@@ -15,8 +15,6 @@ public sealed class MainGameStartScreenFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool AllowInterruption => true;
-
     protected override IEnumerator Execute(object _)
     {
         // Allow manual control of game for stuff like changing settings

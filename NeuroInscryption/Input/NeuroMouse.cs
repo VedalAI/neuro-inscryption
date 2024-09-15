@@ -21,6 +21,8 @@ public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 
         while (Vector2.Distance(_simulatedMousePosition, end) > 0.1f)
         {
+            if (AutomationManager.Instance.AllowManualInput) yield break;
+
             _simulatedMousePosition = Vector2.MoveTowards(_simulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 5 * Plugin.Config.MouseSpeedMultiplier.Value);
             yield return null;
         }
@@ -62,7 +64,7 @@ public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 
         Cursor.visible = false;
 
-        __instance.transform.position = new Vector3(_simulatedMousePosition.x, _simulatedMousePosition.y, 0);
+        __instance.transform.position = new Vector3(_simulatedMousePosition.x, _simulatedMousePosition.y, __instance.rayCamera.nearClipPlane);
 
         return false;
     }
@@ -127,7 +129,7 @@ public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 
     private static Vector2 GetCursorPosition(InteractableBase interactable)
     {
-        Vector2 position;
+        Vector3 position;
 
         Transform topLeft = interactable.transform.Find("TopLeftMarker");
         Transform topRight = interactable.transform.Find("TopRightMarker");

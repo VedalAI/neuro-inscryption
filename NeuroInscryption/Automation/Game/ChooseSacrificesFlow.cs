@@ -25,8 +25,6 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool AllowInterruption => true;
-
     protected override IEnumerator Execute(object enumerator)
     {
         GameState.Board state = GameState.Board.Calculate();

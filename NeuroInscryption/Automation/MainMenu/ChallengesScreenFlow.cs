@@ -19,8 +19,6 @@ public sealed class ChallengesScreenFlow : AutomationFlow<AscensionChallengeScre
         }
     ];
 
-    public override bool AllowInterruption => true;
-
     protected override IEnumerator Execute(AscensionChallengeScreen target)
     {
         yield return new WaitForSeconds(1);

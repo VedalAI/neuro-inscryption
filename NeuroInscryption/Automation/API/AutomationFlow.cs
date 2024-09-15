@@ -24,8 +24,6 @@ public abstract class AutomationFlow
 
     public abstract FlowHook[] Hooks { get; }
 
-    public abstract bool AllowInterruption { get; }
-
     public abstract IEnumerator Execute(HarmonyContext context);
 }
 

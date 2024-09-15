@@ -17,8 +17,6 @@ public sealed class ChallengesConfirmScreenFlow : AutomationFlow<AscensionChalle
         }
     ];
 
-    public override bool AllowInterruption => true;
-
     protected override IEnumerator Execute(AscensionChallengeConfirmScreen target)
     {
         yield return NeuroMouse.MoveTo(target.continueButton);

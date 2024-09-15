@@ -17,8 +17,6 @@ public sealed class StartScreenFlow : AutomationFlow<AscensionStartScreen>
         }
     ];
 
-    public override bool AllowInterruption => true;
-
     protected override IEnumerator Execute(AscensionStartScreen target)
     {
         yield return new WaitForSeconds(1);

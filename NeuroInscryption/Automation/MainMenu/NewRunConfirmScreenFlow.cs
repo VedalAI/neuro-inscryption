@@ -18,8 +18,6 @@ public sealed class NewRunConfirmScreenFlow : AutomationFlow<AscensionMenuScreen
         }
     ];
 
-    public override bool AllowInterruption => true;
-
     protected override IEnumerator Execute(AscensionMenuScreenTransition target)
     {
         yield return NeuroMouse.MoveTo(target.screenInteractables[1]);

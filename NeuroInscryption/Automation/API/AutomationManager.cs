@@ -139,14 +139,14 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         }
         else
         {
-            if (Instance._currentFlow?.AllowInterruption ?? true)
+            if (/*Instance._currentFlow?.AllowInterruption ??*/ true)
             {
                 Instance.AllowManualInput = true;
             }
-            else
+            /*else
             {
                 Instance._wantsManualControl = true;
-            }
+            }*/
         }
     }
 
