@@ -10,12 +10,12 @@ namespace NeuroInscryption.Input;
 [HarmonyPatch]
 public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 {
-    public static void SnapTo(Component interactable)
+    public static void SnapTo(InteractableBase interactable)
     {
-        _simulatedMousePosition = GetScreenPoint(interactable.transform.position);
+        _simulatedMousePosition = GetCursorPosition(interactable);
     }
 
-    public static IEnumerator MoveTo(Component interactable, float mouseSpeedMultiplier = 1)
+    public static IEnumerator MoveTo(InteractableBase interactable, float mouseSpeedMultiplier = 1)
     {
         if (_simulatedMousePosition == default)
         {
@@ -23,11 +23,11 @@ public sealed class NeuroMouse : Singlyboi<NeuroMouse>
             yield break;
         }
 
-        Vector2 end = GetScreenPoint(interactable.transform.position);
+        Vector2 end = GetCursorPosition(interactable);
 
         while (Vector2.Distance(_simulatedMousePosition, end) > 0.1f)
         {
-            _simulatedMousePosition = Vector2.MoveTowards(_simulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 2000 * Plugin.Config.MouseSpeedMultiplier.Value);
+            _simulatedMousePosition = Vector3.MoveTowards(_simulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 5 * Plugin.Config.MouseSpeedMultiplier.Value);
             yield return null;
         }
 
@@ -61,7 +61,7 @@ public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 
     #region Position
 
-    private static Vector2 _simulatedMousePosition;
+    private static Vector3 _simulatedMousePosition;
 
     [HarmonyPatch(typeof(InteractionCursor), nameof(InteractionCursor.UpdatePosition))]
     [HarmonyPrefix]
@@ -73,8 +73,7 @@ public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 
         Cursor.visible = false;
 
-        Vector2 worldPoint = __instance.rayCamera.ScreenToWorldPoint(_simulatedMousePosition);
-        __instance.transform.position = new Vector3(worldPoint.x, worldPoint.y, __instance.rayCamera.nearClipPlane);
+        __instance.transform.position = _simulatedMousePosition;
 
         return false;
     }
@@ -130,5 +129,19 @@ public sealed class NeuroMouse : Singlyboi<NeuroMouse>
 
     #endregion
 
-    private static Vector2 GetScreenPoint(Vector3 position) => InteractionCursor.Instance.rayCamera.WorldToScreenPoint(position);
+    private static Vector3 GetCursorPosition(InteractableBase interactable)
+    {
+        Vector3 position;
+
+        Transform topLeft = interactable.transform.Find("TopLeftMarker");
+        Transform topRight = interactable.transform.Find("TopRightMarker");
+
+        if (topLeft && InteractionCursor.Instance.CastForInteractableAtWorldPosition(topLeft.position) == interactable) position = topLeft.position;
+        else if (topRight) position = topRight.position;
+        else position = interactable.transform.position;
+
+        Vector2 screenPoint = Camera.main!.WorldToScreenPoint(position);
+        Vector2 cursorPoint = InteractionCursor.Instance.rayCamera.ScreenToWorldPoint(screenPoint);
+        return new Vector3(cursorPoint.x, cursorPoint.y, InteractionCursor.Instance.rayCamera.nearClipPlane);
+    }
 }
