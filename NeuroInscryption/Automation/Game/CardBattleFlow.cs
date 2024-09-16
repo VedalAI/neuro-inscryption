@@ -41,10 +41,12 @@ public class CardBattleFlow : AutomationFlow<object>
         GameState.Board state = GameState.Board.Calculate();
 
         ChooseCardAction chooseCardAction = new(state);
+        AcceptSurrenderAction acceptSurrenderAction = new(state);
         EndTurnAction endTurnAction = new();
 
         Decision decision = new("card_battle_turn", state, DecisionStrings.CardBattleDecision);
         decision.AddAction(chooseCardAction);
+        decision.AddAction(acceptSurrenderAction);
         decision.AddAction(endTurnAction);
 
         Action action = await decision.SendAsync(ct);
@@ -54,6 +56,12 @@ public class CardBattleFlow : AutomationFlow<object>
             PlayableCard target = state.PlayerHand.Find(c => c.Identifier == card).TargetCard!;
 
             await NeuroMouse.MoveToAsync(target, ct);
+            await UniTask.Delay(500, cancellationToken: ct);
+            NeuroMouse.ClickOnce();
+        }
+        else if (action.Match(acceptSurrenderAction))
+        {
+            await NeuroMouse.MoveToAsync(LeshyAnimationController.Instance.oliveBranchInteractable, ct);
             await UniTask.Delay(500, cancellationToken: ct);
             NeuroMouse.ClickOnce();
         }

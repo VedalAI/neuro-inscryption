@@ -86,10 +86,10 @@ public sealed class CardData
 
         DisplayName = TargetCardInfo.DisplayedNameEnglish;
         Health = TargetCardInfo.Health;
-        Power = CalculatePower();
+        Power = GetPower();
         Sigils = GetSigils(false);
         RelevantSigils = GetSigils(true);
-        Cost = TargetCardInfo.BonesCost > 0 ? string.Format(CardStrings.BonesCost, TargetCardInfo.BonesCost) : string.Format(CardStrings.BloodCost, TargetCardInfo.BloodCost);
+        Cost = GetCost();
         CanBeSacrificed = TargetCardInfo.Sacrificable || TargetCardInfo.HasAbility(Ability.TripleBlood);
         Tribes = TargetCardInfo.tribes.Count == 0 ? null : string.Join(CardStrings.InfoSeparator, TargetCardInfo.tribes);
         Traits = GetTraits();
@@ -101,7 +101,7 @@ public sealed class CardData
 
         DisplayName = TargetCardInfo.DisplayedNameEnglish;
         Identifier = GetIdentifier(TargetCardInfo.DisplayedNameEnglish);
-        Power = CalculatePower();
+        Power = GetPower();
         IsPlayable = !TargetCard.InHand ? null : TargetCard.CanPlay();
 
         if (!TargetCard.InHand) Cost = null;
@@ -175,7 +175,7 @@ public sealed class CardData
         return sb.ToString();
     }
 
-    private string CalculatePower()
+    private string GetPower()
     {
         foreach (SpecialTriggeredAbility ability in TargetCardInfo.SpecialAbilities)
         {
@@ -202,6 +202,13 @@ public sealed class CardData
         }
 
         return TargetCardInfo.Attack.ToString();
+    }
+
+    private string GetCost()
+    {
+        if (TargetCardInfo.BonesCost > 0) return string.Format(CardStrings.BonesCost, TargetCardInfo.BonesCost);
+        if (TargetCardInfo.BloodCost > 0) return string.Format(CardStrings.BloodCost, TargetCardInfo.BloodCost);
+        return CardStrings.FreeCost;
     }
 
     private List<SigilData> GetSigils(bool includeTangential)

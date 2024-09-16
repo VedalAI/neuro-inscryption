@@ -2,6 +2,7 @@
 
 public static class CardStrings
 {
+    public const string FreeCost = "free";
     public const string BonesCost = "{0} bones";
     public const string BloodCost = "{0} blood";
     public const string IjiraqBonesCost = "{0} bones (but won't consume them when played)";

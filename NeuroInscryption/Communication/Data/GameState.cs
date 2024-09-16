@@ -30,6 +30,8 @@ public static class GameState
         public readonly Dictionary<string, string>? SigilDescriptions;
         public readonly Dictionary<string, string>? TraitDescriptions;
 
+        public readonly bool? IsOpponentSurrendering;
+
         [JsonProperty("Note")]
         private string? Note => Ijiraq.AnythingCouldBeIjiraq ? StateStrings.IjiraqPresent : null;
 
@@ -64,6 +66,8 @@ public static class GameState
                 .SelectMany(c => c.Traits).Distinct()
                 .ToDictionary(t => t.Name, t => t.Description)
                 .NullIfEmpty();
+
+            IsOpponentSurrendering = TurnManager.Instance.Opponent.OfferingSurrender ? true : null;
         }
 
         // ["playerTotem"]
@@ -72,7 +76,6 @@ public static class GameState
         // ["enemyTotem"]
         // ["enemyLives"]
         // ["boons"]
-        // ["isOpponentSurrendering"] ?
         // ["bossAbilityDescription"] ?
 
         public class IjiraqState
