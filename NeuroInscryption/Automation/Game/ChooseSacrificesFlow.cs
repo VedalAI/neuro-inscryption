@@ -45,10 +45,8 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 
             foreach (PlayableCard target in targets)
             {
-                await NeuroMouse.MoveToAsync(target, ct);
-                await UniTask.Delay(500, cancellationToken: ct);
-                NeuroMouse.ClickOnce();
-                await UniTask.Delay(250, cancellationToken: ct);
+                await NeuroMouse.MoveToAsync(target, 500, ct);
+                await NeuroMouse.Click(250, ct);
             }
         }
         else

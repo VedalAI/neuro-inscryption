@@ -20,8 +20,7 @@ public sealed class StartScreenFlow : AutomationFlow<AscensionStartScreen>
     protected override async UniTask ExecuteAsync(AscensionStartScreen target, CancellationToken ct)
     {
         await UniTask.Delay(1000, cancellationToken: ct);
-        await NeuroMouse.MoveToAsync(target.RunExists ? target.continueRunText : target.newRunText, ct);
-        await UniTask.Delay(500, cancellationToken: ct);
-        NeuroMouse.ClickOnce();
+        await NeuroMouse.MoveToAsync(target.RunExists ? target.continueRunText : target.newRunText, 500, ct);
+        NeuroMouse.Click();
     }
 }

@@ -20,8 +20,7 @@ public sealed class NewRunConfirmScreenFlow : AutomationFlow<AscensionMenuScreen
 
     protected override async UniTask ExecuteAsync(AscensionMenuScreenTransition target, CancellationToken ct)
     {
-        await NeuroMouse.MoveToAsync(target.screenInteractables[1], ct);
-        await UniTask.Delay(500, cancellationToken: ct);
-        NeuroMouse.ClickOnce();
+        await NeuroMouse.MoveToAsync(target.screenInteractables[1], 500, ct);
+        NeuroMouse.Click();
     }
 }

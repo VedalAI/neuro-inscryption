@@ -30,16 +30,14 @@ public sealed class ChallengesScreenFlow : AutomationFlow<AscensionChallengeScre
         {
             if (enabledChallenges.Includes(icon.Info.challengeType, seenDifficulty) != icon.activatedRenderer.enabled)
             {
-                await NeuroMouse.MoveToAsync(icon, ct);
-                await UniTask.Delay(200, cancellationToken: ct);
-                NeuroMouse.ClickOnce();
+                await NeuroMouse.MoveToAsync(icon, 200, ct);
+                NeuroMouse.Click();
             }
 
             if (icon.Info.challengeType == AscensionChallenge.BaseDifficulty) seenDifficulty = true;
         }
 
-        await NeuroMouse.MoveToAsync(target.continueButton, ct);
-        await UniTask.Delay(500, cancellationToken: ct);
-        NeuroMouse.ClickOnce();
+        await NeuroMouse.MoveToAsync(target.continueButton, 500, ct);
+        NeuroMouse.Click();
     }
 }

@@ -40,9 +40,8 @@ public sealed class DrawCardFlow : AutomationFlow<object>
         if (action.Match(drawCardAction, out bool drawFromSideDeck))
         {
             CardPile target = !drawFromSideDeck ? CardDrawPiles3D.Instance.Pile : CardDrawPiles3D.Instance.SidePile;
-            await NeuroMouse.MoveToAsync(target, ct);
-            await UniTask.Delay(500, cancellationToken: ct);
-            NeuroMouse.ClickOnce();
+            await NeuroMouse.MoveToAsync(target, 500, ct);
+            NeuroMouse.Click();
         }
         else
         {

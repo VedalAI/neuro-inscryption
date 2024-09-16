@@ -13,7 +13,7 @@ using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
 
-public class CardBattleFlow : AutomationFlow<object>
+public sealed class CardBattleFlow : AutomationFlow<object>
 {
     public override FlowHook[] Hooks =>
     [
@@ -55,21 +55,18 @@ public class CardBattleFlow : AutomationFlow<object>
         {
             PlayableCard target = state.PlayerHand.Find(c => c.Identifier == card).TargetCard!;
 
-            await NeuroMouse.MoveToAsync(target, ct);
-            await UniTask.Delay(500, cancellationToken: ct);
-            NeuroMouse.ClickOnce();
+            await NeuroMouse.MoveToAsync(target, 500, ct);
+            NeuroMouse.Click();
         }
         else if (action.Match(acceptSurrenderAction))
         {
-            await NeuroMouse.MoveToAsync(LeshyAnimationController.Instance.oliveBranchInteractable, ct);
-            await UniTask.Delay(500, cancellationToken: ct);
-            NeuroMouse.ClickOnce();
+            await NeuroMouse.MoveToAsync(LeshyAnimationController.Instance.oliveBranchInteractable, 500, ct);
+            NeuroMouse.Click();
         }
         else if (action.Match(endTurnAction))
         {
-            await NeuroMouse.MoveToAsync(((BoardManager3D) BoardManager.Instance).Bell, ct);
-            await UniTask.Delay(500, cancellationToken: ct);
-            NeuroMouse.ClickOnce();
+            await NeuroMouse.MoveToAsync(((BoardManager3D) BoardManager.Instance).Bell, 500, ct);
+            NeuroMouse.Click();
         }
         else
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 
@@ -25,7 +26,21 @@ public sealed class FlowRunner
 
     public void QueueFlow(AutomationFlow flow, HarmonyContext context)
     {
-        Plugin.Logger.LogMessage($"Changing flow to {flow.GetType().Name}.");
+        if (_currentFlow != null && _currentFlow.FlowsBlockedForInterruption.Contains(flow.GetType()))
+        {
+            if (_currentFlow.GetType() == flow.GetType())
+            {
+                Plugin.Logger.LogInfo($"Prevented changing flow from {FlowName} to itself.");
+            }
+            else
+            {
+                Plugin.Logger.LogMessage($"Preventing changing flow from {FlowName} to {flow.GetType().Name}.");
+            }
+
+            return;
+        }
+
+        Plugin.Logger.LogMessage($"Changing flow from {FlowName} to {flow.GetType().Name}.");
 
         _cts?.Cancel();
 
@@ -36,6 +51,14 @@ public sealed class FlowRunner
     public void RestartLastFlow()
     {
         if (_currentFlow == null) return;
+
+        if (_cts?.IsCancellationRequested == false && _currentFlow.FlowsBlockedForInterruption.Contains(_currentFlow.GetType()))
+        {
+            Plugin.Logger.LogInfo($"Restarting flow {FlowName} was blocked.");
+            return;
+        }
+
+        Plugin.Logger.LogMessage($"Starting flow {FlowName}.");
 
         _cts?.Cancel();
         _cts?.Dispose();
@@ -48,6 +71,13 @@ public sealed class FlowRunner
     {
         try
         {
+            object? instance = context.GetInstance();
+            if (instance == null || instance is UnityEngine.Object unityObject && unityObject == null)
+            {
+                Plugin.Logger.LogWarning($"Flow {FlowName} was cancelled because the target object was destroyed.");
+                return;
+            }
+
             await flow.ExecuteAsync(context, ct);
             Plugin.Logger.LogMessage($"Flow {FlowName} completed.");
             _currentFlow = null;

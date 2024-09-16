@@ -63,6 +63,15 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         }
     }
 
+    private void Update()
+    {
+        if (UnityEngine.Input.GetKeyDown(KeyCode.U))
+        {
+            Instance.AllowManualInput = !Instance.AllowManualInput;
+            Plugin.Logger.LogWarning($"Manul input {(Instance.AllowManualInput ? "enabled" : "disabled")}");
+        }
+    }
+
     private void TryStartNewFlow(string description, HarmonyContext context)
     {
         if (!_flowCache.TryGetValue(description, out List<LinkedFlowHook> flows))
@@ -95,15 +104,6 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
                 _flowRunner.StartFlow(linked.flow, context);
             }
         }
-    }
-
-    [HarmonyPatch(typeof(InteractionCursor), nameof(InteractionCursor.UpdatePosition))]
-    [HarmonyPrefix]
-    private static void ManualControlHandler()
-    {
-        if (!UnityEngine.Input.GetKeyDown(KeyCode.U)) return;
-
-        Instance.AllowManualInput = !Instance.AllowManualInput;
     }
 
     #region Patch methods

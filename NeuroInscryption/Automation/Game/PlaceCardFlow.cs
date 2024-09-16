@@ -40,9 +40,8 @@ public sealed class PlaceCardFlow : AutomationFlow<object>
         if (action.Match(placeCardAction, out int lane))
         {
             CardSlot slot = BoardManager.Instance.playerSlots[lane];
-            await NeuroMouse.MoveToAsync(slot, ct);
-            await UniTask.Delay(500, cancellationToken: ct);
-            NeuroMouse.ClickOnce();
+            await NeuroMouse.MoveToAsync(slot, 500, ct);
+            NeuroMouse.Click();
         }
         else
         {

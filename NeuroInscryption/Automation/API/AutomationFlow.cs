@@ -23,7 +23,15 @@ public abstract class AutomationFlow
             .ToList();
     }
 
+    /// <summary>
+    /// A list of Harmony patch hooks that are able to trigger this flow
+    /// </summary>
     public abstract FlowHook[] Hooks { get; }
+
+    /// <summary>
+    /// A list of <see cref="AutomationFlow"/> types that cannot interrupt this flow
+    /// </summary>
+    public virtual Type[] FlowsBlockedForInterruption => [];
 
     public abstract UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct);
 }
