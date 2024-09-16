@@ -21,7 +21,7 @@ public sealed class ChooseCardAction(GameState.Board state) : IAction<string>
             Properties = new Dictionary<string, JsonSchema>
             {
                 ["action"] = QJS.Const(_actionName),
-                ["data"] = QJS.Enum(state.PlayerHand.Where(c => c.IsPlayable == true).Select(c => c.Name))
+                ["data"] = QJS.Enum(state.PlayerHand.Where(c => c.IsPlayable == true).Select(c => c.Identifier!))
             }
         });
     }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
 using DiskCardGame;
 using JetBrains.Annotations;
 using NeuroInscryption.Communication.Strings;
@@ -16,7 +17,9 @@ public sealed class CardData
     private static readonly HashSet<Trait> _nonImmediateTraits = [Trait.Ant, Trait.Pelt, Trait.Uncuttable, Trait.Giant, Trait.KillsSurvivors, Trait.Goat, Trait.Lice];
     private static readonly HashSet<SpecialTriggeredAbility> _nonImmediateAbilities = [SpecialTriggeredAbility.Cat, SpecialTriggeredAbility.JerseyDevil, SpecialTriggeredAbility.Daus, SpecialTriggeredAbility.Ouroboros];
 
-    public readonly string Name;
+    public readonly string DisplayName;
+
+    public readonly string? Identifier;
 
     public readonly int? Health;
 
@@ -69,7 +72,7 @@ public sealed class CardData
 
         if (TargetCardInfo.name == "!STATIC!GLITCH")
         {
-            Name = "Glitched Card";
+            DisplayName = "Glitched Card";
             Sigils = [];
             RelevantSigils = [];
             Traits = [];
@@ -81,7 +84,7 @@ public sealed class CardData
             TargetCardInfo = CardLoader.GetCardByName("Ijiraq");
         }
 
-        Name = TargetCardInfo.DisplayedNameEnglish;
+        DisplayName = TargetCardInfo.DisplayedNameEnglish;
         Health = TargetCardInfo.Health;
         Power = CalculatePower();
         Sigils = GetSigils(false);
@@ -96,7 +99,8 @@ public sealed class CardData
     {
         TargetCard = card;
 
-        Name = $"{TargetCard.Info.DisplayedNameEnglish}{(TargetCard.OpponentCard ? null : $" ({(TargetCard.InHand ? 12 + PlayerHand.Instance.CardsInHand.IndexOf(TargetCard) : BoardManager.Instance.CardsOnBoard.IndexOf(TargetCard))})")}";
+        DisplayName = TargetCardInfo.DisplayedNameEnglish;
+        Identifier = GetIdentifier(TargetCardInfo.DisplayedNameEnglish);
         Power = CalculatePower();
         IsPlayable = !TargetCard.InHand ? null : TargetCard.CanPlay();
 
@@ -110,7 +114,8 @@ public sealed class CardData
         {
             CardInfo ijiraq = CardLoader.GetCardByName("Ijiraq");
 
-            Name = ijiraq.DisplayedNameEnglish;
+            DisplayName = ijiraq.DisplayedNameEnglish;
+            Identifier = GetIdentifier(ijiraq.DisplayedNameEnglish);
             Health = ijiraq.Health;
             Power = ijiraq.Attack.ToString();
             if (TargetCard.Info.BonesCost > 0) Cost = string.Format(CardStrings.IjiraqBonesCost, TargetCard.Info.BonesCost);
@@ -141,13 +146,33 @@ public sealed class CardData
     public string GetDescription()
     {
         return string.Format(CardStrings.Description,
-            Name,
+            DisplayName,
             Power,
             Health,
             SigilNames != null ? CardStrings.InfoSeparator + string.Join(CardStrings.InfoSeparator, SigilNames) : "",
             _maybeIjiraq ? CardStrings.InfoSeparator + CardStrings.IjiraqNarrowedDownShortDescription : "",
             Cost
         );
+    }
+
+    private string GetIdentifier(string displayName)
+    {
+        StringBuilder sb = new(displayName);
+
+        if (TargetCard!.OpponentCard) return sb.ToString();
+
+        // $" ({(TargetCard.InHand ? 12 + PlayerHand.Instance.CardsInHand.IndexOf(TargetCard) : BoardManager.Instance.CardsOnBoard.IndexOf(TargetCard))})")}"
+
+        if (TargetCard.InHand)
+        {
+            sb.Append($" ({PlayerHand.Instance.CardsInHand.IndexOf(TargetCard)})");
+        }
+        else
+        {
+            sb.Append($" (Lane {BoardManager.Instance.playerSlots.FindIndex(slot => slot.Card == TargetCard)})");
+        }
+
+        return sb.ToString();
     }
 
     private string CalculatePower()

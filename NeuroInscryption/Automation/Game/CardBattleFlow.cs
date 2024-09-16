@@ -51,7 +51,7 @@ public class CardBattleFlow : AutomationFlow<object>
 
         if (action.Match(chooseCardAction, out string? card))
         {
-            PlayableCard target = state.PlayerHand.Find(c => c.Name == card).TargetCard!;
+            PlayableCard target = state.PlayerHand.Find(c => c.Identifier == card).TargetCard!;
 
             await NeuroMouse.MoveToAsync(target, ct);
             await UniTask.Delay(500, cancellationToken: ct);

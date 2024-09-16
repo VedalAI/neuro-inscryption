@@ -54,7 +54,7 @@ public static class TraitStrings
     private static readonly Describable _mirror = ("Mirror", "The power of a card bearing this trait is equal to the power of the card opposite it.");
 
     [Describes(SpecialTriggeredAbility.BellProximity)]
-    private static readonly Describable _bellProximity = ("Leftmost", "The power of a card bearing this trait ranges from 4 to 1, depending on which lane you place it in.");
+    private static readonly Describable _bellProximity = ("Bell Ringer", "The base power of a card bearing this trait ranges from 4 to 1, depending on how close it is to the bell. The bell is located to the left of lane 0. Additionally, this card gains 1 additional power for every Chime it is next to.");
 
     [Describes(SpecialTriggeredAbility.TrapSpawner)]
     private static readonly Describable _trapSpawner = ("Trap Spawner", "When a card bearing this trait dies, a Leaping Trap (0 power, 1 health, Steel Trap and Mighty Leap sigils) is played in its place.");

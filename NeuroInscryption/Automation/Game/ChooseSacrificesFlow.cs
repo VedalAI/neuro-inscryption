@@ -41,7 +41,7 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 
         if (action.Match(sacrificeAction, out IEnumerable<string>? sacrifices))
         {
-            IEnumerable<PlayableCard> targets = sacrifices.Select(sacrifice => state.PlayerLanes.Values.First(c => c?.Name == sacrifice)!.TargetCard!);
+            IEnumerable<PlayableCard> targets = sacrifices.Select(sacrifice => state.PlayerLanes.Values.First(c => c?.Identifier == sacrifice)!.TargetCard!);
 
             foreach (PlayableCard target in targets)
             {

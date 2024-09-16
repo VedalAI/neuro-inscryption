@@ -66,8 +66,6 @@ public static class GameState
                 .NullIfEmpty();
         }
 
-        // TODO: Standardize card ids so that empty lanes are taken into account in the index calculation
-
         // ["playerTotem"]
         // ["items"]
         // ["remainingSquirrels"] ?

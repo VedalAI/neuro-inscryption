@@ -30,7 +30,7 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, GameState.Board sta
     {
         List<Sacrifice> sacrificableSlots = BoardManager.Instance.playerSlots
             .Where(p => p.Card && p.Card.CanBeSacrificed)
-            .Select(p => (state.PlayerLanes.Values.First(c => c?.TargetCard == p.Card)!.Name, p.Card.HasAbility(Ability.TripleBlood) ? 3 : 1))
+            .Select(p => (state.PlayerLanes.Values.First(c => c?.TargetCard == p.Card)!.Identifier!, p.Card.HasAbility(Ability.TripleBlood) ? 3 : 1))
             .ToList();
 
         List<List<Sacrifice>> possibilities = DontOpenJumpscareWarning.GenerateAllPermutationsOfSubsets(sacrificableSlots);
