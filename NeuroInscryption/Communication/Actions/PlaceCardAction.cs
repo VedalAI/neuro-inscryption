@@ -23,7 +23,7 @@ public sealed class PlaceCardAction(GameState.Board state) : IAction<int>
         });
     }
 
-    string IAction<int>.ActionName => _actionName;
+    string IAction.ActionName => _actionName;
     bool IAction<int>.Deserialize(Action action, out int response)
     {
         response = action.ActionData?.Value<int>() ?? -1;

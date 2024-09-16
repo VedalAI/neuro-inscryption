@@ -19,6 +19,11 @@ public class Action : ICustomIncomingMessageHandler
         ActionData = data["data"];
     }
 
+    public bool Match(IAction iAction)
+    {
+        return iAction.ActionName == ActionName;
+    }
+
     public bool Match<TResponse>(IAction<TResponse> iAction, [NotNullWhen(true)] out TResponse? response)
     {
         if (iAction.ActionName != ActionName)

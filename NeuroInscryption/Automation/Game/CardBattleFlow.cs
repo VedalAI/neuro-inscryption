@@ -40,18 +40,26 @@ public class CardBattleFlow : AutomationFlow<object>
 
         GameState.Board state = GameState.Board.Calculate();
 
-        PlayCardAction playCardAction = new(state);
+        ChooseCardAction chooseCardAction = new(state);
+        EndTurnAction endTurnAction = new();
 
         Decision decision = new("card_battle_turn", state, DecisionStrings.CardBattleDecision);
-        decision.AddAction(playCardAction);
+        decision.AddAction(chooseCardAction);
+        decision.AddAction(endTurnAction);
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(playCardAction, out string? card))
+        if (action.Match(chooseCardAction, out string? card))
         {
             PlayableCard target = state.PlayerHand.Find(c => c.Name == card).TargetCard!;
 
             await NeuroMouse.MoveToAsync(target, ct);
+            await UniTask.Delay(500, cancellationToken: ct);
+            NeuroMouse.ClickOnce();
+        }
+        else if (action.Match(endTurnAction))
+        {
+            await NeuroMouse.MoveToAsync(((BoardManager3D) BoardManager.Instance).Bell, ct);
             await UniTask.Delay(500, cancellationToken: ct);
             NeuroMouse.ClickOnce();
         }

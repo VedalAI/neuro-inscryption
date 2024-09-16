@@ -51,7 +51,7 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, GameState.Board sta
         return possibilities.Select(p => p.Select(s => s.name).ToList());
     }
 
-    string IAction<IEnumerable<string>>.ActionName => _actionName;
+    string IAction.ActionName => _actionName;
     bool IAction<IEnumerable<string>>.Deserialize(Action action, out IEnumerable<string>? response)
     {
         response = action.ActionData?.Values<string>()!;

@@ -28,7 +28,7 @@ public sealed class Decision(string id, object state, string query) : OutgoingMe
     protected override WsMessage GetMessage() => new("decision", this);
     protected override string ResponseCommand => "action";
 
-    public void AddAction<TResponse>(IAction<TResponse> action)
+    public void AddAction(IAction action)
     {
         _responseSchema.Apply(action);
     }

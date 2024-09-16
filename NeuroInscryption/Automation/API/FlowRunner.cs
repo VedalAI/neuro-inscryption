@@ -25,7 +25,7 @@ public sealed class FlowRunner
 
     public void QueueFlow(AutomationFlow flow, HarmonyContext context)
     {
-        Plugin.Logger.LogMessage($"Changing flow from {FlowName} to {flow.GetType().Name}.");
+        Plugin.Logger.LogMessage($"Changing flow to {flow.GetType().Name}.");
 
         _cts?.Cancel();
 
@@ -51,6 +51,10 @@ public sealed class FlowRunner
             await flow.ExecuteAsync(context, ct);
             Plugin.Logger.LogMessage($"Flow {FlowName} completed.");
             _currentFlow = null;
+        }
+        catch (OperationCanceledException)
+        {
+            Plugin.Logger.LogMessage($"Flow {FlowName} was cancelled.");
         }
         catch (Exception e)
         {

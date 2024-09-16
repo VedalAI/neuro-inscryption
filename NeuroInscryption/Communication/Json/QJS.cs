@@ -7,8 +7,6 @@ namespace NeuroInscryption.Communication.Json;
 // ReSharper disable once InconsistentNaming
 public static class QJS
 {
-    public static JsonSchema ConstEmptyArray => Const(Array.Empty<object>());
-
     private static JsonSchema Const<T>(T value)
     {
         return new JsonSchema
@@ -21,6 +19,8 @@ public static class QJS
     public static JsonSchema Const(int value) => Const<int>(value);
     public static JsonSchema Const(IEnumerable<string> values) => Const<IEnumerable<string>>(values);
     public static JsonSchema Const(IEnumerable<int> values) => Const<IEnumerable<int>>(values);
+    public static JsonSchema ConstEmptyArray => Const(Array.Empty<object>());
+    public static JsonSchema ConstNull => Const<object?>(null);
 
     private static JsonSchema Enum<T>(IEnumerable<T> values)
     {

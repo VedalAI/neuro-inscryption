@@ -8,7 +8,7 @@ using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Communication.Actions;
 
-public sealed class PlayCardAction(GameState.Board state) : IAction<string>
+public sealed class ChooseCardAction(GameState.Board state) : IAction<string>
 {
     private const string _actionName = "choose_card_to_play";
 
@@ -26,7 +26,7 @@ public sealed class PlayCardAction(GameState.Board state) : IAction<string>
         });
     }
 
-    string IAction<string>.ActionName => _actionName;
+    string IAction.ActionName => _actionName;
 
     bool IAction<string>.Deserialize(Action action, out string? response)
     {
