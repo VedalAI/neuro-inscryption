@@ -22,7 +22,7 @@ public sealed class InputHandler : Singlyboi<InputHandler>
     {
         Cursor.lockState = CursorLockMode.None;
 
-        if (AutomationManager.Instance.AllowManualInput) return true;
+        if (AutomationManager.AllowManualInput) return true;
 
         Cursor.visible = false;
 
@@ -35,7 +35,7 @@ public sealed class InputHandler : Singlyboi<InputHandler>
     [HarmonyPostfix]
     private static void ResetSimulatedPosition(InteractionCursor __instance)
     {
-        if (AutomationManager.Instance.AllowManualInput) SimulatedMousePosition = __instance.transform.position;
+        if (AutomationManager.AllowManualInput) SimulatedMousePosition = __instance.transform.position;
     }
 
     #endregion
@@ -50,11 +50,31 @@ public sealed class InputHandler : Singlyboi<InputHandler>
         _buttonHandlers[button].Enqueue(down);
     }
 
+    [HarmonyPatch(typeof(InputButtons), nameof(InputButtons.AnyGamepadButton))]
+    [HarmonyPrefix]
+    private static bool DisableAnyGamepadButton(ref bool __result)
+    {
+        if (AutomationManager.AllowManualInput) return true;
+
+        __result = false;
+        return false;
+    }
+
+    [HarmonyPatch(typeof(InputButtons), nameof(InputButtons.GetAxis))]
+    [HarmonyPrefix]
+    private static bool DisableGetAxis(ref float __result)
+    {
+        if (AutomationManager.AllowManualInput) return true;
+
+        __result = 0f;
+        return false;
+    }
+
     [HarmonyPatch(typeof(InputButtons), nameof(InputButtons.GetButton))]
     [HarmonyPrefix]
     private static bool CustomGetButton(ref bool __result, Button button)
     {
-        if (AutomationManager.Instance.AllowManualInput) return true;
+        if (AutomationManager.AllowManualInput) return true;
 
         if (_buttonHandlers.TryGetValue(button, out IndividualButtonHandler? handler))
         {
@@ -66,10 +86,11 @@ public sealed class InputHandler : Singlyboi<InputHandler>
     }
 
     [HarmonyPatch(typeof(InputButtons), nameof(InputButtons.GetButtonDown))]
+    [HarmonyPatch(typeof(InputButtons), nameof(InputButtons.GetButtonRepeating))]
     [HarmonyPrefix]
     private static bool CustomGetButtonDown(ref bool __result, Button button)
     {
-        if (AutomationManager.Instance.AllowManualInput) return true;
+        if (AutomationManager.AllowManualInput) return true;
 
         if (_buttonHandlers.TryGetValue(button, out IndividualButtonHandler? handler))
         {
@@ -84,7 +105,7 @@ public sealed class InputHandler : Singlyboi<InputHandler>
     [HarmonyPrefix]
     private static bool CustomGetButtonUp(ref bool __result, Button button)
     {
-        if (AutomationManager.Instance.AllowManualInput) return true;
+        if (AutomationManager.AllowManualInput) return true;
 
         if (_buttonHandlers.TryGetValue(button, out IndividualButtonHandler? handler))
         {
@@ -94,8 +115,6 @@ public sealed class InputHandler : Singlyboi<InputHandler>
 
         return true;
     }
-
-    // TODO: fix wasd and scroll wheel
 
     private void Update()
     {

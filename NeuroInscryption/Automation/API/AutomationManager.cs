@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using DiskCardGame;
 using HarmonyLib;
 using JetBrains.Annotations;
+using NeuroInscryption.Tweaks;
 using NeuroInscryption.Utilities;
 using UnityEngine;
 
@@ -14,11 +14,13 @@ using LinkedFlowHook = (FlowHook hook, AutomationFlow flow);
 [HarmonyPatch]
 public sealed class AutomationManager : Singlyboi<AutomationManager>
 {
-    private readonly Dictionary<string, List<LinkedFlowHook>> _flowCache = [];
-    private readonly FlowRunner _flowRunner = new();
+    public const KeyCode ManualInputKey = KeyCode.U;
 
-    private bool _allowManualInput;
-    public bool AllowManualInput
+    private static readonly Dictionary<string, List<LinkedFlowHook>> _flowCache = [];
+    private static readonly FlowRunner _flowRunner = new();
+
+    private static bool _allowManualInput;
+    public static bool AllowManualInput
     {
         get => _allowManualInput;
         private set
@@ -33,8 +35,11 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
                 _flowRunner.RestartLastFlow();
             }
             _allowManualInput = value;
+            ManualInputUI.SetActive(value);
         }
     }
+
+    public static string CurrentFlowName => _flowRunner.FlowName;
 
     private new void Awake()
     {
@@ -65,10 +70,10 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
 
     private void Update()
     {
-        if (UnityEngine.Input.GetKeyDown(KeyCode.U))
+        if (UnityEngine.Input.GetKeyDown(ManualInputKey))
         {
-            Instance.AllowManualInput = !Instance.AllowManualInput;
-            Plugin.Logger.LogWarning($"Manul input {(Instance.AllowManualInput ? "enabled" : "disabled")}");
+            AllowManualInput = !AllowManualInput;
+            Plugin.Logger.LogWarning($"Manul input {(AllowManualInput ? "enabled" : "disabled")}");
         }
     }
 

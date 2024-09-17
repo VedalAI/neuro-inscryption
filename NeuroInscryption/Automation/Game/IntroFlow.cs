@@ -33,6 +33,7 @@ public sealed class IntroFlow : AutomationFlow<object>
 
         // Move to painting
         await UniTask.WaitUntil(() => ViewManager.Instance.Controller.LockState == ViewLockState.Unlocked, cancellationToken: ct);
+        await UniTask.Delay(1000, cancellationToken: ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 1000, ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, 250, ct);

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace NeuroInscryption.Automation.API;
 
@@ -11,7 +12,7 @@ public sealed class FlowRunner
     private HarmonyContext? _currentContext;
     private CancellationTokenSource? _cts;
 
-    private string FlowName => _currentFlow?.GetType().Name ?? "<none>";
+    public string FlowName => _currentFlow?.GetType().Name ?? "<none>";
 
     public void StartFlow(AutomationFlow flow, HarmonyContext context)
     {
@@ -75,6 +76,12 @@ public sealed class FlowRunner
             if (instance == null || instance is UnityEngine.Object unityObject && unityObject == null)
             {
                 Plugin.Logger.LogWarning($"Flow {FlowName} was cancelled because the target object was destroyed.");
+                return;
+            }
+
+            if (instance is GameObject { activeInHierarchy: false })
+            {
+                Plugin.Logger.LogWarning($"Flow {FlowName} was cancelled because the target object was inactive.");
                 return;
             }
 

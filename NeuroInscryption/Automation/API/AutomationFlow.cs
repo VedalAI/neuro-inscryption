@@ -38,6 +38,8 @@ public abstract class AutomationFlow
 
 public abstract class AutomationFlow<T> : AutomationFlow
 {
+    // TODO: Prevent interrupting *certain* flows
+    
     protected abstract UniTask ExecuteAsync(T target, CancellationToken ct);
 
     public sealed override UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct) => ExecuteAsync(context.GetInstance<T>()!, ct);
