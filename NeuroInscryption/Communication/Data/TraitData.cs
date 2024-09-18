@@ -49,7 +49,7 @@ public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, I
         _value = trait;
 
         Describable? describable = TraitStrings.Get(trait);
-        if (describable == null) throw new ArgumentException("Trait not found in strings");
+        if (describable == null) throw new ArgumentException($"Trait {trait} not found in strings");
 
         Name = describable.Name;
         Description = describable.Description;
@@ -61,7 +61,7 @@ public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, I
         _value = ability;
 
         Describable? describable = TraitStrings.Get(ability);
-        if (describable == null) throw new ArgumentException("Special ability not found in strings");
+        if (describable == null) throw new ArgumentException($"Special ability {ability} not found in strings");
 
         Name = describable.Name;
         Description = describable.Description;

@@ -100,6 +100,7 @@ public static class TraitStrings
 }
 
 [MeansImplicitUse]
+[AttributeUsage(AttributeTargets.Field)]
 file class DescribesAttribute : Attribute
 {
     private readonly Type _type;

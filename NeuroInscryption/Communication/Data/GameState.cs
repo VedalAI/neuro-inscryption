@@ -12,7 +12,7 @@ namespace NeuroInscryption.Communication.Data;
 public static class GameState
 {
     [PublicAPI]
-    public class Board
+    public sealed class Board
     {
         public static Board Calculate() => new();
 
@@ -78,7 +78,7 @@ public static class GameState
         // ["boons"]
         // ["bossAbilityDescription"] ?
 
-        public class IjiraqState
+        public sealed class IjiraqState
         {
             /// <summary>
             /// All cards in the player's deck that should be faked as Ijiraqs.

@@ -32,10 +32,6 @@
         <EmbeddedResource Remove="Resources/**/*.cs" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Compile Remove="schizo\**" />
-    </ItemGroup>
-
     <Target Name="Copy" AfterTargets="Build" Condition="'$(Inscryption)' != ''">
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(Inscryption)/BepInEx/plugins/" UseSymboliclinksIfPossible="true" />
     </Target>
