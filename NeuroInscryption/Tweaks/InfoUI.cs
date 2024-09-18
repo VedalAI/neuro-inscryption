@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using GBC;
@@ -6,37 +7,47 @@ using JetBrains.Annotations;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Utilities;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.SceneManagement;
 
 namespace NeuroInscryption.Tweaks;
 
-public sealed class ManualInputUI : Singlyboi<ManualInputUI>
+public sealed class InfoUI : Singlyboi<InfoUI>
 {
     public sealed class TextBehaviour : ViewportRelativePosition
     {
-        private static string Text => $"MANUAL INPUT ENABLED - Current flow: <color=#eef4c6>{AutomationManager.CurrentFlowName}</color>";
+        private static string Text
+        {
+            get
+            {
+#if !DEBUG
+                // This text only displays during manual input anyway
+                return $"MANUAL INPUT ENABLED - Current flow: <color=#eef4c6>{AutomationManager.CurrentFlowName}</color>";
+#else
+                return $"Current flow: <color=#eef4c6>{AutomationManager.FlowRunner.FlowName}</color>{(!AutomationManager.FlowRunner.AllowManualInterruption ? " (manual input blocked)" : "")}{(AutomationManager.AllowManualInput ? " - MANUAL INPUT ENABLED" : "")}";
+#endif
+            }
+        }
 
         private float _swapTimer = 0.5f;
-        private PixelText[] _texts = null!;
+        public PixelText[] texts = [];
 
         private new void Awake()
         {
             UpdateCamera();
             base.Awake();
-
-            _texts = [transform.GetChild(0).GetComponentInChildren<PixelText>(), transform.GetChild(1).GetComponentInChildren<PixelText>()];
         }
 
         public override void OnEnable()
         {
             base.OnEnable();
 
-            foreach (PixelText text in _texts)
+            foreach (PixelText text in texts)
             {
                 text.SetText(Text);
             }
 
-            foreach (PixelText text in _texts)
+            foreach (PixelText text in texts)
             {
                 text.gameObject.SetActive(true);
             }
@@ -47,20 +58,22 @@ public sealed class ManualInputUI : Singlyboi<ManualInputUI>
             UpdateCamera();
             base.ManagedUpdate();
 
-            _swapTimer -= Time.deltaTime;
-
-            foreach (PixelText text in _texts)
+            foreach (PixelText text in texts)
             {
                 text.SetText(Text);
             }
 
+            _swapTimer -= Time.deltaTime;
+
             if (_swapTimer <= 0)
             {
                 _swapTimer = 0.5f;
-                foreach (PixelText text in _texts)
+#if !DEBUG
+                foreach (PixelText text in texts)
                 {
                     text.gameObject.SetActive(!text.gameObject.activeSelf);
                 }
+#endif
             }
         }
 
@@ -87,18 +100,17 @@ public sealed class ManualInputUI : Singlyboi<ManualInputUI>
             .First(t => t.name == "Footer" && t.transform.parent.name == "ChallengesScreen");
 
         GameObject obj = Instantiate(foundText.transform.gameObject, transform);
+#if !DEBUG
         obj.SetActive(false);
+#endif
         Destroy(obj.GetComponent<AdjustAscensionMenuItemsSpacing>());
         Destroy(obj.GetComponent<SequentialPixelTextLines>());
-        Destroy(obj.transform.GetChild(4).gameObject);
-        Destroy(obj.transform.GetChild(3).gameObject);
-        Destroy(obj.transform.GetChild(2).gameObject);
         Destroy(obj.transform.GetChild(1).gameObject);
+        Destroy(obj.transform.GetChild(2).gameObject);
+        Destroy(obj.transform.GetChild(3).gameObject);
+        Destroy(obj.transform.GetChild(4).gameObject);
 
         Destroy(obj.GetComponent<ViewportRelativePosition>());
-        ViewportRelativePosition positioning = obj.AddComponent<TextBehaviour>();
-        positioning.viewportAnchor = new Vector2(0, 1);
-        positioning.offset = new Vector2(0.05f, -0.12f);
 
         Transform textObj = obj.transform.GetChild(0);
         textObj.localPosition = Vector3.zero;
@@ -110,11 +122,17 @@ public sealed class ManualInputUI : Singlyboi<ManualInputUI>
         duplicatedTextObj.localPosition += new Vector3(0, -0.05f, 1.05f);
         duplicatedTextObj.localScale *= 2;
 
+        TextBehaviour customTextBehaviour = obj.AddComponent<TextBehaviour>();
+        customTextBehaviour.viewportAnchor = new Vector2(0, 1);
+        customTextBehaviour.offset = new Vector2(0.05f, -0.12f);
+        customTextBehaviour.texts = [textObj.GetComponent<PixelText>(), duplicatedTextObj.GetComponent<PixelText>()];
         _textBehaviour = obj;
     }
 
-    public static void SetActive(bool active)
+    public static void SetManualInputActive(bool active)
     {
+#if !DEBUG
         Instance._textBehaviour.SetActive(active);
+#endif
     }
 }

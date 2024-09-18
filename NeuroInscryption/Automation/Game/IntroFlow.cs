@@ -23,6 +23,16 @@ public sealed class IntroFlow : AutomationFlow<object>
 
     public override Type[] FlowsBlockedForInterruption => [typeof(IntroFlow), /*Block map flow*/];
 
+    public override bool AllowManualInterruption => _allowManualInterruption;
+    private bool _allowManualInterruption;
+
+    public override ManualInterruptionBehaviour ManualInterruptionBehaviour => ManualInterruptionBehaviour.Cancel;
+
+    public override void ResetState()
+    {
+        _allowManualInterruption = true;
+    }
+
     protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
     {
         OilPaintingPuzzle puzzle = GameObject.FindObjectOfType<OilPaintingPuzzle>();
@@ -34,6 +44,7 @@ public sealed class IntroFlow : AutomationFlow<object>
         // Move to painting
         await UniTask.WaitUntil(() => ViewManager.Instance.Controller.LockState == ViewLockState.Unlocked, cancellationToken: ct);
         await UniTask.Delay(1000, cancellationToken: ct);
+        _allowManualInterruption = false;
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 1000, ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, 250, ct);

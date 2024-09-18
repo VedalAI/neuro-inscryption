@@ -1,7 +1,9 @@
-﻿using DiskCardGame;
+﻿using System;
+using DiskCardGame;
 
 namespace NeuroInscryption.Configuration;
 
+[Flags]
 public enum ChallengeFlags
 {
     None = 0,

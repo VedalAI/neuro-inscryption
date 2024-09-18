@@ -14,15 +14,23 @@ public sealed class FlowRunner
 
     public string FlowName => _currentFlow?.GetType().Name ?? "<none>";
 
+    public bool AllowManualInterruption => _currentFlow?.AllowManualInterruption ?? true;
+
     public void StartFlow(AutomationFlow flow, HarmonyContext context)
     {
         QueueFlow(flow, context);
         RestartLastFlow();
     }
 
-    public void CancelCurrentFlow()
+    public void CancelCurrentFlowForManualInput()
     {
         _cts?.Cancel();
+
+        if (_currentFlow?.ManualInterruptionBehaviour == ManualInterruptionBehaviour.Cancel)
+        {
+            Plugin.Logger.LogInfo($"Flow {FlowName} was cancelled for manual input and will not restart.");
+            _currentFlow = null;
+        }
     }
 
     public void QueueFlow(AutomationFlow flow, HarmonyContext context)
@@ -45,6 +53,7 @@ public sealed class FlowRunner
 
         _cts?.Cancel();
 
+        flow.ResetState();
         _currentFlow = flow;
         _currentContext = context;
     }
@@ -65,14 +74,14 @@ public sealed class FlowRunner
         _cts?.Dispose();
 
         _cts = new CancellationTokenSource();
-        ExecuteFlowAsync(_currentFlow, _currentContext!, _cts.Token).Forget();
+        ExecuteCurrentFlowAsync().Forget();
     }
 
-    private async UniTaskVoid ExecuteFlowAsync(AutomationFlow flow, HarmonyContext context, CancellationToken ct)
+    private async UniTaskVoid ExecuteCurrentFlowAsync()
     {
         try
         {
-            object? instance = context.GetInstance();
+            object? instance = _currentContext!.GetInstance();
             if (instance == null || instance is UnityEngine.Object unityObject && unityObject == null)
             {
                 Plugin.Logger.LogWarning($"Flow {FlowName} was cancelled because the target object was destroyed.");
@@ -85,7 +94,8 @@ public sealed class FlowRunner
                 return;
             }
 
-            await flow.ExecuteAsync(context, ct);
+            _currentFlow!.ResetState();
+            await _currentFlow.ExecuteAsync(_currentContext, _cts!.Token);
             Plugin.Logger.LogMessage($"Flow {FlowName} completed.");
             _currentFlow = null;
         }

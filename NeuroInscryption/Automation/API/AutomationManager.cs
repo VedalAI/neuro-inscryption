@@ -14,10 +14,8 @@ using LinkedFlowHook = (FlowHook hook, AutomationFlow flow);
 [HarmonyPatch]
 public sealed class AutomationManager : Singlyboi<AutomationManager>
 {
-    public const KeyCode ManualInputKey = KeyCode.U;
-
     private static readonly Dictionary<string, List<LinkedFlowHook>> _flowCache = [];
-    private static readonly FlowRunner _flowRunner = new();
+    public static FlowRunner FlowRunner { get; } = new();
 
     private static bool _allowManualInput;
     public static bool AllowManualInput
@@ -28,18 +26,16 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
             if (_allowManualInput == value) return;
             if (value)
             {
-                _flowRunner.CancelCurrentFlow();
+                FlowRunner.CancelCurrentFlowForManualInput();
             }
             else
             {
-                _flowRunner.RestartLastFlow();
+                FlowRunner.RestartLastFlow();
             }
             _allowManualInput = value;
-            ManualInputUI.SetActive(value);
+            InfoUI.SetManualInputActive(value);
         }
     }
-
-    public static string CurrentFlowName => _flowRunner.FlowName;
 
     private new void Awake()
     {
@@ -70,7 +66,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
 
     private void Update()
     {
-        if (UnityEngine.Input.GetKeyDown(ManualInputKey))
+        if (UnityEngine.Input.GetKeyDown(KeyCode.U) && FlowRunner.AllowManualInterruption)
         {
             AllowManualInput = !AllowManualInput;
             Plugin.Logger.LogWarning($"Manul input {(AllowManualInput ? "enabled" : "disabled")}");
@@ -102,11 +98,11 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
 
             if (AllowManualInput)
             {
-                _flowRunner.QueueFlow(linked.flow, context);
+                FlowRunner.QueueFlow(linked.flow, context);
             }
             else
             {
-                _flowRunner.StartFlow(linked.flow, context);
+                FlowRunner.StartFlow(linked.flow, context);
             }
         }
     }

@@ -33,13 +33,23 @@ public abstract class AutomationFlow
     /// </summary>
     public virtual Type[] FlowsBlockedForInterruption => [];
 
+    /// <summary>
+    /// Whether or not this flow can be interrupted by manual input
+    /// </summary>
+    public virtual bool AllowManualInterruption => true;
+
+    /// <summary>
+    /// How should the flow behave if it's interrupted by manual input
+    /// </summary>
+    public virtual ManualInterruptionBehaviour ManualInterruptionBehaviour => ManualInterruptionBehaviour.Restart;
+
+    public virtual void ResetState() {}
+
     public abstract UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct);
 }
 
 public abstract class AutomationFlow<T> : AutomationFlow
 {
-    // TODO: Prevent interrupting *certain* flows
-    
     protected abstract UniTask ExecuteAsync(T target, CancellationToken ct);
 
     public sealed override UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct) => ExecuteAsync(context.GetInstance<T>()!, ct);
