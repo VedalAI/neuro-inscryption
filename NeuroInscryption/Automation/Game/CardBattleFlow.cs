@@ -56,17 +56,17 @@ public sealed class CardBattleFlow : AutomationFlow<object>
             PlayableCard target = state.PlayerHand.Find(c => c.Identifier == card).TargetCard!;
 
             await NeuroMouse.MoveToAsync(target, 500, ct);
-            NeuroMouse.Click();
+            await NeuroMouse.ClickAsync(ct);
         }
         else if (action.Match(acceptSurrenderAction))
         {
             await NeuroMouse.MoveToAsync(LeshyAnimationController.Instance.oliveBranchInteractable, 500, ct);
-            NeuroMouse.Click();
+            await NeuroMouse.ClickAsync(ct);
         }
         else if (action.Match(endTurnAction))
         {
             await NeuroMouse.MoveToAsync(((BoardManager3D) BoardManager.Instance).Bell, 500, ct);
-            NeuroMouse.Click();
+            await NeuroMouse.ClickAsync(ct);
         }
         else
         {

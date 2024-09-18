@@ -41,7 +41,7 @@ public sealed class DrawCardFlow : AutomationFlow<object>
         {
             CardPile target = !drawFromSideDeck ? CardDrawPiles3D.Instance.Pile : CardDrawPiles3D.Instance.SidePile;
             await NeuroMouse.MoveToAsync(target, 500, ct);
-            NeuroMouse.Click();
+            await NeuroMouse.ClickAsync(ct);
         }
         else
         {

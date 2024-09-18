@@ -43,20 +43,21 @@ public static class NeuroMouse
         await UniTask.Delay(msDelay, cancellationToken: ct);
     }
 
-    public static void Click(bool alt = false)
+    public static async UniTask ClickAsync(CancellationToken ct = default, bool alt = false)
     {
         Button button = !alt ? Button.Select : Button.AltSelect;
         InputHandler.EnqueueInput(button, true);
+        await UniTask.Delay(85, cancellationToken: ct);
         InputHandler.EnqueueInput(button, false);
     }
 
-    public static async UniTask Click(bool alt, int msDelay, CancellationToken ct = default)
+    public static async UniTask ClickAsync(int msDelay, CancellationToken ct = default, bool alt = false)
     {
-        Click(alt);
+        await ClickAsync(ct, alt);
         await UniTask.Delay(msDelay, cancellationToken: ct);
     }
 
-    public static UniTask Click(int msDelay, CancellationToken ct = default) => Click(false, msDelay, ct);
+    #region Movement shenanigans
 
     private static bool CursorReachedTarget(InteractableBase target, InteractableBase? currentHit)
     {
@@ -136,4 +137,6 @@ public static class NeuroMouse
         Vector3 screenPoint = Camera.main!.WorldToViewportPoint(worldPosition);
         return screenPoint.x is > 0 and < 1 && screenPoint.y is > 0 and < 1;
     }
+
+    #endregion
 }

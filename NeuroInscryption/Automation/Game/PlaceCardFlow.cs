@@ -41,7 +41,7 @@ public sealed class PlaceCardFlow : AutomationFlow<object>
         {
             CardSlot slot = BoardManager.Instance.playerSlots[lane];
             await NeuroMouse.MoveToAsync(slot, 500, ct);
-            NeuroMouse.Click();
+            await NeuroMouse.ClickAsync(ct);
         }
         else
         {

@@ -29,7 +29,9 @@ public sealed class IndividualButtonHandler
     {
         if (_clickQueue.Count > 0)
         {
-            if (_clickQueue.Dequeue())
+            bool input = _clickQueue.Dequeue();
+
+            if (input)
             {
                 // Want to press down
                 _state = _state switch

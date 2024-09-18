@@ -53,7 +53,7 @@ public sealed class IntroFlow : AutomationFlow<object>
 
         // Inspect paiting
         await NeuroMouse.MoveToAsync(puzzle.zoomInteractable, ct, mouseSpeedMultiplier: 10);
-        await NeuroMouse.Click(2500, ct);
+        await NeuroMouse.ClickAsync(2500, ct);
 
         // Return to table
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 250, ct);

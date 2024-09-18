@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq;
+﻿using System.Linq;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using GBC;
@@ -7,7 +6,6 @@ using JetBrains.Annotations;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Utilities;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using UnityEngine.SceneManagement;
 
 namespace NeuroInscryption.Tweaks;
@@ -88,7 +86,8 @@ public sealed class InfoUI : Singlyboi<InfoUI>
         }
     }
 
-    private GameObject _textBehaviour = null!;
+    [UsedImplicitly]
+    private static GameObject _textBehaviour = null!;
 
     // ReSharper disable once Unity.IncorrectMethodSignature
     [UsedImplicitly]
@@ -132,7 +131,7 @@ public sealed class InfoUI : Singlyboi<InfoUI>
     public static void SetManualInputActive(bool active)
     {
 #if !DEBUG
-        Instance._textBehaviour.SetActive(active);
+        _textBehaviour.SetActive(active);
 #endif
     }
 }

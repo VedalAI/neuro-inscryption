@@ -21,6 +21,6 @@ public sealed class StartScreenFlow : AutomationFlow<AscensionStartScreen>
     {
         await UniTask.Delay(1000, cancellationToken: ct);
         await NeuroMouse.MoveToAsync(target.RunExists ? target.continueRunText : target.newRunText, 500, ct);
-        NeuroMouse.Click();
+        await NeuroMouse.ClickAsync(ct);
     }
 }

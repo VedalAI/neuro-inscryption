@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
@@ -20,7 +21,7 @@ public sealed class NewRunConfirmScreenFlow : AutomationFlow<AscensionMenuScreen
 
     protected override async UniTask ExecuteAsync(AscensionMenuScreenTransition target, CancellationToken ct)
     {
-        await NeuroMouse.MoveToAsync(target.screenInteractables[1], 500, ct);
-        NeuroMouse.Click();
+        await NeuroMouse.MoveToAsync(target.screenInteractables.First(i => i.name == "ContinueButton"), 500, ct);
+        await NeuroMouse.ClickAsync(ct);
     }
 }
