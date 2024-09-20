@@ -20,7 +20,7 @@ public sealed class InfoUI : Singlyboi<InfoUI>
             {
 #if !DEBUG
                 // This text only displays during manual input anyway
-                return $"MANUAL INPUT ENABLED - Current flow: <color=#eef4c6>{AutomationManager.CurrentFlowName}</color>";
+                return $"MANUAL INPUT ENABLED - Current flow: <color=#eef4c6>{AutomationManager.FlowRunner.FlowName}</color>";
 #else
                 return $"Current flow: <color=#eef4c6>{AutomationManager.FlowRunner.FlowName}</color>{(!AutomationManager.FlowRunner.AllowManualInterruption ? " (manual input blocked)" : "")}{(AutomationManager.AllowManualInput ? " - MANUAL INPUT ENABLED" : "")}";
 #endif
