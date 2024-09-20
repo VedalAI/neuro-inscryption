@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Json;
 
-[PublicAPI]
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public sealed class JsonSchema
 {
     public static JsonSchema NewResponseSchema() => new()

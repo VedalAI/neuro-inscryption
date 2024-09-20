@@ -4,14 +4,13 @@ using DiskCardGame;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
+using NeuroInscryption.Communication.Strings;
 using Newtonsoft.Json.Linq;
 
-namespace NeuroInscryption.Communication.Actions;
+namespace NeuroInscryption.Communication.Actions.Combat;
 
 public sealed class ChooseCardAction(CombatState state) : IAction<string>
 {
-    private const string _actionName = "choose_card_to_play";
-
     void ISchemaModifier.Apply(JsonSchema schema)
     {
         if (PlayerHand.Instance.CardsInHand.Count == 0) return;
@@ -20,13 +19,13 @@ public sealed class ChooseCardAction(CombatState state) : IAction<string>
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(_actionName),
+                ["action"] = QJS.Const(ActionIds.ChooseCardToPlay),
                 ["data"] = QJS.Enum(state.PlayerHand.Where(c => c.IsPlayable == true).Select(c => c.Identifier))
             }
         });
     }
 
-    string IAction.ActionName => _actionName;
+    string IAction.ActionName => ActionIds.ChooseCardToPlay;
 
     bool IAction<string>.Deserialize(Action action, out string? response)
     {

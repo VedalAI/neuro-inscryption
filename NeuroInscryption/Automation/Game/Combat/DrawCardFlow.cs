@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Actions.Combat;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
@@ -11,7 +11,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 
-namespace NeuroInscryption.Automation.Game;
+namespace NeuroInscryption.Automation.Game.Combat;
 
 public sealed class DrawCardFlow : AutomationFlow<object>
 {
@@ -32,7 +32,7 @@ public sealed class DrawCardFlow : AutomationFlow<object>
 
         DrawCardAction drawCardAction = new();
 
-        Decision decision = new("card_lane_choice", state, DecisionStrings.DrawCardDecision);
+        Decision decision = new(DecisionIds.DrawCardChoice, state, DecisionStrings.DrawCard);
         decision.AddAction(drawCardAction);
 
         Action action = await decision.SendAsync(ct);

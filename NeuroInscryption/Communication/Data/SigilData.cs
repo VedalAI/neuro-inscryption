@@ -4,11 +4,11 @@ using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Communication.Data;
 
-public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, IEquatable<Ability>
+public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, IEquatable<Ability>, IDescribableConvertible
 {
-    public readonly string Name;
-    public readonly string Description;
-    public readonly Ability Sigil;
+    public string Name { get; }
+    public string Description { get; }
+    public Ability Sigil { get; }
 
     private SigilData(Ability ability)
     {

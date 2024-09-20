@@ -4,23 +4,26 @@ using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Communication.Data;
 
-public sealed class MapNodeData : IComparable<MapNodeData>, IEquatable<MapNodeData>
+public sealed class MapNodeData : IComparable<MapNodeData>, IEquatable<MapNodeData>, IDescribableConvertible
 {
-    public readonly string Name;
-    public readonly string Description;
+    public string Name { get; }
+    public string Description { get; }
+    public MapNode MapNode { get; }
 
-    private MapNodeData(NodeData nodeData)
+    private MapNodeData(MapNode node)
     {
-        Describable? describable = MapStrings.Get(nodeData);
-        if (describable == null) throw new ArgumentException($"Node data {nodeData} not found in strings");
+        MapNode = node;
+
+        Describable? describable = MapStrings.Get(node.Data);
+        if (describable == null) throw new ArgumentException($"Node data {node.Data} not found in strings");
 
         Name = describable.Name;
         Description = describable.Description;
     }
 
-    public static MapNodeData Create(NodeData nodeData) => new(nodeData);
+    public static MapNodeData Create(MapNode node) => new(node);
 
-    public static implicit operator MapNodeData(NodeData nodeData) => Create(nodeData);
+    public static implicit operator MapNodeData(MapNode node) => Create(node);
 
     #region Equality
 

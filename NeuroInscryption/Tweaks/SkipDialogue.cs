@@ -1,7 +1,7 @@
 ﻿using DiskCardGame;
 using HarmonyLib;
 
-namespace NeuroInscryption.Automation.Game;
+namespace NeuroInscryption.Tweaks;
 
 [HarmonyPatch]
 public static class SkipDialogue

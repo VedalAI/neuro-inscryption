@@ -1,27 +1,26 @@
 ﻿using System.Collections.Generic;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
+using NeuroInscryption.Communication.Strings;
 using Newtonsoft.Json.Linq;
 
-namespace NeuroInscryption.Communication.Actions;
+namespace NeuroInscryption.Communication.Actions.Combat;
 
 public sealed class DrawCardAction : IAction<bool>
 {
-    private const string _actionName = "draw_card";
-
     void ISchemaModifier.Apply(JsonSchema schema)
     {
         schema.OneOf.Add(new JsonSchema
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(_actionName),
+                ["action"] = QJS.Const(ActionIds.DrawCard),
                 ["data"] = QJS.Enum(["Random", "Squirrel"])
             }
         });
     }
 
-    string IAction.ActionName => _actionName;
+    string IAction.ActionName => ActionIds.DrawCard;
 
     bool IAction<bool>.Deserialize(Action action, out bool drawFromSideDeck)
     {

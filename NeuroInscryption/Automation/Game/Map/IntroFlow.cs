@@ -8,7 +8,7 @@ using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using UnityEngine;
 
-namespace NeuroInscryption.Automation.Game;
+namespace NeuroInscryption.Automation.Game.Map;
 
 public sealed class IntroFlow : AutomationFlow<object>
 {

@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data.State;
 
-[PublicAPI]
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public sealed class CombatState : IGameState
 {
     public static CombatState Calculate() => new();
@@ -18,15 +18,15 @@ public sealed class CombatState : IGameState
     public readonly int Bones;
     public readonly int PlayerLives;
 
-    public readonly Dictionary<string, PlayableCardData?> PlayerLanes;
-    public readonly Dictionary<string, PlayableCardData?> OpponentLanes;
-    public readonly Dictionary<string, PlayableCardData?> OpponentQueueLanes;
+    public readonly IReadOnlyDictionary<string, PlayableCardData?> PlayerLanes;
+    public readonly IReadOnlyDictionary<string, PlayableCardData?> OpponentLanes;
+    public readonly IReadOnlyDictionary<string, PlayableCardData?> OpponentQueueLanes;
 
-    public readonly List<PlayableCardData> PlayerHand;
-    public readonly List<CardData> RemainingDeck;
+    public readonly IReadOnlyList<PlayableCardData> PlayerHand;
+    public readonly IReadOnlyList<CardData> RemainingDeck;
 
-    public readonly Dictionary<string, string>? SigilDescriptions;
-    public readonly Dictionary<string, string>? TraitDescriptions;
+    public readonly IReadOnlyDictionary<string, string>? SigilDescriptions;
+    public readonly IReadOnlyDictionary<string, string>? TraitDescriptions;
 
     public readonly bool? IsOpponentSurrendering;
 
@@ -58,14 +58,8 @@ public sealed class CombatState : IGameState
         List<CardData> allCardsInPlay = [..PlayerLanes.Values, ..OpponentLanes.Values, ..OpponentQueueLanes.Values, ..PlayerHand, ..RemainingDeck];
         allCardsInPlay.RemoveAll(data => data == null);
 
-        SigilDescriptions = allCardsInPlay
-            .SelectMany(c => c.RelevantSigils).Distinct()
-            .ToDictionary(s => s.Name, t => t.Description)
-            .NullIfEmpty();
-        TraitDescriptions = allCardsInPlay
-            .SelectMany(c => c.Traits).Distinct()
-            .ToDictionary(t => t.Name, t => t.Description)
-            .NullIfEmpty();
+        SigilDescriptions = allCardsInPlay.SelectMany(c => c.RelevantSigils).ToDescribableDictionary().NullIfEmpty();
+        TraitDescriptions = allCardsInPlay.SelectMany(c => c.Traits).Distinct().ToDescribableDictionary().NullIfEmpty();
 
         IsOpponentSurrendering = TurnManager.Instance.Opponent.OfferingSurrender ? true : null;
     }

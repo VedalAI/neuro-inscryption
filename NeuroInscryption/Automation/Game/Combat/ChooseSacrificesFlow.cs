@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Actions.Combat;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
@@ -13,7 +13,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 
-namespace NeuroInscryption.Automation.Game;
+namespace NeuroInscryption.Automation.Game.Combat;
 
 public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 {
@@ -33,8 +33,8 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 
         SacrificeAction sacrificeAction = new(card, state);
 
-        string query = string.Format(DecisionStrings.ChooseSacrificesDecision, state.PlayerHand.Find(c => c.TargetCard == card).GetDescription());
-        Decision decision = new("card_sacrifice_choice", state, query);
+        string query = string.Format(DecisionStrings.ChooseSacrifices, state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
+        Decision decision = new(DecisionIds.CardSacrificeChoice, state, query);
         decision.AddAction(sacrificeAction);
 
         Action action = await decision.SendAsync(ct);

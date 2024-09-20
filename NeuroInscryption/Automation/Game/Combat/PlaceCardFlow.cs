@@ -1,9 +1,10 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Actions.Combat;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
@@ -11,7 +12,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 
-namespace NeuroInscryption.Automation.Game;
+namespace NeuroInscryption.Automation.Game.Combat;
 
 public sealed class PlaceCardFlow : AutomationFlow<object>
 {
@@ -31,8 +32,8 @@ public sealed class PlaceCardFlow : AutomationFlow<object>
 
         PlaceCardAction placeCardAction = new(state);
 
-        string query = string.Format(DecisionStrings.PlaceCardDecision, state.PlayerHand.Find(c => c.TargetCard == card).GetDescription());
-        Decision decision = new("card_lane_choice", state, query);
+        string query = string.Format(DecisionStrings.PlaceCard, state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
+        Decision decision = new(DecisionIds.CardLaneChoice, state, query);
         decision.AddAction(placeCardAction);
 
         Action action = await decision.SendAsync(ct);

@@ -4,7 +4,7 @@ using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Communication.Data;
 
-public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, IEquatable<Trait>, IEquatable<SpecialTriggeredAbility>
+public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, IEquatable<Trait>, IEquatable<SpecialTriggeredAbility>, IDescribableConvertible
 {
     private enum Type
     {
@@ -13,8 +13,8 @@ public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, I
         Custom
     }
 
-    public readonly string Name;
-    public readonly string Description;
+    public string Name { get; }
+    public string Description { get; }
 
     private readonly Type _type;
     private readonly object _value;

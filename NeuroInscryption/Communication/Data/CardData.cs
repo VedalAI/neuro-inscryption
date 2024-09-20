@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data;
 
-[PublicAPI]
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class CardData
 {
     [JsonProperty(Order = 0)]

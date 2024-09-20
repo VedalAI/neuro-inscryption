@@ -1,9 +1,10 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Actions.Combat;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
@@ -11,7 +12,7 @@ using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
-namespace NeuroInscryption.Automation.Game;
+namespace NeuroInscryption.Automation.Game.Combat;
 
 public sealed class CardBattleFlow : AutomationFlow<object>
 {
@@ -44,7 +45,7 @@ public sealed class CardBattleFlow : AutomationFlow<object>
         AcceptSurrenderAction acceptSurrenderAction = new(state);
         EndTurnAction endTurnAction = new();
 
-        Decision decision = new("card_battle_turn", state, DecisionStrings.CardBattleDecision);
+        Decision decision = new(DecisionIds.CardBattleTurn, state, DecisionStrings.CardBattle);
         decision.AddAction(chooseCardAction);
         decision.AddAction(acceptSurrenderAction);
         decision.AddAction(endTurnAction);
@@ -53,7 +54,7 @@ public sealed class CardBattleFlow : AutomationFlow<object>
 
         if (action.Match(chooseCardAction, out string? card))
         {
-            PlayableCard target = state.PlayerHand.Find(c => c.Identifier == card).TargetCard;
+            PlayableCard target = state.PlayerHand.First(c => c.Identifier == card).TargetCard;
 
             await NeuroMouse.MoveToAsync(target, 500, ct);
             await NeuroMouse.ClickAsync(ct);

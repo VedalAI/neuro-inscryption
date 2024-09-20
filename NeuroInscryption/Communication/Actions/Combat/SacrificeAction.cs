@@ -4,23 +4,22 @@ using DiskCardGame;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
+using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 
-namespace NeuroInscryption.Communication.Actions;
+namespace NeuroInscryption.Communication.Actions.Combat;
 
 using Sacrifice = (string name, int blood);
 
 public sealed class SacrificeAction(PlayableCard cardToPlay, CombatState state) : IAction<IEnumerable<string>>
 {
-    private const string _actionName = "choose_sacrifices";
-
     void ISchemaModifier.Apply(JsonSchema schema)
     {
         schema.OneOf.Add(new JsonSchema
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(_actionName),
+                ["action"] = QJS.Const(ActionIds.ChooseSacrifices),
                 ["data"] = QJS.Enum(GetSacrificeCombinations(cardToPlay.Info.BloodCost))
             }
         });
@@ -51,7 +50,7 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, CombatState state) 
         return possibilities.Select(p => p.Select(s => s.name).ToList());
     }
 
-    string IAction.ActionName => _actionName;
+    string IAction.ActionName => ActionIds.ChooseSacrifices;
     bool IAction<IEnumerable<string>>.Deserialize(Action action, out IEnumerable<string>? response)
     {
         response = action.ActionData?.Values<string>()!;

@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
+using NeuroInscryption.Communication.Strings;
 
-namespace NeuroInscryption.Communication.Actions;
+namespace NeuroInscryption.Communication.Actions.Combat;
 
 public sealed class AcceptSurrenderAction(CombatState state) : IAction
 {
-    private const string _actionName = "accept_surrender";
-
     void ISchemaModifier.Apply(JsonSchema schema)
     {
         if (state.IsOpponentSurrendering != true) return;
@@ -16,11 +15,11 @@ public sealed class AcceptSurrenderAction(CombatState state) : IAction
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(_actionName),
+                ["action"] = QJS.Const(ActionIds.AcceptSurrender),
                 ["data"] = QJS.ConstNull
             }
         });
     }
 
-    string IAction.ActionName => _actionName;
+    string IAction.ActionName => ActionIds.AcceptSurrender;
 }

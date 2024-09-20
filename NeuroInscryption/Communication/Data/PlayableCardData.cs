@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data;
 
-[PublicAPI]
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class PlayableCardData : CardData
 {
     [JsonProperty(Order = 1)]
@@ -132,11 +132,11 @@ public class PlayableCardData : CardData
 
         if (TargetCard.InHand)
         {
-            sb.Append($" ({PlayerHand.Instance.CardsInHand.IndexOf(TargetCard)})");
+            sb.AppendFormat(CardStrings.InHandDiscriminator, PlayerHand.Instance.CardsInHand.IndexOf(TargetCard));
         }
         else
         {
-            sb.Append($" (Lane {BoardManager.Instance.playerSlots.FindIndex(slot => slot.Card == TargetCard)})");
+            sb.AppendFormat(CardStrings.OnBoardDiscriminator, BoardManager.Instance.playerSlots.FindIndex(slot => slot.Card == TargetCard));
         }
 
         return sb.ToString();
