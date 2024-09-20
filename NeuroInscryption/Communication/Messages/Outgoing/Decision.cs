@@ -10,19 +10,19 @@ namespace NeuroInscryption.Communication.Messages.Outgoing;
 [method: SetsRequiredMembers]
 public sealed class Decision(string id, object state, string query) : OutgoingMessage<Action>
 {
-    [JsonProperty("game")]
+    [JsonProperty("game", Order = 0)]
     private string Game => "Inscryption";
 
-    [JsonProperty("id")]
+    [JsonProperty("id", Order = 20)]
     public required string Id { get; set; } = id;
 
-    [JsonProperty("state")]
+    [JsonProperty("state", Order = 10)]
     public required object State { get; set; } = state;
 
-    [JsonProperty("query")]
+    [JsonProperty("query", Order = 30)]
     public required string Query { get; set; } = query;
 
-    [JsonProperty("responseSchema")]
+    [JsonProperty("responseSchema", Order = 40)]
     private readonly JsonSchema _responseSchema = JsonSchema.NewResponseSchema();
 
     protected override WsMessage GetMessage() => new("decision", this);

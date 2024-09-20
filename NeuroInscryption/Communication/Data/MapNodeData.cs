@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DiskCardGame;
 using NeuroInscryption.Communication.Strings;
 
@@ -7,6 +8,7 @@ namespace NeuroInscryption.Communication.Data;
 public sealed class MapNodeData : IComparable<MapNodeData>, IEquatable<MapNodeData>, IDescribableConvertible
 {
     public string Name { get; }
+    public string NameWithDiscriminator { get; }
     public string Description { get; }
     public MapNode MapNode { get; }
 
@@ -19,6 +21,16 @@ public sealed class MapNodeData : IComparable<MapNodeData>, IEquatable<MapNodeDa
 
         Name = describable.Name;
         Description = describable.Description;
+
+        List<MapNode> connectedNodes = MapNodeManager.Instance.GetNodeWithId(RunState.Run.currentNodeId).connectedNodes;
+        if (connectedNodes.Contains(node))
+        {
+            NameWithDiscriminator = Name + string.Format(ActionStrings.PathDiscriminator, connectedNodes.IndexOf(node));
+        }
+        else
+        {
+            NameWithDiscriminator = Name;
+        }
     }
 
     public static MapNodeData Create(MapNode node) => new(node);

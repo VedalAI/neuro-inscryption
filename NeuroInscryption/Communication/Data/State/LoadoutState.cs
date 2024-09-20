@@ -10,14 +10,14 @@ namespace NeuroInscryption.Communication.Data.State;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public sealed class LoadoutState : IGameState
 {
-    public static LoadoutState Calculate<T>(T? decisionContext) where T : class => new(decisionContext);
+    public static LoadoutState CalculateWithContext<T>(T? decisionContext) where T : class => new(decisionContext);
     public static LoadoutState Calculate() => new();
 
-    public readonly IReadOnlyList<CardData> PlayerDeck;
-    public readonly int Teeth;
+    public IReadOnlyList<CardData> PlayerDeck { get; }
+    public int Teeth { get; }
 
     [JsonExtensionData]
-    public readonly JObject? Context;
+    public JObject? Context { get; private set; }
 
     // Excluded from JSON
 
@@ -27,6 +27,11 @@ public sealed class LoadoutState : IGameState
     {
         PlayerDeck = RunState.Run.playerDeck.Cards.Select(c => CardData.Create(c, this)).ToList();
         Teeth = RunState.Run.currency;
-        Context = decisionContext != null ? JObject.FromObject(decisionContext) : null;
+        SetContext(decisionContext);
+    }
+
+    public void SetContext<T>(T? decisionContext) where T : class
+    {
+        Context = decisionContext != null ? JObject.FromObject(decisionContext, new JsonSerializer { NullValueHandling = NullValueHandling.Ignore }) : null;
     }
 }

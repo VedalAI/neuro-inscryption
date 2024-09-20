@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
+using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
@@ -11,7 +12,7 @@ namespace NeuroInscryption.Communication.Actions.Combat;
 
 using Sacrifice = (string name, int blood);
 
-public sealed class SacrificeAction(PlayableCard cardToPlay, CombatState state) : IAction<IEnumerable<string>>
+public sealed class SacrificeAction(PlayableCard cardToPlay, CombatState state) : IAction<IEnumerable<PlayableCardData>>
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
@@ -51,9 +52,16 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, CombatState state) 
     }
 
     string IAction.ActionName => ActionIds.ChooseSacrifices;
-    bool IAction<IEnumerable<string>>.Deserialize(Action action, out IEnumerable<string>? response)
+    bool IAction<IEnumerable<PlayableCardData>>.Deserialize(Action action, out IEnumerable<PlayableCardData>? response)
     {
-        response = action.ActionData?.Values<string>()!;
-        return response != null;
+        IEnumerable<string?>? cardIdentifiers = action.ActionData?.Values<string>()!;
+        if (cardIdentifiers == null)
+        {
+            response = null;
+            return false;
+        }
+
+        response = cardIdentifiers.Select(id => state.PlayerLanes.Values.First(c => c?.Identifier == id)!);
+        return true;
     }
 }

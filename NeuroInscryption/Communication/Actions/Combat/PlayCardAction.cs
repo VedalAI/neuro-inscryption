@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
+using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
@@ -9,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Combat;
 
-public sealed class ChooseCardAction(CombatState state) : IAction<string>
+public sealed class PlayCardAction(CombatState state) : IAction<PlayableCardData>
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
@@ -19,17 +20,24 @@ public sealed class ChooseCardAction(CombatState state) : IAction<string>
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(ActionIds.ChooseCardToPlay),
+                ["action"] = QJS.Const(ActionIds.PlayCard),
                 ["data"] = QJS.Enum(state.PlayerHand.Where(c => c.IsPlayable == true).Select(c => c.Identifier))
             }
         });
     }
 
-    string IAction.ActionName => ActionIds.ChooseCardToPlay;
+    string IAction.ActionName => ActionIds.PlayCard;
 
-    bool IAction<string>.Deserialize(Action action, out string? response)
+    bool IAction<PlayableCardData>.Deserialize(Action action, out PlayableCardData? response)
     {
-        response = action.ActionData?.Value<string>();
-        return response != null;
+        string? cardIdentifier = action.ActionData?.Value<string>();
+        if (cardIdentifier == null)
+        {
+            response = null;
+            return false;
+        }
+
+        response = state.PlayerHand.First(c => c.Identifier == cardIdentifier);
+        return true;
     }
 }

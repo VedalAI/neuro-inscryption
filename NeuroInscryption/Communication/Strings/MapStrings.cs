@@ -66,7 +66,7 @@ public static class MapStrings
 
     public static Describable? Get(NodeData nodeData)
     {
-        FieldInfo? fieldInfo = AccessTools.GetDeclaredFields(typeof(MapStrings)).SingleOrDefault(f => f.GetCustomAttribute<DescribesAttribute>()?.Matches(nodeData) ?? false);
+        FieldInfo? fieldInfo = AccessTools.GetDeclaredFields(typeof(MapStrings)).SingleOrDefault(f => f.GetCustomAttributes<DescribesAttribute>().Any(a => a.Matches(nodeData)));
         return fieldInfo != null ? (Describable) fieldInfo.GetValue(null) : null;
     }
 }

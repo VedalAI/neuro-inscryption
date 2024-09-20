@@ -21,7 +21,8 @@ public sealed class IntroFlow : AutomationFlow<object>
         }
     ];
 
-    public override Type[] FlowsBlockedForInterruption => [typeof(IntroFlow), /*Block map flow*/];
+    public override Type[] FlowsBlockedForInterruption => [typeof(ChoosePathFlow)];
+    public override bool CanInterruptItself => false;
 
     public override bool AllowManualInterruption => _allowManualInterruption;
     private bool _allowManualInterruption;

@@ -8,4 +8,5 @@ public static class DecisionStrings
     public const string PlaceCard = "You have chosen to play {0}. Choose which lane to place it in.";
 
     public const string ChoosePath = "Choose a path to continue on. Take into account where each path leads to next.";
+    public const string ChooseCard = "Choose a card to add to your deck from the provided list of options.";
 }

@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 namespace NeuroInscryption.Communication.Data;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-public class PlayableCardData : CardData
+public sealed class PlayableCardData : CardData
 {
     [JsonProperty(Order = 1)]
     public string Identifier { get; private set; }
@@ -59,7 +59,7 @@ public class PlayableCardData : CardData
             Identifier = GetIdentifier(ijiraq.DisplayedNameEnglish);
             Health = ijiraq.Health;
             Power = ijiraq.Attack.ToString();
-            if (TargetCard.Info.BonesCost > 0) Cost = string.Format(CardStrings.IjiraqBonesCost, TargetCard.Info.BonesCost);
+            if (TargetCard.Info.BonesCost > 0) Cost = PluralFormatProvider.Format(CardStrings.BonesCost + CardStrings.IjiraqBonesCostSuffix, TargetCard.Info.BonesCost);
             CanBeSacrificed = true;
             Tribes = null;
 
@@ -132,7 +132,7 @@ public class PlayableCardData : CardData
 
         if (TargetCard.InHand)
         {
-            sb.AppendFormat(CardStrings.InHandDiscriminator, PlayerHand.Instance.CardsInHand.IndexOf(TargetCard));
+            sb.AppendFormat(CardStrings.GenericDiscriminator, PlayerHand.Instance.CardsInHand.IndexOf(TargetCard));
         }
         else
         {

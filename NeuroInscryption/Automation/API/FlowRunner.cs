@@ -35,18 +35,18 @@ public sealed class FlowRunner
 
     public void QueueFlow(AutomationFlow flow, HarmonyContext context)
     {
-        if (_currentFlow != null && _currentFlow.FlowsBlockedForInterruption.Contains(flow.GetType()))
+        if (_currentFlow != null)
         {
-            if (_currentFlow.GetType() == flow.GetType())
-            {
-                Plugin.Logger.LogInfo($"Prevented changing flow from {FlowName} to itself.");
-            }
-            else
+            if (_currentFlow.FlowsBlockedForInterruption.Contains(flow.GetType()))
             {
                 Plugin.Logger.LogMessage($"Preventing changing flow from {FlowName} to {flow.GetType().Name}.");
+                return;
             }
 
-            return;
+            if (_currentFlow.GetType() == flow.GetType() && !_currentFlow.CanInterruptItself)
+            {
+                return;
+            }
         }
 
         Plugin.Logger.LogMessage($"Changing flow from {FlowName} to {flow.GetType().Name}.");
@@ -62,10 +62,18 @@ public sealed class FlowRunner
     {
         if (_currentFlow == null) return;
 
-        if (_cts?.IsCancellationRequested == false && _currentFlow.FlowsBlockedForInterruption.Contains(_currentFlow.GetType()))
+        if (_cts?.IsCancellationRequested == false)
         {
-            Plugin.Logger.LogInfo($"Restarting flow {FlowName} was blocked.");
-            return;
+            if (_currentFlow.FlowsBlockedForInterruption.Contains(_currentFlow.GetType()))
+            {
+                Plugin.Logger.LogInfo($"Restarting flow {FlowName} was blocked.");
+                return;
+            }
+
+            if (!_currentFlow.CanInterruptItself)
+            {
+                return;
+            }
         }
 
         Plugin.Logger.LogMessage($"Starting flow {FlowName}.");

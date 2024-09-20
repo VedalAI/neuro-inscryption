@@ -6,6 +6,7 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Combat;
+using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
@@ -39,13 +40,11 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(sacrificeAction, out IEnumerable<string>? sacrifices))
+        if (action.Match(sacrificeAction, out IEnumerable<PlayableCardData>? sacrifices))
         {
-            IEnumerable<PlayableCard> targets = sacrifices.Select(sacrifice => state.PlayerLanes.Values.First(c => c?.Identifier == sacrifice)!.TargetCard);
-
-            foreach (PlayableCard target in targets)
+            foreach (PlayableCardData sacrifice in sacrifices)
             {
-                await NeuroMouse.MoveToAsync(target, 500, ct);
+                await NeuroMouse.MoveToAsync(sacrifice.TargetCard, 500, ct);
                 await NeuroMouse.ClickAsync(250, ct);
             }
         }

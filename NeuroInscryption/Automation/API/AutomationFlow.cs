@@ -34,6 +34,13 @@ public abstract class AutomationFlow
     public virtual Type[] FlowsBlockedForInterruption => [];
 
     /// <summary>
+    /// Whether or not this flow can interrupt itself.
+    /// <br/>
+    /// Setting this to false is equivalent to adding the flow to <see cref="FlowsBlockedForInterruption"/>, but it will not output any logs
+    /// </summary>
+    public virtual bool CanInterruptItself => true;
+
+    /// <summary>
     /// Whether or not this flow can be interrupted by manual input
     /// </summary>
     public virtual bool AllowManualInterruption => true;

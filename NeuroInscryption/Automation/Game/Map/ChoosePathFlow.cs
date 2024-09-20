@@ -17,19 +17,13 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class ChoosePathFlow : AutomationFlow
+public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context
+    private sealed class Context(List<List<MapNodeData>> paths)
     {
-        public readonly IReadOnlyList<IReadOnlyList<string>> Paths;
-        public readonly IReadOnlyDictionary<string, string> PathDescriptions;
-
-        public Context(List<List<MapNodeData>> paths)
-        {
-            Paths = paths.Select(path => path.Select(node => node.Name).ToList()).ToList();
-            PathDescriptions = paths.Flatten().ToDescribableDictionary();
-        }
+        public readonly IReadOnlyList<string> Paths = paths.Select(path => string.Join(" -> ", path.Select(node => node.NameWithDiscriminator))).ToList();
+        public readonly IReadOnlyDictionary<string, string> PathDescriptions = paths.Flatten().ToDescribableDictionary();
     }
 
     public override FlowHook[] Hooks =>
@@ -40,27 +34,25 @@ public sealed class ChoosePathFlow : AutomationFlow
         }
     ];
 
-    public override async UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(MapNodeManager instance, CancellationToken ct)
     {
         await UniTask.Delay(1000, cancellationToken: ct);
 
-        List<List<MapNodeData>> paths = GetPaths(context.GetInstance<MapNodeManager>()!.ActiveNode);
-        Dictionary<string, MapNodeData> nextNodes = paths.Select(p => p.First()).Distinct()
-            .Select((node, index) => (desc: node.Name + string.Format(ActionStrings.PathDiscriminator, index), node))
-            .ToDictionary(tuple => tuple.desc, tuple => tuple.node);
+        List<List<MapNodeData>> paths = GetPaths(instance.ActiveNode);
+        List<MapNodeData> nextNodes = paths.Select(p => p.First()).Distinct().ToList();
 
-        LoadoutState state = LoadoutState.Calculate(new Context(paths));
+        LoadoutState state = LoadoutState.CalculateWithContext(new Context(paths));
 
-        ChoosePathAction choosePathAction = new(nextNodes.Keys);
+        ChoosePathAction choosePathAction = new(nextNodes);
 
         Decision decision = new(DecisionIds.PathChoice, state, DecisionStrings.ChoosePath);
         decision.AddAction(choosePathAction);
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(choosePathAction, out string? path))
+        if (action.Match(choosePathAction, out MapNodeData? node))
         {
-            await NeuroMouse.MoveToAsync(nextNodes[path].MapNode, 500, ct);
+            await NeuroMouse.MoveToAsync(node.MapNode, 500, ct);
             await NeuroMouse.ClickAsync(ct);
         }
         else
