@@ -4,12 +4,12 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
-using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
 
@@ -26,7 +26,7 @@ public sealed class PlaceCardFlow : AutomationFlow<object>
 
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
-        GameState.Board state = GameState.Board.Calculate();
+        CombatState state = CombatState.Calculate();
         PlayableCard card = PlayerHand.Instance.ChoosingSlotCard;
 
         PlaceCardAction placeCardAction = new(state);

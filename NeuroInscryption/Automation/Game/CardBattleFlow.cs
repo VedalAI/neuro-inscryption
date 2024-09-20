@@ -4,12 +4,12 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
-using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
 
@@ -38,7 +38,7 @@ public sealed class CardBattleFlow : AutomationFlow<object>
 
         ViewManager.Instance.SwitchToView(BoardManager.Instance.DefaultView);
 
-        GameState.Board state = GameState.Board.Calculate();
+        CombatState state = CombatState.Calculate();
 
         ChooseCardAction chooseCardAction = new(state);
         AcceptSurrenderAction acceptSurrenderAction = new(state);
@@ -53,7 +53,7 @@ public sealed class CardBattleFlow : AutomationFlow<object>
 
         if (action.Match(chooseCardAction, out string? card))
         {
-            PlayableCard target = state.PlayerHand.Find(c => c.Identifier == card).TargetCard!;
+            PlayableCard target = state.PlayerHand.Find(c => c.Identifier == card).TargetCard;
 
             await NeuroMouse.MoveToAsync(target, 500, ct);
             await NeuroMouse.ClickAsync(ct);

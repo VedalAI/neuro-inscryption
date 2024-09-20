@@ -4,12 +4,12 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
-using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
 
@@ -28,7 +28,7 @@ public sealed class DrawCardFlow : AutomationFlow<object>
     {
         await UniTask.Delay(500, cancellationToken: ct);
 
-        GameState.Board state = GameState.Board.Calculate();
+        CombatState state = CombatState.Calculate();
 
         DrawCardAction drawCardAction = new();
 

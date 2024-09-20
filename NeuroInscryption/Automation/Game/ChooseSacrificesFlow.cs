@@ -6,12 +6,12 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
-using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Automation.Game;
 
@@ -28,7 +28,7 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 
     protected override async UniTask ExecuteAsync(object _, CancellationToken ct)
     {
-        GameState.Board state = GameState.Board.Calculate();
+        CombatState state = CombatState.Calculate();
         PlayableCard card = BoardManager.Instance.CurrentSacrificeDemandingCard;
 
         SacrificeAction sacrificeAction = new(card, state);
@@ -41,7 +41,7 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 
         if (action.Match(sacrificeAction, out IEnumerable<string>? sacrifices))
         {
-            IEnumerable<PlayableCard> targets = sacrifices.Select(sacrifice => state.PlayerLanes.Values.First(c => c?.Identifier == sacrifice)!.TargetCard!);
+            IEnumerable<PlayableCard> targets = sacrifices.Select(sacrifice => state.PlayerLanes.Values.First(c => c?.Identifier == sacrifice)!.TargetCard);
 
             foreach (PlayableCard target in targets)
             {

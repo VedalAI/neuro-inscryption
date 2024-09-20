@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
 using Newtonsoft.Json.Linq;
-using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Communication.Actions;
 
-public sealed class PlaceCardAction(GameState.Board state) : IAction<int>
+public sealed class PlaceCardAction(CombatState state) : IAction<int>
 {
     private const string _actionName = "choose_slot_for_card";
 

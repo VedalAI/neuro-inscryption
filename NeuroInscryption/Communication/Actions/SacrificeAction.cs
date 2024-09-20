@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
+using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Utilities;
-using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Communication.Actions;
 
 using Sacrifice = (string name, int blood);
 
-public sealed class SacrificeAction(PlayableCard cardToPlay, GameState.Board state) : IAction<IEnumerable<string>>
+public sealed class SacrificeAction(PlayableCard cardToPlay, CombatState state) : IAction<IEnumerable<string>>
 {
     private const string _actionName = "choose_sacrifices";
 
@@ -30,7 +30,7 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, GameState.Board sta
     {
         List<Sacrifice> sacrificableSlots = BoardManager.Instance.playerSlots
             .Where(p => p.Card && p.Card.CanBeSacrificed)
-            .Select(p => (state.PlayerLanes.Values.First(c => c?.TargetCard == p.Card)!.Identifier!, p.Card.HasAbility(Ability.TripleBlood) ? 3 : 1))
+            .Select(p => (state.PlayerLanes.Values.First(c => c?.TargetCard == p.Card)!.Identifier, p.Card.HasAbility(Ability.TripleBlood) ? 3 : 1))
             .ToList();
 
         List<List<Sacrifice>> possibilities = DontOpenJumpscareWarning.GenerateAllPermutationsOfSubsets(sacrificableSlots);

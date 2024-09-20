@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
-using GameState = NeuroInscryption.Communication.Data.GameState;
 
 namespace NeuroInscryption.Communication.Actions;
 
-public sealed class AcceptSurrenderAction(GameState.Board state) : IAction
+public sealed class AcceptSurrenderAction(CombatState state) : IAction
 {
     private const string _actionName = "accept_surrender";
 
