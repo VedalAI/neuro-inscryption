@@ -4,7 +4,7 @@ using HarmonyLib;
 namespace NeuroInscryption.Tweaks;
 
 [HarmonyPatch]
-public static class SkipDialogue
+internal static class SkipDialogue
 {
     [HarmonyPatch(typeof(TextDisplayer), nameof(TextDisplayer.ManagedUpdate))]
     [HarmonyPostfix]
