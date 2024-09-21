@@ -10,7 +10,7 @@ public sealed class LeaveAction(bool isOnlyOption) : IAction
     {
         Dictionary<string, JsonSchema> properties = new()
         {
-            ["action"] = QJS.Const(ActionStrings.Leave),
+            ["action"] = QJS.Const(ActionName),
             ["data"] = QJS.ConstNull
         };
 

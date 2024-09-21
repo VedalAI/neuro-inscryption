@@ -17,11 +17,11 @@ public sealed class RerollAction(MainInputInteractable clover) : IAction
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(ActionStrings.Reroll),
+                ["action"] = QJS.Const(ActionName),
                 ["data"] = QJS.ConstNull,
             }
         });
     }
 
-    string IAction.ActionName => ActionStrings.Reroll;
+    public string ActionName => ActionStrings.Reroll;
 }

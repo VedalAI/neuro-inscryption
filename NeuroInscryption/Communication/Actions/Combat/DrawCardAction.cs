@@ -14,13 +14,13 @@ public sealed class DrawCardAction : IAction<bool>
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(ActionStrings.DrawCard),
+                ["action"] = QJS.Const(ActionName),
                 ["data"] = QJS.Enum(["Random", "Squirrel"])
             }
         });
     }
 
-    string IAction.ActionName => ActionStrings.DrawCard;
+    public string ActionName => ActionStrings.DrawCard;
 
     bool IAction<bool>.Deserialize(Action action, out bool drawFromSideDeck)
     {

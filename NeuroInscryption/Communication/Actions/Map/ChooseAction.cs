@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NeuroInscryption.Communication.Data.Serializable;
+using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
@@ -8,23 +8,24 @@ using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Map;
 
-public sealed class ChooseCardAction(IEnumerable<SelectableCardData> cards, bool isOnlyOption) : IAction<SelectableCardData>
+public sealed class ChooseAction<T>(IEnumerable<T> items, bool isOnlyOption) : IAction<T>
+    where T : class, IIdentifiable
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
         Dictionary<string, JsonSchema> properties = new()
         {
-            ["action"] = QJS.Const(ActionStrings.ChooseCard),
-            ["data"] = QJS.Enum(cards.Select(card => card.Identifier))
+            ["action"] = QJS.Const(ActionName),
+            ["data"] = QJS.Enum(items.Select(card => card.Identifier))
         };
 
         if (isOnlyOption) schema.Properties = properties;
         else schema.OneOf.Add(new JsonSchema { Properties = properties });
     }
 
-    string IAction.ActionName => ActionStrings.ChooseCard;
+    public string ActionName => ActionStrings.MakeChoice;
 
-    bool IAction<SelectableCardData>.Deserialize(Action action, out SelectableCardData? response)
+    bool IAction<T>.Deserialize(Action action, out T? response)
     {
         string? identifier = action.ActionData?.Value<string>();
         if (identifier == null)
@@ -33,7 +34,7 @@ public sealed class ChooseCardAction(IEnumerable<SelectableCardData> cards, bool
             return false;
         }
 
-        response = cards.FirstOrDefault(node => node.Identifier == identifier);
+        response = items.FirstOrDefault(node => node.Identifier == identifier);
         return response != null;
     }
 }

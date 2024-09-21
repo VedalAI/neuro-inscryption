@@ -12,11 +12,11 @@ public sealed class EndTurnAction : IAction
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(ActionStrings.EndTurn),
+                ["action"] = QJS.Const(ActionName),
                 ["data"] = QJS.ConstNull
             }
         });
     }
 
-    string IAction.ActionName => ActionStrings.EndTurn;
+    public string ActionName => ActionStrings.EndTurn;
 }

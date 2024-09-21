@@ -17,7 +17,7 @@ using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class CampfireCardFlow : AutomationFlow<object>
+public sealed class CampfireFlow : AutomationFlow<object>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context1(List<SelectableCard> cards, IGameState state, bool isAttack)
@@ -63,7 +63,7 @@ public sealed class CampfireCardFlow : AutomationFlow<object>
         Context1 context = new(instance.selectionSlot.cardSelector.displayedCards, state, isAttack);
         state.SetContext(context);
 
-        ChooseCardAction chooseCardAction = new(context.CardOptions, true);
+        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions, true);
 
         Decision decision = new(DecisionStrings.CampfireChooseCard, state);
         decision.AddAction(chooseCardAction);
@@ -89,7 +89,7 @@ public sealed class CampfireCardFlow : AutomationFlow<object>
 
     private async UniTask HandleSecondUpgradeAsync(CardStatBoostSequencer instance, bool isAttack, LoadoutState state, CardData card, CancellationToken ct)
     {
-        Context2 context = new(card, isAttack);
+        Context2 context = new(card, isAttack); // TODO: see if this card has the boosted stats or the original
         state.SetContext(context);
 
         CampfireSecondUpgradeAction campfireSecondUpgradeAction = new();

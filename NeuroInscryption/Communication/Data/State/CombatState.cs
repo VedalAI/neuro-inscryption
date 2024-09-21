@@ -27,6 +27,8 @@ public sealed class CombatState : IGameState
     public readonly IReadOnlyList<PlayableCardData> PlayerHand;
     public readonly IReadOnlyList<CardData> RemainingDeck;
 
+    public readonly TotemData? Totem;
+
     public readonly IReadOnlyDictionary<string, string>? SigilDescriptions;
     public readonly IReadOnlyDictionary<string, string>? TraitDescriptions;
 
@@ -57,10 +59,15 @@ public sealed class CombatState : IGameState
         PlayerHand = DiskCardGame.PlayerHand.Instance.CardsInHand.Select(c => PlayableCardData.Create(c, this)).ToList();
         RemainingDeck = CardDrawPiles.Instance.Deck.Cards.Select((c, index) => CardData.Create(c, this, index)).ToList();
 
+        // (TurnManager.Instance.Opponent as Part1Opponent).totem
+        Totem = TotemData.Create(Part1ItemsManager.Instance.Totems.FirstOrDefault());
+
         List<CardData> allCardsInPlay = [..PlayerLanes.Values, ..OpponentLanes.Values, ..OpponentQueueLanes.Values, ..PlayerHand, ..RemainingDeck];
         allCardsInPlay.RemoveAll(data => data == null);
 
-        SigilDescriptions = allCardsInPlay.SelectMany(c => c.RelevantSigils).ToDescriptionDictionary().NullIfEmpty();
+        IEnumerable<SigilData> relevantSigils = allCardsInPlay.SelectMany(c => c.RelevantSigils);
+        if (Totem != null) relevantSigils = relevantSigils.Append(Totem.Sigil);
+        SigilDescriptions = relevantSigils.ToDescriptionDictionary().NullIfEmpty();
         TraitDescriptions = allCardsInPlay.SelectMany(c => c.Traits).Distinct().ToDescriptionDictionary().NullIfEmpty();
 
         IsOpponentSurrendering = TurnManager.Instance.Opponent.OfferingSurrender ? true : null;

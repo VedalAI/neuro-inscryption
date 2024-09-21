@@ -16,13 +16,14 @@ public sealed class PlaceCardAction(CombatState state) : IAction<int>
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(ActionStrings.PlaceCard),
+                ["action"] = QJS.Const(ActionName),
                 ["data"] = QJS.Enum(state.PlayerLanes.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key).Select(int.Parse))
             }
         });
     }
 
-    string IAction.ActionName => ActionStrings.PlaceCard;
+    public string ActionName => ActionStrings.PlaceCard;
+
     bool IAction<int>.Deserialize(Action action, out int response)
     {
         response = action.ActionData?.Value<int>() ?? -1;

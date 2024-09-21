@@ -12,11 +12,11 @@ public sealed class CampfireSecondUpgradeAction : IAction
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(ActionStrings.CampfireSecondUpgrade),
+                ["action"] = QJS.Const(ActionName),
                 ["data"] = QJS.ConstNull,
             }
         });
     }
 
-    string IAction.ActionName => ActionStrings.CampfireSecondUpgrade;
+    public string ActionName => ActionStrings.CampfireSecondUpgrade;
 }

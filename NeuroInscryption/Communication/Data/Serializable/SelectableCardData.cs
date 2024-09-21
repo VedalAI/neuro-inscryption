@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 namespace NeuroInscryption.Communication.Data.Serializable;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-public sealed class SelectableCardData
+public sealed class SelectableCardData : IIdentifiable
 {
     public string? Cost { get; private set; }
     public string? Tribe { get; private set; }

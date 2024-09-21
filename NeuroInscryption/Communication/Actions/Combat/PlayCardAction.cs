@@ -20,13 +20,13 @@ public sealed class PlayCardAction(CombatState state) : IAction<PlayableCardData
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(ActionStrings.PlayCard),
+                ["action"] = QJS.Const(ActionName),
                 ["data"] = QJS.Enum(state.PlayerHand.Where(c => c.IsPlayable == true).Select(c => c.Identifier))
             }
         });
     }
 
-    string IAction.ActionName => ActionStrings.PlayCard;
+    public string ActionName => ActionStrings.PlayCard;
 
     bool IAction<PlayableCardData>.Deserialize(Action action, out PlayableCardData? response)
     {

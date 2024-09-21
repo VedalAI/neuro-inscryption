@@ -150,8 +150,8 @@ public class CardData
     {
         List<TraitData> result = [];
 
-        result.AddRange(TargetCardInfo.traits.Select(TraitData.Create).Where(t => t != null)!);
-        result.AddRange(TargetCardInfo.specialAbilities.Select(TraitData.Create).Where(t => t != null)!);
+        result.AddRange(TargetCardInfo.traits.Select(TraitData.Create).WhereNotNull());
+        result.AddRange(TargetCardInfo.specialAbilities.Select(TraitData.Create).WhereNotNull());
         if (TargetCardInfo.name.ToLowerInvariant().Contains("bell")) result.Add(TraitData.Create(TraitStrings.Chime));
 
         if (GameFlowManager.Instance.CurrentGameState == GameState.CardBattle)

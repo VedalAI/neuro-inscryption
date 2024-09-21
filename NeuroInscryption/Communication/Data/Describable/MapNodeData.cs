@@ -5,10 +5,10 @@ using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Communication.Data.Describable;
 
-public sealed class MapNodeData : IComparable<MapNodeData>, IEquatable<MapNodeData>, IDescriptionConvertible
+public sealed class MapNodeData : IComparable<MapNodeData>, IEquatable<MapNodeData>, IDescriptionConvertible, IIdentifiable
 {
     public string Name { get; }
-    public string NameWithDiscriminator { get; }
+    public string Identifier { get; }
     public string Info { get; }
     public MapNode MapNode { get; }
 
@@ -25,11 +25,11 @@ public sealed class MapNodeData : IComparable<MapNodeData>, IEquatable<MapNodeDa
         List<MapNode> connectedNodes = MapNodeManager.Instance.GetNodeWithId(RunState.Run.currentNodeId).connectedNodes;
         if (connectedNodes.Contains(node))
         {
-            NameWithDiscriminator = Name + string.Format(ActionStrings.PathDiscriminator, connectedNodes.IndexOf(node));
+            Identifier = Name + string.Format(ActionStrings.PathDiscriminator, connectedNodes.IndexOf(node));
         }
         else
         {
-            NameWithDiscriminator = Name;
+            Identifier = Name;
         }
     }
 

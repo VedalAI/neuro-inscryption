@@ -22,7 +22,7 @@ public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(List<List<MapNodeData>> paths)
     {
-        public readonly IReadOnlyList<string> Paths = paths.Select(path => string.Join(" -> ", path.Select(node => node.NameWithDiscriminator))).ToList();
+        public readonly IReadOnlyList<string> Paths = paths.Select(path => string.Join(" -> ", path.Select(node => node.Identifier))).ToList();
         public readonly IReadOnlyDictionary<string, string> PathDescriptions = paths.Flatten().ToDescriptionDictionary();
     }
 
@@ -43,7 +43,7 @@ public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
 
         LoadoutState state = LoadoutState.CalculateWithContext(new Context(paths));
 
-        ChoosePathAction choosePathAction = new(nextNodes);
+        ChooseAction<MapNodeData> choosePathAction = new(nextNodes, true);
 
         Decision decision = new(DecisionStrings.ChoosePath, state);
         decision.AddAction(choosePathAction);

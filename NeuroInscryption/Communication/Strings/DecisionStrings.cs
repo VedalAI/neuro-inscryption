@@ -16,4 +16,6 @@ public static class DecisionStrings
     public static readonly Description CampfireNoRiskUpgrade = ("campfire_second_upgrade", "You can upgrade the card again. It would probably be wise to do so.");
     public const string CampfireAttackBoost = "+1 Power";
     public const string CampfireHealthBoost = "+2 Health";
+    public static readonly Description ChooseTotemPiece = ("totem_piece_choice", "Choose a totem piece to add to your collection. In order to create a full totem, you need a Sigil piece and a Tribe piece. All cards belonging to that tribe will then receive the sigil.");
+    public static readonly Description BuildTotem = ("build_totem", "You have all the pieces needed to build a totem. Choose a tribe to apply the sigil to.");
 }

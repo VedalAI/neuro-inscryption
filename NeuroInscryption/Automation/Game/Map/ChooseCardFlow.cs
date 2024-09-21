@@ -79,15 +79,15 @@ public sealed class ChooseCardFlow : AutomationFlow<object>
         state.SetContext(context);
 
         RerollAction rerollAction = new(instance.rerollInteractable);
-        ChooseCardAction chooseCardAction = new(context.CardOptions, !rerollAction.Applicable);
+        ChooseAction<SelectableCardData> chooseAction = new(context.CardOptions, !rerollAction.Applicable);
 
         Decision decision = new(DecisionStrings.ChooseCard, state);
-        decision.AddAction(chooseCardAction);
+        decision.AddAction(chooseAction);
         decision.AddAction(rerollAction);
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(chooseCardAction, out SelectableCardData? cardData))
+        if (action.Match(chooseAction, out SelectableCardData? cardData))
         {
             await NeuroMouse.MoveToAsync(cardData.TargetCard, 200, ct);
             AllowManualInterruption = false;
