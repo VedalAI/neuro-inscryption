@@ -4,7 +4,7 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Combat;
-using NeuroInscryption.Communication.Data;
+using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;

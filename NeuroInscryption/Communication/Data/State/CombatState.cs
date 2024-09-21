@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
 using JetBrains.Annotations;
+using NeuroInscryption.Communication.Data.Describable;
+using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
@@ -58,8 +60,8 @@ public sealed class CombatState : IGameState
         List<CardData> allCardsInPlay = [..PlayerLanes.Values, ..OpponentLanes.Values, ..OpponentQueueLanes.Values, ..PlayerHand, ..RemainingDeck];
         allCardsInPlay.RemoveAll(data => data == null);
 
-        SigilDescriptions = allCardsInPlay.SelectMany(c => c.RelevantSigils).ToDescribableDictionary().NullIfEmpty();
-        TraitDescriptions = allCardsInPlay.SelectMany(c => c.Traits).Distinct().ToDescribableDictionary().NullIfEmpty();
+        SigilDescriptions = allCardsInPlay.SelectMany(c => c.RelevantSigils).ToDescriptionDictionary().NullIfEmpty();
+        TraitDescriptions = allCardsInPlay.SelectMany(c => c.Traits).Distinct().ToDescriptionDictionary().NullIfEmpty();
 
         IsOpponentSurrendering = TurnManager.Instance.Opponent.OfferingSurrender ? true : null;
     }

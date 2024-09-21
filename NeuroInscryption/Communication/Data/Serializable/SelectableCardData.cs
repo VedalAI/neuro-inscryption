@@ -6,10 +6,10 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
 
-namespace NeuroInscryption.Communication.Data;
+namespace NeuroInscryption.Communication.Data.Serializable;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-public class SelectableCardData
+public sealed class SelectableCardData
 {
     public string? Cost { get; private set; }
     public string? Tribe { get; private set; }

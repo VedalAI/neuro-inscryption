@@ -2,9 +2,9 @@
 using DiskCardGame;
 using NeuroInscryption.Communication.Strings;
 
-namespace NeuroInscryption.Communication.Data;
+namespace NeuroInscryption.Communication.Data.Describable;
 
-public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, IEquatable<Trait>, IEquatable<SpecialTriggeredAbility>, IDescribableConvertible
+public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, IEquatable<Trait>, IEquatable<SpecialTriggeredAbility>, IDescriptionConvertible
 {
     private enum Type
     {
@@ -14,7 +14,7 @@ public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, I
     }
 
     public string Name { get; }
-    public string Description { get; }
+    public string Info { get; }
 
     private readonly Type _type;
     private readonly object _value;
@@ -48,11 +48,11 @@ public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, I
         _type = Type.Trait;
         _value = trait;
 
-        Describable? describable = TraitStrings.Get(trait);
+        Description? describable = TraitStrings.Get(trait);
         if (describable == null) throw new ArgumentException($"Trait {trait} not found in strings");
 
         Name = describable.Name;
-        Description = describable.Description;
+        Info = describable.Info;
     }
 
     private TraitData(SpecialTriggeredAbility ability)
@@ -60,20 +60,20 @@ public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, I
         _type = Type.Ability;
         _value = ability;
 
-        Describable? describable = TraitStrings.Get(ability);
+        Description? describable = TraitStrings.Get(ability);
         if (describable == null) throw new ArgumentException($"Special ability {ability} not found in strings");
 
         Name = describable.Name;
-        Description = describable.Description;
+        Info = describable.Info;
     }
 
-    private TraitData(Describable custom)
+    private TraitData(Description custom)
     {
         _type = Type.Custom;
         _value = custom.Name;
 
         Name = custom.Name;
-        Description = custom.Description;
+        Info = custom.Info;
     }
 
     public static TraitData? Create(Trait trait)
@@ -100,7 +100,7 @@ public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, I
         }
     }
 
-    public static TraitData Create(Describable custom)
+    public static TraitData Create(Description custom)
     {
         return new TraitData(custom);
     }

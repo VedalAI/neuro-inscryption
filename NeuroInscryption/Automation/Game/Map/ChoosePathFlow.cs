@@ -7,7 +7,7 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
-using NeuroInscryption.Communication.Data;
+using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
@@ -23,7 +23,7 @@ public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
     private sealed class Context(List<List<MapNodeData>> paths)
     {
         public readonly IReadOnlyList<string> Paths = paths.Select(path => string.Join(" -> ", path.Select(node => node.NameWithDiscriminator))).ToList();
-        public readonly IReadOnlyDictionary<string, string> PathDescriptions = paths.Flatten().ToDescribableDictionary();
+        public readonly IReadOnlyDictionary<string, string> PathDescriptions = paths.Flatten().ToDescriptionDictionary();
     }
 
     public override FlowHook[] Hooks =>

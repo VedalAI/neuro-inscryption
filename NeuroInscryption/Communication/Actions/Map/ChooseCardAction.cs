@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NeuroInscryption.Communication.Data;
+using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;

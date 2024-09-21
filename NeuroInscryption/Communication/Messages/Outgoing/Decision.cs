@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using NeuroInscryption.Communication.Actions;
-using NeuroInscryption.Communication.Data;
+using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
@@ -28,7 +28,7 @@ public sealed class Decision(string id, IGameState state, string query) : Outgoi
     private readonly JsonSchema _responseSchema = JsonSchema.NewResponseSchema();
 
     [SetsRequiredMembers]
-    public Decision(Describable decisionDescribable, IGameState state) : this(decisionDescribable.Name, state, decisionDescribable.Description)
+    public Decision(Description decisionDescription, IGameState state) : this(decisionDescription.Name, state, decisionDescription.Info)
     {
     }
 

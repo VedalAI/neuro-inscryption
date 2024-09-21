@@ -2,12 +2,12 @@
 using DiskCardGame;
 using NeuroInscryption.Communication.Strings;
 
-namespace NeuroInscryption.Communication.Data;
+namespace NeuroInscryption.Communication.Data.Describable;
 
-public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, IEquatable<Ability>, IDescribableConvertible
+public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, IEquatable<Ability>, IDescriptionConvertible
 {
     public string Name { get; }
-    public string Description { get; }
+    public string Info { get; }
     public Ability Sigil { get; }
 
     private SigilData(Ability ability)
@@ -17,14 +17,14 @@ public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, I
         if (ability == Ability.SubmergeSquid)
         {
             Name = SigilStrings.SubmergeSquidName;
-            Description = SigilStrings.SubmergeSquidDescription;
+            Info = SigilStrings.SubmergeSquidDescription;
         }
         else
         {
             AbilityInfo info = AbilitiesUtil.GetInfo(ability);
             Name = info.rulebookName;
-            Description = info.LocalizedRulebookDescription.Replace("[creature]", Localization.Translate("a card bearing this sigil"));
-            Description = char.ToUpper(Description[0]) + Description[1..];
+            Info = info.LocalizedRulebookDescription.Replace("[creature]", Localization.Translate("a card bearing this sigil"));
+            Info = char.ToUpper(Info[0]) + Info[1..];
             // TODO: Are card definitions included here? ("A rabbit is defined as 0 power, 1 health")
         }
     }

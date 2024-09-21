@@ -2,6 +2,7 @@
 using System.Linq;
 using DiskCardGame;
 using JetBrains.Annotations;
+using NeuroInscryption.Communication.Data.Serializable;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

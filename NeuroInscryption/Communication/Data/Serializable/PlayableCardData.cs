@@ -9,7 +9,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
 
-namespace NeuroInscryption.Communication.Data;
+namespace NeuroInscryption.Communication.Data.Serializable;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public sealed class PlayableCardData : CardData
