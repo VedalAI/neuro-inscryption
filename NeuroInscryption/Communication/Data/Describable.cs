@@ -2,7 +2,7 @@
 
 namespace NeuroInscryption.Communication.Data;
 
-public record Describable(string Name, string Description) : IComparable<Describable>
+public sealed record Describable(string Name, string Description) : IComparable<Describable>
 {
     public static implicit operator Describable((string name, string description) tuple) => new(tuple.name, tuple.description);
 

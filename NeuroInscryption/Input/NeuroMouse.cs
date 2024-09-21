@@ -17,7 +17,7 @@ public static class NeuroMouse
 
         while (Vector2.Distance(InputHandler.SimulatedMousePosition, end) > 0.1f)
         {
-            InputHandler.SimulatedMousePosition = Vector2.MoveTowards(InputHandler.SimulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 5 * Plugin.Config.MouseSpeedMultiplier.Value);
+            InputHandler.SimulatedMousePosition = Vector2.MoveTowards(InputHandler.SimulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 8 * Plugin.Config.MouseSpeedMultiplier.Value);
             end = GetCursorPositionFor(interactable);
             await UniTask.Yield(ct);
         }

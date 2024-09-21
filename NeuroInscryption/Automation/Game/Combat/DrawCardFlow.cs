@@ -32,7 +32,7 @@ public sealed class DrawCardFlow : AutomationFlow<object>
 
         DrawCardAction drawCardAction = new();
 
-        Decision decision = new(DecisionIds.DrawCardChoice, state, DecisionStrings.DrawCard);
+        Decision decision = new(DecisionStrings.DrawCard, state);
         decision.AddAction(drawCardAction);
 
         Action action = await decision.SendAsync(ct);

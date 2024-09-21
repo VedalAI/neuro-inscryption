@@ -35,6 +35,7 @@ public class Action : ICustomIncomingMessageHandler
         return iAction.Deserialize(this, out response);
     }
 
+    [DoesNotReturn]
     public void ThrowInvalid()
     {
         throw new InvalidOperationException($"Received action '{ActionName}' which did not match possible expected actions.");

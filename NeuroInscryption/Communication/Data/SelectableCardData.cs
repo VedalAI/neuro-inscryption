@@ -27,25 +27,29 @@ public class SelectableCardData
     {
         TargetCard = card;
 
-        CardChoice info = card.ChoiceInfo;
-        if (info.CardInfo != null)
+        if (card.Info != null)
         {
-            Card = CardData.Create(info.CardInfo, state);
+            Card = CardData.Create(card.Info, state);
             Identifier = Card.DisplayName + string.Format(CardStrings.GenericDiscriminator, index);
         }
-        else if (info.tribe != DiskCardGame.Tribe.None)
+        else if (card.ChoiceInfo.CardInfo != null)
         {
-            Identifier = Tribe = info.tribe.ToString();
+            Card = CardData.Create(card.ChoiceInfo.CardInfo, state);
+            Identifier = Card.DisplayName + string.Format(CardStrings.GenericDiscriminator, index);
+        }
+        else if (card.ChoiceInfo.tribe != DiskCardGame.Tribe.None)
+        {
+            Identifier = Tribe = card.ChoiceInfo.tribe.ToString();
         }
         else
         {
-            switch (info.resourceType)
+            switch (card.ChoiceInfo.resourceType)
             {
                 case ResourceType.Blood:
-                    Identifier = Cost = string.Format(CardStrings.BloodCost, info.resourceAmount);
+                    Identifier = Cost = string.Format(CardStrings.BloodCost, card.ChoiceInfo.resourceAmount);
                     break;
                 case ResourceType.Bone:
-                    Identifier = Cost = PluralFormatProvider.Format(CardStrings.BonesCost, info.resourceAmount);
+                    Identifier = Cost = PluralFormatProvider.Format(CardStrings.BonesCost, card.ChoiceInfo.resourceAmount);
                     break;
 
                 case ResourceType.None:

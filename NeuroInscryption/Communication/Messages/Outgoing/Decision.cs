@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Data;
+using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Websocket;
@@ -8,7 +10,7 @@ using Newtonsoft.Json;
 namespace NeuroInscryption.Communication.Messages.Outgoing;
 
 [method: SetsRequiredMembers]
-public sealed class Decision(string id, object state, string query) : OutgoingMessage<Action>
+public sealed class Decision(string id, IGameState state, string query) : OutgoingMessage<Action>
 {
     [JsonProperty("game", Order = 0)]
     private string Game => "Inscryption";
@@ -24,6 +26,11 @@ public sealed class Decision(string id, object state, string query) : OutgoingMe
 
     [JsonProperty("responseSchema", Order = 40)]
     private readonly JsonSchema _responseSchema = JsonSchema.NewResponseSchema();
+
+    [SetsRequiredMembers]
+    public Decision(Describable decisionDescribable, IGameState state) : this(decisionDescribable.Name, state, decisionDescribable.Description)
+    {
+    }
 
     protected override WsMessage GetMessage() => new("decision", this);
     protected override string ResponseCommand => "action";

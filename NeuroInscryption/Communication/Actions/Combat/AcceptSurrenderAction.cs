@@ -15,11 +15,13 @@ public sealed class AcceptSurrenderAction(CombatState state) : IAction
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(ActionIds.AcceptSurrender),
+                ["action"] = QJS.Const(ActionStrings.AcceptSurrender),
                 ["data"] = QJS.ConstNull
             }
         });
     }
 
-    string IAction.ActionName => ActionIds.AcceptSurrender;
+    string IAction.ActionName => ActionStrings.AcceptSurrender;
 }
+
+// TODO: fix end screen / start screen flow transition through manual input

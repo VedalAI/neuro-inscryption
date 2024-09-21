@@ -47,6 +47,11 @@ public sealed class ChooseCardFlow : AutomationFlow<object>
 
     public override bool CanInterruptItself => false;
 
+    public override void ResetState()
+    {
+        AllowManualInterruption = true;
+    }
+
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         await UniTask.Delay(500, cancellationToken: ct);
@@ -65,7 +70,7 @@ public sealed class ChooseCardFlow : AutomationFlow<object>
             {
                 await UniTask.WaitUntil(() => ViewManager.Instance.Controller.LockState == ViewLockState.Locked, cancellationToken: ct);
                 await UniTask.WaitUntil(() => ViewManager.Instance.Controller.LockState == ViewLockState.Unlocked, cancellationToken: ct);
-                await UniTask.Delay(500, cancellationToken: ct);
+                await UniTask.Delay(350, cancellationToken: ct);
             }
         }
 
@@ -73,10 +78,10 @@ public sealed class ChooseCardFlow : AutomationFlow<object>
         Context context = new(instance.selectableCards, choiceType, state);
         state.SetContext(context);
 
-        ChooseCardAction chooseCardAction = new(context.CardOptions);
         RerollAction rerollAction = new(instance.rerollInteractable);
+        ChooseCardAction chooseCardAction = new(context.CardOptions, !rerollAction.Applicable);
 
-        Decision decision = new(DecisionIds.ChooseCard, state, DecisionStrings.ChooseCard);
+        Decision decision = new(DecisionStrings.ChooseCard, state);
         decision.AddAction(chooseCardAction);
         decision.AddAction(rerollAction);
 
@@ -84,7 +89,8 @@ public sealed class ChooseCardFlow : AutomationFlow<object>
 
         if (action.Match(chooseCardAction, out SelectableCardData? cardData))
         {
-            await NeuroMouse.MoveToAsync(cardData.TargetCard, 200, ct, mouseSpeedMultiplier: 2);
+            await NeuroMouse.MoveToAsync(cardData.TargetCard, 200, ct);
+            AllowManualInterruption = false;
             await NeuroMouse.ClickAsync(ct);
 
             if (choiceType != CardChoicesType.Random)
@@ -95,7 +101,8 @@ public sealed class ChooseCardFlow : AutomationFlow<object>
         }
         else if (action.Match(rerollAction))
         {
-            await NeuroMouse.MoveToAsync(instance.rerollInteractable, 500, ct);
+            await NeuroMouse.MoveToAsync(instance.rerollInteractable, 200, ct);
+            AllowManualInterruption = false;
             await NeuroMouse.ClickAsync(ct);
             await UniTask.WaitUntil(() => instance.choicesRerolled, cancellationToken: ct);
         }

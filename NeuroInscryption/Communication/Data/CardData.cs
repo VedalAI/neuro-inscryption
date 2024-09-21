@@ -37,6 +37,9 @@ public class CardData
     [JsonProperty("Traits", Order = 70)]
     private List<string>? TraitNames => Traits.Select(d => d.Name).ToList().NullIfEmpty();
 
+    [JsonProperty(Order = 80)]
+    public bool? IsRare { get; protected set; }
+
     // Excluded from JSON
 
     [JsonIgnore]
@@ -81,6 +84,7 @@ public class CardData
         CanBeSacrificed = TargetCardInfo.Sacrificable || TargetCardInfo.HasAbility(Ability.TripleBlood);
         Tribes = TargetCardInfo.tribes.Count == 0 ? null : string.Join(CardStrings.InfoSeparator, TargetCardInfo.tribes);
         Traits = GetTraits();
+        IsRare = TargetCardInfo.metaCategories.Contains(CardMetaCategory.Rare) ? true : null;
     }
 
     [return: NotNullIfNotNull(nameof(cardInfo))]

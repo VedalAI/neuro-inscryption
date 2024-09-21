@@ -8,21 +8,21 @@ using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Map;
 
-public class ChooseCardAction(IEnumerable<SelectableCardData> cards) : IAction<SelectableCardData>
+public sealed class ChooseCardAction(IEnumerable<SelectableCardData> cards, bool isOnlyOption) : IAction<SelectableCardData>
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
-        schema.OneOf.Add(new JsonSchema
+        Dictionary<string, JsonSchema> properties = new()
         {
-            Properties = new Dictionary<string, JsonSchema>
-            {
-                ["action"] = QJS.Const(ActionIds.ChooseCard),
-                ["data"] = QJS.Enum(cards.Select(card => card.Identifier))
-            }
-        });
+            ["action"] = QJS.Const(ActionStrings.ChooseCard),
+            ["data"] = QJS.Enum(cards.Select(card => card.Identifier))
+        };
+
+        if (isOnlyOption) schema.Properties = properties;
+        else schema.OneOf.Add(new JsonSchema { Properties = properties });
     }
 
-    string IAction.ActionName => ActionIds.ChooseCard;
+    string IAction.ActionName => ActionStrings.ChooseCard;
 
     bool IAction<SelectableCardData>.Deserialize(Action action, out SelectableCardData? response)
     {

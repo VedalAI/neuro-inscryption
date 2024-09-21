@@ -43,7 +43,7 @@ public abstract class AutomationFlow
     /// <summary>
     /// Whether or not this flow can be interrupted by manual input
     /// </summary>
-    public virtual bool AllowManualInterruption => true;
+    public virtual bool AllowManualInterruption { get; protected set; } = true;
 
     /// <summary>
     /// How should the flow behave if it's interrupted by manual input

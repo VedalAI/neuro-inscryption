@@ -45,14 +45,14 @@ public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
 
         ChoosePathAction choosePathAction = new(nextNodes);
 
-        Decision decision = new(DecisionIds.PathChoice, state, DecisionStrings.ChoosePath);
+        Decision decision = new(DecisionStrings.ChoosePath, state);
         decision.AddAction(choosePathAction);
 
         Action action = await decision.SendAsync(ct);
 
         if (action.Match(choosePathAction, out MapNodeData? node))
         {
-            await NeuroMouse.MoveToAsync(node.MapNode, 500, ct);
+            await NeuroMouse.MoveToAsync(node.MapNode, 300, ct);
             await NeuroMouse.ClickAsync(ct);
         }
         else

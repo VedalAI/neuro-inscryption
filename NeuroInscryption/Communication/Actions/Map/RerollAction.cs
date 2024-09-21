@@ -7,19 +7,21 @@ namespace NeuroInscryption.Communication.Actions.Map;
 
 public sealed class RerollAction(MainInputInteractable clover) : IAction
 {
-    public void Apply(JsonSchema schema)
+    public bool Applicable { get; } = clover.Enabled && clover.gameObject.activeSelf;
+
+    void ISchemaModifier.Apply(JsonSchema schema)
     {
-        if (!clover.Enabled) return;
+        if (!Applicable) return;
 
         schema.OneOf.Add(new JsonSchema
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(ActionIds.Reroll),
+                ["action"] = QJS.Const(ActionStrings.Reroll),
                 ["data"] = QJS.ConstNull,
             }
         });
     }
 
-    string IAction.ActionName => ActionIds.Reroll;
+    string IAction.ActionName => ActionStrings.Reroll;
 }

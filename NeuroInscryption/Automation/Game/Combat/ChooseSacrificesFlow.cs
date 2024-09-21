@@ -27,6 +27,11 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
         }
     ];
 
+    public override void ResetState()
+    {
+        AllowManualInterruption = true;
+    }
+
     protected override async UniTask ExecuteAsync(object _, CancellationToken ct)
     {
         CombatState state = CombatState.Calculate();
@@ -34,14 +39,16 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 
         SacrificeAction sacrificeAction = new(card, state);
 
-        string query = string.Format(DecisionStrings.ChooseSacrifices, state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
-        Decision decision = new(DecisionIds.CardSacrificeChoice, state, query);
+        Describable decisionString = DecisionStrings.ChooseSacrifices.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
+        Decision decision = new(decisionString, state);
         decision.AddAction(sacrificeAction);
 
         Action action = await decision.SendAsync(ct);
 
         if (action.Match(sacrificeAction, out IEnumerable<PlayableCardData>? sacrifices))
         {
+            AllowManualInterruption = false;
+
             foreach (PlayableCardData sacrifice in sacrifices)
             {
                 await NeuroMouse.MoveToAsync(sacrifice.TargetCard, 500, ct);

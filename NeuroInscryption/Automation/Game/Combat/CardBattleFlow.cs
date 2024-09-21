@@ -45,7 +45,7 @@ public sealed class CardBattleFlow : AutomationFlow<object>
         AcceptSurrenderAction acceptSurrenderAction = new(state);
         EndTurnAction endTurnAction = new();
 
-        Decision decision = new(DecisionIds.CardBattleTurn, state, DecisionStrings.CardBattle);
+        Decision decision = new(DecisionStrings.CardBattleTurn, state);
         decision.AddAction(playCardAction);
         decision.AddAction(acceptSurrenderAction);
         decision.AddAction(endTurnAction);

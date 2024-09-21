@@ -20,7 +20,7 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, CombatState state) 
         {
             Properties = new Dictionary<string, JsonSchema>
             {
-                ["action"] = QJS.Const(ActionIds.ChooseSacrifices),
+                ["action"] = QJS.Const(ActionStrings.ChooseSacrifices),
                 ["data"] = QJS.Enum(GetSacrificeCombinations(cardToPlay.Info.BloodCost))
             }
         });
@@ -51,7 +51,7 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, CombatState state) 
         return possibilities.Select(p => p.Select(s => s.name).ToList());
     }
 
-    string IAction.ActionName => ActionIds.ChooseSacrifices;
+    string IAction.ActionName => ActionStrings.ChooseSacrifices;
     bool IAction<IEnumerable<PlayableCardData>>.Deserialize(Action action, out IEnumerable<PlayableCardData>? response)
     {
         IEnumerable<string?>? cardIdentifiers = action.ActionData?.Values<string>()!;

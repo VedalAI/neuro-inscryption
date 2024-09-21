@@ -15,12 +15,12 @@ public sealed class ChoosePathAction(IEnumerable<MapNodeData> nextNodes) : IActi
         // this is only action, so we dont have OneOf
         schema.Properties = new Dictionary<string, JsonSchema>
         {
-            ["action"] = QJS.Const(ActionIds.ChoosePath),
+            ["action"] = QJS.Const(ActionStrings.ChoosePath),
             ["data"] = QJS.Enum(nextNodes.Select(node => node.NameWithDiscriminator))
         };
     }
 
-    string IAction.ActionName => ActionIds.ChoosePath;
+    string IAction.ActionName => ActionStrings.ChoosePath;
 
     bool IAction<MapNodeData>.Deserialize(Action action, out MapNodeData? response)
     {
