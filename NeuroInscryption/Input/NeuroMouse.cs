@@ -73,6 +73,7 @@ public static class NeuroMouse
     private static Vector3? GetPreferredWorldPositionFor(InteractableBase interactable)
     {
         if (interactable is CombatBell3D) return interactable.transform.position + Vector3.up * 0.5f;
+        if (interactable is SelectableItemSlot) return interactable.transform.position + Vector3.up * 0.5f;
 
         return null;
     }

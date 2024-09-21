@@ -6,6 +6,7 @@ using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
+using NeuroInscryption.Utilities;
 using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Combat;
@@ -14,7 +15,7 @@ public sealed class PlayCardAction(CombatState state) : IAction<PlayableCardData
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
-        if (PlayerHand.Instance.CardsInHand.Count == 0) return;
+        if (!PlayerHand.Instance.CardsInHand.Any(c => c.CanPlay())) return;
 
         schema.OneOf.Add(new JsonSchema
         {

@@ -69,7 +69,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         if (UnityEngine.Input.GetKeyDown(KeyCode.U) && FlowRunner.AllowManualInterruption)
         {
             AllowManualInput = !AllowManualInput;
-            Plugin.Logger.LogWarning($"Manul input {(AllowManualInput ? "enabled" : "disabled")}");
+            Plugin.Logger.LogWarning($"Manual input {(AllowManualInput ? "enabled" : "disabled")}");
         }
     }
 

@@ -65,7 +65,7 @@ public sealed class WoodcarverFlow : AutomationFlow<object>
         {
             await NeuroMouse.MoveToAsync(piece.Slot!, 300, ct);
             AllowManualInterruption = false;
-            await NeuroMouse.ClickAsync(1000, ct);
+            await NeuroMouse.ClickAsync(ct);
         }
         else
         {
@@ -77,28 +77,39 @@ public sealed class WoodcarverFlow : AutomationFlow<object>
 
     private async UniTask HandleTotemBuildAsync(BuildTotemSequencer instance, LoadoutState oldState, CancellationToken ct)
     {
-        Context2 context = new(oldState.Totem);
-        LoadoutState state = LoadoutState.CalculateWithContext(context); // need new state since we have new totem parts
+        bool canBuildTotem = RunState.Run.totemTops.Count > 0 && RunState.Run.totemBottoms.Count > 0;
+        bool autoBuildTotem = RunState.Run.totemTops.Count == 1 && RunState.Run.totemBottoms.Count == 1;
 
-        BuildTotemAction buildTotemAction = new(instance.slots.Select(TotemPieceData.Create)!);
+        if (!canBuildTotem) return;
 
-        Decision decision = new(DecisionStrings.BuildTotem, state);
-        decision.AddAction(buildTotemAction);
+        await UniTask.Delay(1000, cancellationToken: ct);
 
-        Action action = await decision.SendAsync(ct);
-
-        if (action.Match(buildTotemAction, out BuildTotemAction.Response response))
+        if (!autoBuildTotem)
         {
-            await NeuroMouse.MoveToAsync(response.Top.Slot!, 200, ct);
-            await NeuroMouse.ClickAsync(ct);
-            await NeuroMouse.MoveToAsync(response.Bottom.Slot!, 200, ct);
-            await NeuroMouse.ClickAsync(1000, ct);
-            await NeuroMouse.MoveToAsync(instance.completeTotemSlot, 200, ct);
-            await NeuroMouse.ClickAsync(ct);
+            Context2 context = new(oldState.Totem);
+            LoadoutState state = LoadoutState.CalculateWithContext(context); // need new state since we have new totem parts
+
+            BuildTotemAction buildTotemAction = new(instance.inventorySlots.Where(slot => slot.Item != null).Select(TotemPieceData.Create)!);
+
+            Decision decision = new(DecisionStrings.BuildTotem, state);
+            decision.AddAction(buildTotemAction);
+
+            Action action = await decision.SendAsync(ct);
+
+            if (action.Match(buildTotemAction, out BuildTotemAction.Response response))
+            {
+                await NeuroMouse.MoveToAsync(response.Top.Slot!, 200, ct);
+                await NeuroMouse.ClickAsync(ct);
+                await NeuroMouse.MoveToAsync(response.Bottom.Slot!, 200, ct);
+                await NeuroMouse.ClickAsync(1000, ct);
+            }
+            else
+            {
+                action.ThrowInvalid();
+            }
         }
-        else
-        {
-            action.ThrowInvalid();
-        }
+
+        await NeuroMouse.MoveToAsync(instance.completeTotemSlot, 200, ct);
+        await NeuroMouse.ClickAsync(ct);
     }
 }

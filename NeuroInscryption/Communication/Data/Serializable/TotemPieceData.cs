@@ -26,12 +26,14 @@ public sealed class TotemPieceData : IIdentifiable
     private TotemPieceData(Tribe tribe, SelectableItemSlot? slot = null)
     {
         Identifier = Tribe = tribe.ToString();
+        Slot = slot;
     }
 
     private TotemPieceData(Ability sigil, SelectableItemSlot? slot = null)
     {
         Sigil = sigil;
         Identifier = SigilName = SigilData.Create(sigil).Name;
+        Slot = slot;
     }
 
     public static TotemPieceData Create(Tribe tribe) => new(tribe);

@@ -30,7 +30,7 @@ public sealed class CampfireFlow : AutomationFlow<object>
     private sealed class Context2(CardData card, bool isAttack)
     {
         public readonly string BoostType = isAttack ? DecisionStrings.CampfireAttackBoost : DecisionStrings.CampfireHealthBoost;
-        public readonly CardData ChosenCard = card;
+        public readonly CardData ChosenCardToUpgrade = card;
     }
 
     public override FlowHook[] Hooks =>
@@ -87,9 +87,9 @@ public sealed class CampfireFlow : AutomationFlow<object>
         await HandleSecondUpgradeAsync(instance, isAttack, state, selected.Card!, ct);
     }
 
-    private async UniTask HandleSecondUpgradeAsync(CardStatBoostSequencer instance, bool isAttack, LoadoutState state, CardData card, CancellationToken ct)
+    private async UniTask HandleSecondUpgradeAsync(CardStatBoostSequencer instance, bool isAttack, LoadoutState state, CardData oldCardData, CancellationToken ct)
     {
-        Context2 context = new(card, isAttack); // TODO: see if this card has the boosted stats or the original
+        Context2 context = new(CardData.Create(oldCardData.TargetCardInfo, state), isAttack);
         state.SetContext(context);
 
         CampfireSecondUpgradeAction campfireSecondUpgradeAction = new();
