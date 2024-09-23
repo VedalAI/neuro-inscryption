@@ -33,6 +33,13 @@ public sealed class FlowRunner
         }
     }
 
+    public void CancelCurrentFlowForcefully()
+    {
+        Plugin.Logger.LogInfo($"Forcefully cancelled current flow {FlowName}.");
+        _cts?.Cancel();
+        _currentFlow = null;
+    }
+
     public void QueueFlow(AutomationFlow flow, HarmonyContext context)
     {
         if (_currentFlow != null)

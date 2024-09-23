@@ -20,7 +20,7 @@ namespace NeuroInscryption.Automation.Game.Map;
 public sealed class CampfireFlow : AutomationFlow<object>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context1(List<SelectableCard> cards, IGameState state, bool isAttack)
+    private sealed class Context1(IEnumerable<SelectableCard> cards, IGameState state, bool isAttack)
     {
         public readonly string BoostType = isAttack ? DecisionStrings.CampfireAttackBoost : DecisionStrings.CampfireHealthBoost;
         public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();

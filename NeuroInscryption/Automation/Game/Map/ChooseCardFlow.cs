@@ -54,10 +54,10 @@ public sealed class ChooseCardFlow : AutomationFlow<object>
 
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
-        await UniTask.Delay(500, cancellationToken: ct);
-
         CardSingleChoicesSequencer instance = enumerator.GetEnumeratorThis<CardSingleChoicesSequencer>();
         CardChoicesType choiceType = enumerator.GetEnumeratorField<CardChoicesNodeData>("<choicesData>5__2").choicesType;
+
+        await UniTask.Delay(500, cancellationToken: ct);
 
         foreach (SelectableCard card in instance.selectableCards.Where(c => c.Flipped))
         {

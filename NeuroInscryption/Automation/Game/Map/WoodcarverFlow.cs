@@ -77,6 +77,7 @@ public sealed class WoodcarverFlow : AutomationFlow<object>
 
         if (!canBuildTotem) return;
 
+        // TODO: make sure dialogue doesnt break this
         await UniTask.Delay(1000, cancellationToken: ct);
 
         if (!autoBuildTotem)

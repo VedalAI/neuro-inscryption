@@ -63,6 +63,7 @@ public sealed class BoneAltarFlow : AutomationFlow<object>
         AllowManualInterruption = false;
         await NeuroMouse.ClickAsync(2500, ct);
 
+        // todo: make sure this isnt broken by dialogue
         await NeuroMouse.MoveToAsync(instance.sacrificeSlot, ct);
         await NeuroMouse.ClickAsync(ct);
     }

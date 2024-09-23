@@ -6,7 +6,6 @@ using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
-using NeuroInscryption.Utilities;
 using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Combat;
@@ -29,7 +28,7 @@ public sealed class PlayCardAction(CombatState state) : IAction<PlayableCardData
 
     public string ActionName => ActionStrings.PlayCard;
 
-    bool IAction<PlayableCardData>.Deserialize(Action action, out PlayableCardData? response)
+    bool IAction<PlayableCardData>.Deserialize(Action action, out PlayableCardData? response) // todo : make this use generic identifiable action
     {
         string? cardIdentifier = action.ActionData?.Value<string>();
         if (cardIdentifier == null)

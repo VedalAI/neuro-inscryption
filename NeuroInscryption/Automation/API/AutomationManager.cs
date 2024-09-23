@@ -71,6 +71,11 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
             AllowManualInput = !AllowManualInput;
             Plugin.Logger.LogWarning($"Manual input {(AllowManualInput ? "enabled" : "disabled")}");
         }
+
+        if (UnityEngine.Input.GetKeyDown(KeyCode.P) && AllowManualInput)
+        {
+            FlowRunner.CancelCurrentFlowForcefully();
+        }
     }
 
     private void TryStartNewFlow(string description, HarmonyContext context)

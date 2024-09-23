@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
@@ -70,26 +71,23 @@ public static class NeuroMouse
         return target == currentHit;
     }
 
-    private static Vector3? GetPreferredWorldPositionFor(InteractableBase interactable)
+    private static List<Vector3> GetPreferredWorldPositionsFor(InteractableBase interactable)
     {
-        if (interactable is CombatBell3D) return interactable.transform.position + Vector3.up * 0.5f;
-        if (interactable is SelectableItemSlot) return interactable.transform.position + Vector3.up * 0.5f;
-        if (interactable is SelectableCard) return interactable.transform.position + new Vector3(-0.5f, 0);
+        if (interactable is CombatBell3D) return [interactable.transform.position + Vector3.up * 0.5f];
+        if (interactable is SelectableItemSlot) return [interactable.transform.position + Vector3.up * 0.5f];
+        if (interactable is SelectableCard) return [interactable.transform.position, interactable.transform.position + new Vector3(-0.5f, 0)];
 
-        return null;
+        return [];
     }
 
     private static Vector2 GetCursorPositionFor(InteractableBase interactable)
     {
-        Vector3? preferredPosition = GetPreferredWorldPositionFor(interactable);
-        if (preferredPosition != null && IsPointOnScreen(preferredPosition.Value))
-        {
-            if (isOk(preferredPosition.Value, out Vector2 result)) return result;
-        }
+        List<Vector3> worldPositions = GetPreferredWorldPositionsFor(interactable);
+        worldPositions.Add(interactable.transform.position);
 
-        if (IsPointOnScreen(interactable.transform.position))
+        foreach (Vector3 position in worldPositions)
         {
-            if (isOk(interactable.transform.position, out Vector2 result)) return result;
+            if (IsPointOnScreen(position) && isOk(position, out Vector2 result)) return result;
         }
 
         Transform topLeft = interactable.transform.Find("TopLeftMarker");
