@@ -74,6 +74,7 @@ public static class NeuroMouse
     {
         if (interactable is CombatBell3D) return interactable.transform.position + Vector3.up * 0.5f;
         if (interactable is SelectableItemSlot) return interactable.transform.position + Vector3.up * 0.5f;
+        if (interactable is SelectableCard) return interactable.transform.position + new Vector3(-0.5f, 0);
 
         return null;
     }

@@ -46,19 +46,14 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(sacrificeAction, out IEnumerable<PlayableCardData>? sacrifices))
-        {
-            AllowManualInterruption = false;
+        if (!action.Match(sacrificeAction, out IEnumerable<PlayableCardData>? sacrifices)) action.ThrowInvalid();
 
-            foreach (PlayableCardData sacrifice in sacrifices)
-            {
-                await NeuroMouse.MoveToAsync(sacrifice.TargetCard, 500, ct);
-                await NeuroMouse.ClickAsync(250, ct);
-            }
-        }
-        else
+        AllowManualInterruption = false;
+
+        foreach (PlayableCardData sacrifice in sacrifices)
         {
-            action.ThrowInvalid();
+            await NeuroMouse.MoveToAsync(sacrifice.TargetCard, 500, ct);
+            await NeuroMouse.ClickAsync(250, ct);
         }
     }
 }

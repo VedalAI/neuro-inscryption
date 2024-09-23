@@ -37,15 +37,10 @@ public sealed class DrawCardFlow : AutomationFlow<object>
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(drawCardAction, out bool drawFromSideDeck))
-        {
-            CardPile target = !drawFromSideDeck ? CardDrawPiles3D.Instance.Pile : CardDrawPiles3D.Instance.SidePile;
-            await NeuroMouse.MoveToAsync(target, 500, ct);
-            await NeuroMouse.ClickAsync(ct);
-        }
-        else
-        {
-            action.ThrowInvalid();
-        }
+        if (!action.Match(drawCardAction, out bool drawFromSideDeck)) action.ThrowInvalid();
+
+        CardPile target = !drawFromSideDeck ? CardDrawPiles3D.Instance.Pile : CardDrawPiles3D.Instance.SidePile;
+        await NeuroMouse.MoveToAsync(target, 500, ct);
+        await NeuroMouse.ClickAsync(ct);
     }
 }

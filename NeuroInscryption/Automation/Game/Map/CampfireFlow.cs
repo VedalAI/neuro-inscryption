@@ -70,15 +70,10 @@ public sealed class CampfireFlow : AutomationFlow<object>
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(chooseCardAction, out SelectableCardData? selected))
-        {
-            await NeuroMouse.MoveToAsync(selected.TargetCard, 200, ct);
-            await NeuroMouse.ClickAsync(1000, ct);
-        }
-        else
-        {
-            action.ThrowInvalid();
-        }
+        if (!action.Match(chooseCardAction, out SelectableCardData? selected)) action.ThrowInvalid();
+
+        await NeuroMouse.MoveToAsync(selected.TargetCard, 200, ct);
+        await NeuroMouse.ClickAsync(1000, ct);
 
         await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);
         AllowManualInterruption = false;

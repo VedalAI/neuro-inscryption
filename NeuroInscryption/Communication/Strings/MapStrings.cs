@@ -45,7 +45,7 @@ public static class MapStrings
     private static readonly Description _tradePelts = ("The Trader", "Exchange pelts in your deck for new cards");
 
     [Describes(typeof(CardRemoveNodeData))]
-    private static readonly Description _cardRemove = ("Bone Altar", "Sacrifice a card, removing it from your deck permanently. You will get a Minor Boon of the Bone Lord in exchange"); // TODO: boon descriptions
+    private static readonly Description _cardRemove = ("Bone Altar", "Sacrifice a card, removing it from your deck permanently. You will get a Minor Boon of the Bone Lord in exchange, allowing you to start each battle with one extra bone.");
 
     [Describes(typeof(DuplicateMergeNodeData))]
     private static readonly Description _duplicateMerge = ("The Mycologists", "Combine two versions of the same card together to create a stronger version with stats equal to the combined stats of the original cards. Sigils will be combined as well, but duplicate sigils will only be counted once");

@@ -61,16 +61,11 @@ public sealed class WoodcarverFlow : AutomationFlow<object>
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(chooseAction, out TotemPieceData? piece))
-        {
-            await NeuroMouse.MoveToAsync(piece.Slot!, 300, ct);
-            AllowManualInterruption = false;
-            await NeuroMouse.ClickAsync(ct);
-        }
-        else
-        {
-            action.ThrowInvalid();
-        }
+        if (!action.Match(chooseAction, out TotemPieceData? piece)) action.ThrowInvalid();
+
+        await NeuroMouse.MoveToAsync(piece.Slot!, 300, ct);
+        AllowManualInterruption = false;
+        await NeuroMouse.ClickAsync(ct);
 
         await HandleTotemBuildAsync(instance, state, ct);
     }
@@ -96,17 +91,12 @@ public sealed class WoodcarverFlow : AutomationFlow<object>
 
             Action action = await decision.SendAsync(ct);
 
-            if (action.Match(buildTotemAction, out BuildTotemAction.Response response))
-            {
-                await NeuroMouse.MoveToAsync(response.Top.Slot!, 200, ct);
-                await NeuroMouse.ClickAsync(ct);
-                await NeuroMouse.MoveToAsync(response.Bottom.Slot!, 200, ct);
-                await NeuroMouse.ClickAsync(1000, ct);
-            }
-            else
-            {
-                action.ThrowInvalid();
-            }
+            if (!action.Match(buildTotemAction, out BuildTotemAction.Response response)) action.ThrowInvalid();
+
+            await NeuroMouse.MoveToAsync(response.Top.Slot!, 200, ct);
+            await NeuroMouse.ClickAsync(ct);
+            await NeuroMouse.MoveToAsync(response.Bottom.Slot!, 200, ct);
+            await NeuroMouse.ClickAsync(1000, ct);
         }
 
         await NeuroMouse.MoveToAsync(instance.completeTotemSlot, 200, ct);

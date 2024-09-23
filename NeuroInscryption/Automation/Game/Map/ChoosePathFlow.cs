@@ -50,15 +50,10 @@ public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(choosePathAction, out MapNodeData? node))
-        {
-            await NeuroMouse.MoveToAsync(node.MapNode, 300, ct);
-            await NeuroMouse.ClickAsync(ct);
-        }
-        else
-        {
-            action.ThrowInvalid();
-        }
+        if (!action.Match(choosePathAction, out MapNodeData? node)) action.ThrowInvalid();
+
+        await NeuroMouse.MoveToAsync(node.MapNode, 300, ct);
+        await NeuroMouse.ClickAsync(ct);
     }
 
     private static List<List<MapNodeData>> GetPaths(MapNode node, int depth = 0)

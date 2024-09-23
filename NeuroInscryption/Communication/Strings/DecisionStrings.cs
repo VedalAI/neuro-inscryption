@@ -18,4 +18,5 @@ public static class DecisionStrings
     public const string CampfireHealthBoost = "+2 Health";
     public static readonly Description ChooseTotemPiece = ("totem_piece_choice", "Choose a totem piece to add to your collection. In order to create a full totem, you need a Sigil piece and a Tribe piece. All cards belonging to that tribe will then receive the sigil.");
     public static readonly Description BuildTotem = ("build_totem", "You have all the pieces needed to build a totem. Choose a tribe to apply the sigil to.");
+    public static readonly Description BoneAltarChooseCard = ("sacrifice_card_choice", "Choose a card to sacrifice to the Bone Lord, removing it from your deck permanently. You will get a Minor Boon of the Bone Lord in exchange, allowing you to start each battle with one extra bone. If you choose to sacrifice a Black Goat instead, you will receive a Boon of the Bone Lord, allowing you to start each battle with 8 extra bones. If you sacrifice a Pelt, you will receive nothing.");
 }

@@ -39,15 +39,10 @@ public sealed class PlaceCardFlow : AutomationFlow<object>
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(placeCardAction, out int lane))
-        {
-            CardSlot slot = BoardManager.Instance.playerSlots[lane];
-            await NeuroMouse.MoveToAsync(slot, 500, ct);
-            await NeuroMouse.ClickAsync(ct);
-        }
-        else
-        {
-            action.ThrowInvalid();
-        }
+        if (!action.Match(placeCardAction, out int lane)) action.ThrowInvalid();
+
+        CardSlot slot = BoardManager.Instance.playerSlots[lane];
+        await NeuroMouse.MoveToAsync(slot, 500, ct);
+        await NeuroMouse.ClickAsync(ct);
     }
 }
