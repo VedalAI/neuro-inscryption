@@ -60,7 +60,7 @@ public static class MapStrings
     private static readonly Description _cardMerge = ("Mysterious Stones", "Sacrifice a card and transfer its sigils to another card");
 
     [Describes(typeof(DeckTrialNodeData))]
-    private static readonly Description _deckTrial = ("Deck Trial", "Get a chance at obtaining a random card with 2 additional sigils based on a deck trial of your chooice.");
+    private static readonly Description _deckTrial = ("Deck Trial", "Get a chance at obtaining a random card with 2 additional sigils based on a deck trial of your choice.");
 
     // ---
 

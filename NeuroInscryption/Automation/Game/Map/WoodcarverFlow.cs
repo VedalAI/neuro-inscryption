@@ -52,7 +52,8 @@ public sealed class WoodcarverFlow : AutomationFlow<object>
         BuildTotemSequencer instance = enumerator.GetEnumeratorThis<BuildTotemSequencer>();
 
         Context1 context = new(instance.slots);
-        LoadoutState state = LoadoutState.CalculateWithContext(context);
+        LoadoutState state = LoadoutState.Calculate();
+        state.SetContext(context);
 
         ChooseAction<TotemPieceData> chooseAction = new(context.TotemPieceOptions, true);
 
@@ -83,7 +84,8 @@ public sealed class WoodcarverFlow : AutomationFlow<object>
         if (!autoBuildTotem)
         {
             Context2 context = new(oldState.Totem);
-            LoadoutState state = LoadoutState.CalculateWithContext(context); // need new state since we have new totem parts
+            LoadoutState state = LoadoutState.Calculate(); // need new state since we have new totem parts
+            state.SetContext(context);
 
             BuildTotemAction buildTotemAction = new(instance.inventorySlots.Where(slot => slot.Item != null).Select(TotemPieceData.Create)!);
 

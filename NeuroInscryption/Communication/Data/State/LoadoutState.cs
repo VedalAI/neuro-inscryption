@@ -13,7 +13,6 @@ namespace NeuroInscryption.Communication.Data.State;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public sealed class LoadoutState : IGameState
 {
-    public static LoadoutState CalculateWithContext<T>(T? decisionContext) where T : class => new(decisionContext);
     public static LoadoutState Calculate() => new();
 
     public readonly IReadOnlyList<CardData> PlayerDeck;

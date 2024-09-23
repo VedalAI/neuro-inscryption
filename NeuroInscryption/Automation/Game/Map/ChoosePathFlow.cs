@@ -41,7 +41,8 @@ public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
         List<List<MapNodeData>> paths = GetPaths(instance.ActiveNode);
         List<MapNodeData> nextNodes = paths.Select(p => p.First()).Distinct().ToList();
 
-        LoadoutState state = LoadoutState.CalculateWithContext(new Context(paths));
+        LoadoutState state = LoadoutState.Calculate();
+        state.SetContext(new Context(paths));
 
         ChooseAction<MapNodeData> choosePathAction = new(nextNodes, true);
 
