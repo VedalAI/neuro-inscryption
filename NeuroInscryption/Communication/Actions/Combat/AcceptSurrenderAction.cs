@@ -23,5 +23,3 @@ public sealed class AcceptSurrenderAction(CombatState state) : IAction
 
     public string ActionName => ActionStrings.AcceptSurrender;
 }
-
-// TODO: fix end screen / start screen flow transition through manual input

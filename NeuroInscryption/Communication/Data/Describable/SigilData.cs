@@ -25,7 +25,6 @@ public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, I
             Name = info.rulebookName;
             Info = info.LocalizedRulebookDescription.Replace("[creature]", Localization.Translate("a card bearing this sigil"));
             Info = char.ToUpper(Info[0]) + Info[1..];
-            // TODO: Are card definitions included here? ("A rabbit is defined as 0 power, 1 health")
         }
     }
 

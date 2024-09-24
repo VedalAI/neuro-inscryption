@@ -70,7 +70,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             Traits.RemoveAll(data => data.TryGetAbility(out SpecialTriggeredAbility ability) && _nonImmediateAbilities.Contains(ability));
             Traits.Add(SpecialTriggeredAbility.Shapeshifter!);
 
-            // TODO: Totem Sigils
+            // TODO: Totem Sigils on ijiraq
         }
         else if (_state.Ijiraq.SuspiciousCardsInHand.Contains(TargetCard))
         {

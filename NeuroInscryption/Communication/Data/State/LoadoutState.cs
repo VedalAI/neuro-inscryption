@@ -7,6 +7,7 @@ using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using BoonData = NeuroInscryption.Communication.Data.Serializable.BoonData;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
 namespace NeuroInscryption.Communication.Data.State;
@@ -17,6 +18,7 @@ public sealed class LoadoutState : IGameState
     public static LoadoutState Calculate() => new();
 
     public readonly IReadOnlyList<CardData> PlayerDeck;
+    public readonly IReadOnlyList<BoonData>? Boons;
 
     public readonly int Teeth;
 
@@ -40,6 +42,7 @@ public sealed class LoadoutState : IGameState
     private LoadoutState(object? decisionContext = null)
     {
         PlayerDeck = RunState.Run.playerDeck.Cards.Select(c => CardData.Create(c, this)).ToList();
+        Boons = RunState.Run.playerDeck.Boons.Select(BoonData.Create).ToList().NullIfEmpty();
 
         Teeth = RunState.Run.currency;
 
