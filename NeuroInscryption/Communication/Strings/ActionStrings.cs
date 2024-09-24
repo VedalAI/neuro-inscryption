@@ -6,6 +6,7 @@ public static class ActionStrings
     public const string PlayCard = "choose_card_to_play";
     public const string PlaceCard = "choose_slot_for_card";
     public const string ChooseSacrifices = "choose_sacrifices";
+    public const string UseItem = "use_item";
     public const string AcceptSurrender = "accept_surrender";
     public const string EndTurn = "end_turn";
 

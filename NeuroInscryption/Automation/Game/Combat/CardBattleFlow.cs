@@ -1,9 +1,11 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Combat;
+using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Outgoing;
@@ -11,6 +13,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
+using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
@@ -43,20 +46,27 @@ public sealed class CardBattleFlow : AutomationFlow<object>
 
         CombatState state = CombatState.Calculate();
 
-        PlayCardAction playCardAction = new(state);
+        ChooseAction<PlayableCardData> playCardAction = new(state.PlayerHand.Where(c => c.IsPlayable == true), false, ActionStrings.PlayCard);
+        ChooseAction<ItemData> useItemAction = new(state.Items, false, ActionStrings.UseItem);
         AcceptSurrenderAction acceptSurrenderAction = new(state);
         EndTurnAction endTurnAction = new();
 
         Decision decision = new(DecisionStrings.CardBattleTurn, state);
         decision.AddAction(playCardAction);
+        decision.AddAction(useItemAction);
         decision.AddAction(acceptSurrenderAction);
         decision.AddAction(endTurnAction);
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(playCardAction, out PlayableCardData? cardData))
+        if (action.Match(playCardAction, out PlayableCardData? cardData)) // todo: test
         {
             await NeuroMouse.MoveToAsync(cardData.TargetCard, 500, ct);
+            await NeuroMouse.ClickAsync(ct);
+        }
+        else if (action.Match(useItemAction, out ItemData? itemData)) // todo: test
+        {
+            await NeuroMouse.MoveToAsync(itemData.Slot!, 500, ct);
             await NeuroMouse.ClickAsync(ct);
         }
         else if (action.Match(acceptSurrenderAction))

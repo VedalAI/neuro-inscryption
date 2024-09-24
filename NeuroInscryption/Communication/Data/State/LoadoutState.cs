@@ -44,7 +44,7 @@ public sealed class LoadoutState : IGameState
         Teeth = RunState.Run.currency;
 
         MaxItems = RunState.Run.MaxConsumables;
-        Items = ItemsManager.Instance.Consumables.Select(ItemData.Create).ToList();
+        Items = ItemsManager.Instance.consumableSlots.Where(s => s.Item).Select(ItemData.Create).ToList();
 
         Totem = TotemData.Create(Part1ItemsManager.Instance.Totems.FirstOrDefault());
         TotemPieces = RunState.Run.totemTops.Select(TotemPieceData.Create).Concat(RunState.Run.totemBottoms.Select(TotemPieceData.Create)).ToList().NullIfEmpty();

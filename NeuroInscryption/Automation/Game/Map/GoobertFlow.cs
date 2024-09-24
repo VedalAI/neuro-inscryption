@@ -41,7 +41,7 @@ public sealed class GoobertFlow : AutomationFlow<object>
     public override bool CanInterruptItself => false;
 
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
-    { // TODO: test this to make sure it works
+    {
         CopyCardSequencer instance = enumerator.GetEnumeratorThis<CopyCardSequencer>();
 
         await UniTask.Delay(500, cancellationToken: ct);
@@ -63,7 +63,7 @@ public sealed class GoobertFlow : AutomationFlow<object>
         if (!action.Match(chooseCardAction, out SelectableCardData? selected)) action.ThrowInvalid();
 
         await NeuroMouse.MoveToAsync(selected.TargetCard, 200, ct);
-        await NeuroMouse.ClickAsync(1000, ct); // todo: why so long
+        await NeuroMouse.ClickAsync(1000, ct);
 
         await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);
         await NeuroMouse.ClickAsync(ct);

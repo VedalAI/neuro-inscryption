@@ -64,7 +64,7 @@ public sealed class CombatState : IGameState
         RemainingDeck = CardDrawPiles.Instance.Deck.Cards.Select((c, index) => CardData.Create(c, this, index)).ToList();
 
         MaxItems = RunState.Run.MaxConsumables;
-        Items = ItemsManager.Instance.Consumables.Select(ItemData.Create).ToList();
+        Items = ItemsManager.Instance.consumableSlots.Where(s => s.Item).Select(ItemData.Create).ToList();
 
         // (TurnManager.Instance.Opponent as Part1Opponent).totem
         Totem = TotemData.Create(Part1ItemsManager.Instance.Totems.FirstOrDefault());

@@ -66,7 +66,9 @@ public static class NeuroMouse
 
         if (target is CardSlot slot1 && currentHit is PlayableCard card1) return slot1.Card == card1;
         if (target is PlayableCard card2 && currentHit is CardSlot slot2) return slot2.Card == card2;
-        if (target is CardSlot slot3 && currentHit is BoneTokenInteractable bone) return bone.GetIdentifier().slot == slot3;
+        if (target is CardSlot slot3 && currentHit is BoneTokenInteractable bone3) return bone3.GetIdentifier().slot == slot3;
+        if (target is SelectCardFromDeckSlot slot4 && currentHit is SelectableCard card4) return slot4.Card == card4;
+        if (target is SelectableCard card5 && currentHit is SelectCardFromDeckSlot slot5) return slot5.Card == card5;
 
         return target == currentHit;
     }
@@ -76,6 +78,7 @@ public static class NeuroMouse
         if (interactable is CombatBell3D) return [interactable.transform.position + Vector3.up * 0.5f];
         if (interactable is SelectableItemSlot) return [interactable.transform.position + Vector3.up * 0.5f];
         if (interactable is SelectableCard) return [interactable.transform.position, interactable.transform.position + new Vector3(-0.5f, 0)];
+        if (interactable is SelectableItemSlot) return [interactable.transform.position + Vector3.up];
 
         return [];
     }

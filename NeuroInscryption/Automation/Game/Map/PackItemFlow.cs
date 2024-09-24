@@ -59,7 +59,7 @@ public sealed class PackItemFlow : AutomationFlow<object>
 
         if (!action.Match(chooseAction, out ItemData? item)) action.ThrowInvalid();
 
-        await NeuroMouse.MoveToAsync(item.Slot!, 200, ct);
+        await NeuroMouse.MoveToAsync(item.Slot!, 300, ct);
         await NeuroMouse.ClickAsync(ct);
     }
 }

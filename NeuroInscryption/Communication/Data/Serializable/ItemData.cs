@@ -14,21 +14,16 @@ public sealed class ItemData : IIdentifiable
     // Ignored from json
 
     [JsonIgnore]
-    public SelectableItemSlot? Slot { get; }
+    public ItemSlot? Slot { get; }
 
-    private ItemData(Item item)
+    private ItemData(ItemSlot slot)
     {
-        ConsumableItemData itemData = (ConsumableItemData) item.Data;
+        ConsumableItemData itemData = (ConsumableItemData) slot.Item.Data;
 
         Identifier = itemData.rulebookName;
         Description = itemData.rulebookDescription;
-    }
-
-    private ItemData(SelectableItemSlot slot) : this(slot.Item)
-    {
         Slot = slot;
     }
 
-    public static ItemData Create(Item item) => new(item);
-    public static ItemData Create(SelectableItemSlot slot) => new(slot);
+    public static ItemData Create(ItemSlot slot) => new(slot);
 }

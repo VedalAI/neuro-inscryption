@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 namespace NeuroInscryption.Communication.Data.Serializable;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-public sealed class PlayableCardData : CardData
+public sealed class PlayableCardData : CardData, IIdentifiable
 {
     [JsonProperty(Order = 1)]
     public string Identifier { get; private set; }

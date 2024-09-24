@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Map;
 
-public sealed class ChooseAction<T>(IEnumerable<T> items, bool isOnlyOption) : IAction<T>
+public sealed class ChooseAction<T>(IEnumerable<T> items, bool isOnlyOption, string actionName = ActionStrings.MakeChoice) : IAction<T>
     where T : class, IIdentifiable
 {
     void ISchemaModifier.Apply(JsonSchema schema)
@@ -23,7 +23,7 @@ public sealed class ChooseAction<T>(IEnumerable<T> items, bool isOnlyOption) : I
         else schema.OneOf.Add(new JsonSchema { Properties = properties });
     }
 
-    public string ActionName => ActionStrings.MakeChoice;
+    public string ActionName => actionName;
 
     bool IAction<T>.Deserialize(Action action, out T? response)
     {

@@ -7,7 +7,7 @@ namespace NeuroInscryption.Communication.Actions.Map;
 
 public sealed class RerollAction(MainInputInteractable clover) : IAction
 {
-    public bool Applicable { get; } = clover.Enabled && clover.gameObject.activeSelf;
+    public bool Applicable { get; } = clover && clover.Enabled && clover.gameObject.activeSelf;
 
     void ISchemaModifier.Apply(JsonSchema schema)
     {
