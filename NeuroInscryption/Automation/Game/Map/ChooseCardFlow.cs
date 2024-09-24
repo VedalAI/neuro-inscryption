@@ -7,6 +7,7 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
+using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
@@ -20,7 +21,7 @@ namespace NeuroInscryption.Automation.Game.Map;
 public sealed class ChooseCardFlow : AutomationFlow<object>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(List<SelectableCard> cards, CardChoicesType type, IGameState state)
+    private sealed class Context(List<SelectableCard> cards, CardChoicesType type, IGameState state) : ILoadoutContext
     {
         public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
 
@@ -30,6 +31,9 @@ public sealed class ChooseCardFlow : AutomationFlow<object>
             CardChoicesType.Tribe => "You will receive a random card that belongs to the tribe that you choose.",
             _ => null
         };
+
+        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => CardOptions.SelectMany(c => c.Card!.RelevantSigils);
+        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => CardOptions.SelectMany(c => c.Card!.Traits);
     }
 
     public override FlowHook[] Hooks =>

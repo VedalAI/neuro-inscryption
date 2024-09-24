@@ -26,6 +26,8 @@ public sealed class PlaceCardFlow : AutomationFlow<object>
         }
     ];
 
+    public override bool CanInterruptItself => true;
+
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         CombatState state = CombatState.Calculate();

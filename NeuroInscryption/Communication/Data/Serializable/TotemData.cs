@@ -1,4 +1,5 @@
-﻿using DiskCardGame;
+﻿using System.Diagnostics.CodeAnalysis;
+using DiskCardGame;
 using JetBrains.Annotations;
 using NeuroInscryption.Communication.Data.Describable;
 using Newtonsoft.Json;
@@ -25,5 +26,6 @@ public sealed class TotemData
         Tribe = totemData.top.prerequisites.tribe.ToString();
     }
 
+    [return: NotNullIfNotNull(nameof(totem))]
     public static TotemData? Create(Totem? totem) => totem != null ? new TotemData(totem) : null;
 }

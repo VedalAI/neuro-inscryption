@@ -16,7 +16,7 @@ public sealed class ChooseAction<T>(IEnumerable<T> items, bool isOnlyOption) : I
         Dictionary<string, JsonSchema> properties = new()
         {
             ["action"] = QJS.Const(ActionName),
-            ["data"] = QJS.Enum(items.Select(card => card.Identifier))
+            ["data"] = QJS.Enum(items.Select(card => card.Identifier).Distinct())
         };
 
         if (isOnlyOption) schema.Properties = properties;

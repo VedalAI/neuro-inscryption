@@ -8,6 +8,7 @@ using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
+using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
 namespace NeuroInscryption.Communication.Data.State;
 
@@ -26,6 +27,9 @@ public sealed class CombatState : IGameState
 
     public readonly IReadOnlyList<PlayableCardData> PlayerHand;
     public readonly IReadOnlyList<CardData> RemainingDeck;
+
+    public readonly int MaxItems;
+    public readonly IReadOnlyList<ItemData> Items;
 
     public readonly TotemData? Totem;
 
@@ -58,6 +62,9 @@ public sealed class CombatState : IGameState
 
         PlayerHand = DiskCardGame.PlayerHand.Instance.CardsInHand.Select(c => PlayableCardData.Create(c, this)).ToList();
         RemainingDeck = CardDrawPiles.Instance.Deck.Cards.Select((c, index) => CardData.Create(c, this, index)).ToList();
+
+        MaxItems = RunState.Run.MaxConsumables;
+        Items = ItemsManager.Instance.Consumables.Select(ItemData.Create).ToList();
 
         // (TurnManager.Instance.Opponent as Part1Opponent).totem
         Totem = TotemData.Create(Part1ItemsManager.Instance.Totems.FirstOrDefault());

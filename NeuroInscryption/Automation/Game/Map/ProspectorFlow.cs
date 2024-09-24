@@ -26,11 +26,6 @@ public sealed class ProspectorFlow : AutomationFlow<object>
 
     public override bool CanInterruptItself => false;
 
-    public override void ResetState()
-    {
-        AllowManualInterruption = true;
-    }
-
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         BoulderChoiceSequencer instance = enumerator.GetEnumeratorThis<BoulderChoiceSequencer>();
@@ -49,13 +44,6 @@ public sealed class ProspectorFlow : AutomationFlow<object>
         if (!action.Match(breakBoulderAction, out int selection)) action.ThrowInvalid();
 
         await NeuroMouse.MoveToAsync(instance.selectableCards[selection - 1], 200, ct);
-        AllowManualInterruption = false;
-        await NeuroMouse.ClickAsync(ct);
-
-        await UniTask.WaitUntil(() => enumerator.GetEnumeratorState() == 8, cancellationToken: ct);
-        object rewardSequenceEnumerator = enumerator.GetEnumeratorCurrent();
-        await UniTask.WaitUntil(() => rewardSequenceEnumerator.GetEnumeratorState() == 4, cancellationToken: ct);
-        await UniTask.Delay(500, cancellationToken: ct);
         await NeuroMouse.ClickAsync(ct);
     }
 }

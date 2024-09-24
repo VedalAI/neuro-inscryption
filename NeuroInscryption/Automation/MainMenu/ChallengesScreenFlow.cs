@@ -19,6 +19,8 @@ public sealed class ChallengesScreenFlow : AutomationFlow<AscensionChallengeScre
         }
     ];
 
+    public override bool CanInterruptItself => true;
+
     protected override async UniTask ExecuteAsync(AscensionChallengeScreen target, CancellationToken ct)
     {
         await UniTask.Delay(1000, cancellationToken: ct);

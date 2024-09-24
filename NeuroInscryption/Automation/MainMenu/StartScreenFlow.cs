@@ -17,6 +17,8 @@ public sealed class StartScreenFlow : AutomationFlow<AscensionStartScreen>
         }
     ];
 
+    public override bool CanInterruptItself => true;
+
     protected override async UniTask ExecuteAsync(AscensionStartScreen target, CancellationToken ct)
     {
         await UniTask.Delay(1000, cancellationToken: ct);

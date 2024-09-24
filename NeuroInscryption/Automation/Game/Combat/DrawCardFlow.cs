@@ -24,6 +24,8 @@ public sealed class DrawCardFlow : AutomationFlow<object>
         }
     ];
 
+    public override bool CanInterruptItself => true;
+
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         await UniTask.Delay(500, cancellationToken: ct);

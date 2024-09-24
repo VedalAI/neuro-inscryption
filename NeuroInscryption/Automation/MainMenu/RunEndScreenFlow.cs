@@ -20,6 +20,8 @@ public sealed class RunEndScreenFlow : AutomationFlow<AscensionRunEndScreen>
 
     public override Type[] FlowsBlockedForInterruption => [typeof(StartScreenFlow)];
 
+    public override bool CanInterruptItself => true;
+
     protected override async UniTask ExecuteAsync(AscensionRunEndScreen target, CancellationToken ct)
     {
         await UniTask.Delay(1000, cancellationToken: ct);

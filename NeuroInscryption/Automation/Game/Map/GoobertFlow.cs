@@ -7,6 +7,7 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
+using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
@@ -20,9 +21,12 @@ namespace NeuroInscryption.Automation.Game.Map;
 public sealed class GoobertFlow : AutomationFlow<object>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(IEnumerable<SelectableCard> cards, IGameState state)
+    private sealed class Context(IEnumerable<SelectableCard> cards, IGameState state) : ILoadoutContext
     {
         public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
+
+        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
+        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
     }
 
     public override FlowHook[] Hooks =>

@@ -16,6 +16,8 @@ public sealed class MainGameStartScreenFlow : AutomationFlow
         }
     ];
 
+    public override bool CanInterruptItself => true;
+
     public override UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct)
     {
         // Allow manual control of game for stuff like changing settings

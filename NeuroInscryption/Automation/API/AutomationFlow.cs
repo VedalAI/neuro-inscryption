@@ -38,7 +38,7 @@ public abstract class AutomationFlow
     /// <br/>
     /// Setting this to false is equivalent to adding the flow to <see cref="FlowsBlockedForInterruption"/>, but it will not output any logs
     /// </summary>
-    public virtual bool CanInterruptItself => true;
+    public abstract bool CanInterruptItself { get; }
 
     /// <summary>
     /// Whether or not this flow can be interrupted by manual input

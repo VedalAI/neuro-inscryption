@@ -4,7 +4,7 @@ using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Communication.Data.Describable;
 
-public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, IEquatable<Ability>, IDescriptionConvertible
+public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, IDescriptionConvertible
 {
     public string Name { get; }
     public string Info { get; }
@@ -37,15 +37,10 @@ public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, I
 
     public int CompareTo(SigilData? other) => string.Compare(Name, other?.Name, StringComparison.OrdinalIgnoreCase);
     public bool Equals(SigilData? other) => Sigil == other?.Sigil;
-    public bool Equals(Ability other) => Sigil == other;
     public override bool Equals(object? obj) => obj is SigilData other && Equals(other);
     public override int GetHashCode() => (int) Sigil;
     public static bool operator ==(SigilData? left, SigilData? right) => Equals(left, right);
     public static bool operator !=(SigilData? left, SigilData? right) => !(left == right);
-    public static bool operator ==(SigilData? left, Ability right) => left?.Equals(right) ?? false;
-    public static bool operator !=(SigilData? left, Ability right) => !(left == right);
-    public static bool operator ==(Ability left, SigilData? right) => right == left;
-    public static bool operator !=(Ability left, SigilData? right) => !(left == right);
 
     #endregion
 }

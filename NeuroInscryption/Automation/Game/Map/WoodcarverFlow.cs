@@ -7,6 +7,7 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
+using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
@@ -20,15 +21,21 @@ namespace NeuroInscryption.Automation.Game.Map;
 public sealed class WoodcarverFlow : AutomationFlow<object>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context1(IEnumerable<SelectableItemSlot> items)
+    private sealed class Context1(IEnumerable<SelectableItemSlot> items) : ILoadoutContext
     {
         public readonly IReadOnlyList<TotemPieceData> TotemPieceOptions = items.Select(slot => TotemPieceData.Create(slot)!).ToList();
+
+        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
+        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context2(TotemData? totem)
+    private sealed class Context2(TotemData? totem) : ILoadoutContext
     {
         public readonly TotemData? LastTotem = totem;
+
+        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
+        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
     }
 
     public override FlowHook[] Hooks =>

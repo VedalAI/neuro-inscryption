@@ -4,7 +4,7 @@ using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Communication.Data.Describable;
 
-public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, IEquatable<Trait>, IEquatable<SpecialTriggeredAbility>, IDescriptionConvertible
+public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, IDescriptionConvertible
 {
     private enum Type
     {
@@ -112,20 +112,10 @@ public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, I
 
     public int CompareTo(TraitData? other) => string.Compare(Name, other?.Name, StringComparison.OrdinalIgnoreCase);
     public bool Equals(TraitData? other) => _type == other?._type && _value.Equals(other._value);
-    public bool Equals(Trait other) => _type == Type.Trait && (Trait) _value == other;
-    public bool Equals(SpecialTriggeredAbility other) => _type == Type.Ability && (SpecialTriggeredAbility) _value == other;
     public override bool Equals(object? obj) => obj is TraitData other && Equals(other);
     public override int GetHashCode() => unchecked(((int) _type * 397) ^ _value.GetHashCode());
     public static bool operator ==(TraitData? left, TraitData? right) => Equals(left, right);
     public static bool operator !=(TraitData? left, TraitData? right) => !(left == right);
-    public static bool operator ==(TraitData? left, Trait right) => left?.Equals(right) ?? false;
-    public static bool operator !=(TraitData? left, Trait right) => !(left == right);
-    public static bool operator ==(Trait left, TraitData? right) => right == left;
-    public static bool operator !=(Trait left, TraitData? right) => !(left == right);
-    public static bool operator ==(TraitData? left, SpecialTriggeredAbility right) => left?.Equals(right) ?? false;
-    public static bool operator !=(TraitData? left, SpecialTriggeredAbility right) => !(left == right);
-    public static bool operator ==(SpecialTriggeredAbility left, TraitData? right) => right == left;
-    public static bool operator !=(SpecialTriggeredAbility left, TraitData? right) => !(left == right);
 
     #endregion
 }

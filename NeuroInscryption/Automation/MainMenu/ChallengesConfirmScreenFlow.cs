@@ -17,6 +17,8 @@ public sealed class ChallengesConfirmScreenFlow : AutomationFlow<AscensionChalle
         }
     ];
 
+    public override bool CanInterruptItself => true;
+
     protected override async UniTask ExecuteAsync(AscensionChallengeConfirmScreen target, CancellationToken ct)
     {
         await NeuroMouse.MoveToAsync(target.continueButton, 500, ct);

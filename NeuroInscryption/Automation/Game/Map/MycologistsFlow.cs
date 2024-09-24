@@ -7,6 +7,7 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
+using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
@@ -20,9 +21,12 @@ namespace NeuroInscryption.Automation.Game.Map;
 public sealed class MycologistsFlow : AutomationFlow<object>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(IEnumerable<SelectableCardPair> pairs, IGameState state)
+    private sealed class Context(IEnumerable<SelectableCardPair> pairs, IGameState state) : ILoadoutContext
     {
         public readonly IReadOnlyList<SelectableCardPairData> PairOptions = pairs.Select(p => SelectableCardPairData.Create(p, state)).ToList();
+
+        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
+        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
     }
 
     public override FlowHook[] Hooks =>

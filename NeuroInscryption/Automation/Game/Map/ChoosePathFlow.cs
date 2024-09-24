@@ -20,10 +20,13 @@ namespace NeuroInscryption.Automation.Game.Map;
 public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(List<List<MapNodeData>> paths)
+    private sealed class Context(List<List<MapNodeData>> paths) : ILoadoutContext
     {
         public readonly IReadOnlyList<string> Paths = paths.Select(path => string.Join(" -> ", path.Select(node => node.Identifier))).ToList();
         public readonly IReadOnlyDictionary<string, string> PathDescriptions = paths.Flatten().ToDescriptionDictionary();
+
+        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
+        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
     }
 
     public override FlowHook[] Hooks =>
@@ -33,6 +36,8 @@ public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
             Method = AccessTools.Method(typeof(MapNodeManager), nameof(MapNodeManager.SetActiveNode))
         }
     ];
+
+    public override bool CanInterruptItself => true;
 
     protected override async UniTask ExecuteAsync(MapNodeManager instance, CancellationToken ct)
     {
