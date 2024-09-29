@@ -91,6 +91,18 @@ public class CardData
     [return: NotNullIfNotNull(nameof(cardInfo))]
     public static CardData? Create(CardInfo? cardInfo, IGameState state, int? deckIndex = null) => cardInfo != null ? new CardData(cardInfo, state, deckIndex) : null;
 
+    public virtual string GetDescription()
+    {
+        return string.Format(CardStrings.Description,
+            DisplayName,
+            Power,
+            Health,
+            SigilNames != null ? CardStrings.InfoSeparator + string.Join(CardStrings.InfoSeparator, SigilNames) : "",
+            "",
+            Cost
+        );
+    }
+
     private string GetPowerInDeck()
     {
         foreach (SpecialTriggeredAbility ability in TargetCardInfo.SpecialAbilities)

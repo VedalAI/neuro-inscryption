@@ -82,7 +82,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
     [return: NotNullIfNotNull(nameof(card))]
     public static PlayableCardData? Create(PlayableCard? card, CombatState state) => card != null ? new PlayableCardData(card, state) : null;
 
-    public string GetDescription()
+    public override string GetDescription()
     {
         return string.Format(CardStrings.Description,
             DisplayName,
