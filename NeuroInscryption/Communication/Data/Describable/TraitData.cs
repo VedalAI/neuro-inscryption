@@ -43,28 +43,22 @@ public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, I
         return false;
     }
 
-    private TraitData(Trait trait)
+    private TraitData(Trait trait, Description description)
     {
         _type = Type.Trait;
         _value = trait;
 
-        Description? describable = TraitStrings.Get(trait);
-        if (describable == null) throw new ArgumentException($"Trait {trait} not found in strings");
-
-        Name = describable.Name;
-        Info = describable.Info;
+        Name = description.Name;
+        Info = description.Info;
     }
 
-    private TraitData(SpecialTriggeredAbility ability)
+    private TraitData(SpecialTriggeredAbility ability, Description description)
     {
         _type = Type.Ability;
         _value = ability;
 
-        Description? describable = TraitStrings.Get(ability);
-        if (describable == null) throw new ArgumentException($"Special ability {ability} not found in strings");
-
-        Name = describable.Name;
-        Info = describable.Info;
+        Name = description.Name;
+        Info = description.Info;
     }
 
     private TraitData(Description custom)
@@ -78,26 +72,18 @@ public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, I
 
     public static TraitData? Create(Trait trait)
     {
-        try
-        {
-            return new TraitData(trait);
-        }
-        catch
-        {
-            return null;
-        }
+        Description? description = TraitStrings.Get(trait);
+        if (description == null) return null;
+
+        return new TraitData(trait, description);
     }
 
     public static TraitData? Create(SpecialTriggeredAbility ability)
     {
-        try
-        {
-            return new TraitData(ability);
-        }
-        catch
-        {
-            return null;
-        }
+        Description? description = TraitStrings.Get(ability);
+        if (description == null) return null;
+
+        return new TraitData(ability, description);
     }
 
     public static TraitData Create(Description custom)
