@@ -41,7 +41,7 @@ public sealed class CombatState : IGameState
     public readonly bool? IsOpponentSurrendering;
 
     [JsonProperty("Note")]
-    private string? Note => Ijiraq.AnythingCouldBeIjiraq ? StateStrings.IjiraqPresent : null;
+    private string? Note => Ijiraq.AnythingCouldBeIjiraq ? CardStrings.IjiraqPresent : null;
 
     // Excluded from JSON
 

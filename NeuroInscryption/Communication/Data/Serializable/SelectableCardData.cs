@@ -30,12 +30,14 @@ public sealed class SelectableCardData : IIdentifiable
         if (card.Info != null)
         {
             Card = CardData.Create(card.Info, state);
-            Identifier = Card.DisplayName + string.Format(CardStrings.GenericDiscriminator, index);
+            Identifier = Card.DisplayName;
+            if (index != -1) Identifier += string.Format(CardStrings.GenericDiscriminator, index);
         }
         else if (card.ChoiceInfo.CardInfo != null)
         {
             Card = CardData.Create(card.ChoiceInfo.CardInfo, state);
-            Identifier = Card.DisplayName + string.Format(CardStrings.GenericDiscriminator, index);
+            Identifier = Card.DisplayName;
+            if (index != -1) Identifier += string.Format(CardStrings.GenericDiscriminator, index);
         }
         else if (card.ChoiceInfo.tribe != DiskCardGame.Tribe.None)
         {
@@ -60,5 +62,6 @@ public sealed class SelectableCardData : IIdentifiable
         }
     }
 
+    public static SelectableCardData Create(SelectableCard card, IGameState state) => new(card, -1, state);
     public static SelectableCardData Create(SelectableCard card, int index, IGameState state) => new(card, index, state);
 }

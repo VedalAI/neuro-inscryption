@@ -29,11 +29,6 @@ public sealed class BoneAltarFlow : AutomationFlow<object>
 
     public override bool CanInterruptItself => false;
 
-    public override void ResetState()
-    {
-        AllowManualInterruption = true;
-    }
-
     protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
     {
         CardRemoveSequencer instance = target.GetEnumeratorThis<CardRemoveSequencer>();
@@ -60,11 +55,6 @@ public sealed class BoneAltarFlow : AutomationFlow<object>
         await NeuroMouse.ClickAsync(1000, ct);
 
         await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);
-        AllowManualInterruption = false;
-        await NeuroMouse.ClickAsync(2500, ct);
-
-        // todo: make sure this isnt broken by dialogue
-        await NeuroMouse.MoveToAsync(instance.sacrificeSlot, ct);
         await NeuroMouse.ClickAsync(ct);
     }
 }

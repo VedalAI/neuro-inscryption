@@ -11,8 +11,12 @@ namespace NeuroInscryption.Communication.Actions.Map;
 public sealed class ChooseAction<T>(IEnumerable<T> items, bool isOnlyOption, string actionName = ActionStrings.MakeChoice) : IAction<T>
     where T : class, IIdentifiable
 {
+    public bool Applicable { get; } = items.Any();
+
     void ISchemaModifier.Apply(JsonSchema schema)
     {
+        if (!Applicable) return;
+
         Dictionary<string, JsonSchema> properties = new()
         {
             ["action"] = QJS.Const(ActionName),

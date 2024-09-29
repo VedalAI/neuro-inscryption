@@ -59,12 +59,12 @@ public sealed class CardBattleFlow : AutomationFlow<object>
 
         Action action = await decision.SendAsync(ct);
 
-        if (action.Match(playCardAction, out PlayableCardData? cardData)) // todo: test
+        if (action.Match(playCardAction, out PlayableCardData? cardData))
         {
             await NeuroMouse.MoveToAsync(cardData.TargetCard, 500, ct);
             await NeuroMouse.ClickAsync(ct);
         }
-        else if (action.Match(useItemAction, out ItemData? itemData)) // todo: test
+        else if (action.Match(useItemAction, out ItemData? itemData))
         {
             await NeuroMouse.MoveToAsync(itemData.Slot!, 500, ct);
             await NeuroMouse.ClickAsync(ct);

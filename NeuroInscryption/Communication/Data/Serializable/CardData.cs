@@ -133,6 +133,7 @@ public class CardData
 
         result.AddRange(TargetCardInfo.Abilities.Select(SigilData.Create));
 
+        // TODO: figure out if we should get rid of the implicit conversions
         if (includeTangential)
         {
             if (TargetCardInfo.specialAbilities.Contains(SpecialTriggeredAbility.JerseyDevil)) result.Add(Ability.Flying);

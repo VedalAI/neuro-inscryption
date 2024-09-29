@@ -8,14 +8,14 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class ProspectorPickupCardFlow : AutomationFlow<object>
+public sealed class BoneAltarPickupFlow : AutomationFlow<object>
 {
     public override FlowHook[] Hooks =>
     [
         new()
         {
-            Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(BoulderChoiceSequencer), nameof(BoulderChoiceSequencer.RewardSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 4
+            Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(CardRemoveSequencer), nameof(CardRemoveSequencer.RemoveSequence))),
+            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 19
         }
     ];
 
@@ -23,7 +23,9 @@ public sealed class ProspectorPickupCardFlow : AutomationFlow<object>
 
     protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
     {
-        await UniTask.Delay(500, cancellationToken: ct);
+        CardRemoveSequencer instance = target.GetEnumeratorThis<CardRemoveSequencer>();
+
+        await NeuroMouse.MoveToAsync(instance.sacrificeSlot, ct);
         await NeuroMouse.ClickAsync(ct);
     }
 }

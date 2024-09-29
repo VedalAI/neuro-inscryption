@@ -12,4 +12,6 @@ public static class CardStrings
     public const string IjiraqNarrowedDown = "Careful! This card or another {0} card in your hand is a disguised Ijiraq!";
     public const string GenericDiscriminator = " ({0})";
     public const string OnBoardDiscriminator = " (Lane {0})";
+
+    public const string IjiraqPresent = "Be careful, any card in your hand or deck could be a disguised Ijiraq.";
 }

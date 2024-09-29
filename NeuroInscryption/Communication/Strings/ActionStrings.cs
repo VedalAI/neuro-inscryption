@@ -16,6 +16,7 @@ public static class ActionStrings
     public const string Leave = "leave";
     public const string BuildTotem = "build_totem";
     public const string BreakBoulder = "choose_boulder_to_break";
+    public const string BuyTrapperItem = "buy_item";
 
     public const string PathDiscriminator = " ({0})";
 }

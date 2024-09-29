@@ -48,7 +48,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
                 switch (hook.PatchType)
                 {
                     case HarmonyPatchType.Prefix:
-                        Plugin.Harmony.Patch(hook.Method, GetPatchMethod(hook));
+                        Plugin.Harmony.Patch(hook.Method, prefix: GetPatchMethod(hook));
                         break;
                     case HarmonyPatchType.Postfix:
                         Plugin.Harmony.Patch(hook.Method, postfix: GetPatchMethod(hook));
@@ -91,7 +91,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
             if (!linked.hook.IsValid(context))
             {
                 Plugin.Logger.LogDebug($"Skipping change to flow {linked.flow.GetType().Name} since current instance is not valid.");
-                return;
+                continue;
             }
 
             if (changed)
