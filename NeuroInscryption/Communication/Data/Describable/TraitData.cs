@@ -105,9 +105,6 @@ public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, I
         return new TraitData(custom);
     }
 
-    public static implicit operator TraitData?(Trait trait) => Create(trait);
-    public static implicit operator TraitData?(SpecialTriggeredAbility ability) => Create(ability);
-
     #region Equality
 
     public int CompareTo(TraitData? other) => string.Compare(Name, other?.Name, StringComparison.OrdinalIgnoreCase);

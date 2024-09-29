@@ -35,8 +35,6 @@ public sealed class MapNodeData : IComparable<MapNodeData>, IEquatable<MapNodeDa
 
     public static MapNodeData Create(MapNode node) => new(node);
 
-    public static implicit operator MapNodeData(MapNode node) => Create(node);
-
     #region Equality
 
     public int CompareTo(MapNodeData? other) => string.Compare(Name, other?.Name, StringComparison.OrdinalIgnoreCase);

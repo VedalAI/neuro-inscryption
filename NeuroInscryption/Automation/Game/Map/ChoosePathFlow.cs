@@ -66,7 +66,7 @@ public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
     {
         if (node.connectedNodes.Count == 0 || depth == 5)
         {
-            return [[node]];
+            return [[MapNodeData.Create(node)]];
         }
 
         List<List<MapNodeData>> result = [];
@@ -79,7 +79,7 @@ public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
             {
                 foreach (List<MapNodeData> t in paths)
                 {
-                    t.Insert(0, node);
+                    t.Insert(0, MapNodeData.Create(node));
                 }
             }
 

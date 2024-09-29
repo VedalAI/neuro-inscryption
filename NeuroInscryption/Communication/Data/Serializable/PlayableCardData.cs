@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DiskCardGame;
 using JetBrains.Annotations;
+using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
@@ -64,11 +65,11 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             Tribes = null;
 
             Sigils.RemoveAll(data => !_immediateSigils.Contains(data.Sigil));
-            Sigils.Add(Ability.PreventAttack);
+            Sigils.Add(SigilData.Create(Ability.PreventAttack));
 
             Traits.RemoveAll(data => data.TryGetTrait(out Trait trait) && _nonImmediateTraits.Contains(trait));
             Traits.RemoveAll(data => data.TryGetAbility(out SpecialTriggeredAbility ability) && _nonImmediateAbilities.Contains(ability));
-            Traits.Add(SpecialTriggeredAbility.Shapeshifter!);
+            Traits.Add(TraitData.Create(SpecialTriggeredAbility.Shapeshifter)!);
 
             // TODO: Totem Sigils on ijiraq
         }

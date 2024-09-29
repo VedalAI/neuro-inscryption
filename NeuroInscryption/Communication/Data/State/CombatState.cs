@@ -76,7 +76,7 @@ public sealed class CombatState : IGameState
         allCardsInPlay.RemoveAll(data => data == null);
 
         IEnumerable<SigilData> relevantSigils = allCardsInPlay.SelectMany(c => c.RelevantSigils);
-        if (Totem != null) relevantSigils = relevantSigils.Append(Totem.Sigil);
+        if (Totem != null) relevantSigils = relevantSigils.Append(SigilData.Create(Totem.Sigil));
         SigilDescriptions = relevantSigils.ToDescriptionDictionary().NullIfEmpty();
         TraitDescriptions = allCardsInPlay.SelectMany(c => c.Traits).Distinct().ToDescriptionDictionary().NullIfEmpty();
 

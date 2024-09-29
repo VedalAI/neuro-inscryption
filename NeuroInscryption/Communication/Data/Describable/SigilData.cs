@@ -30,8 +30,6 @@ public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, I
 
     public static SigilData Create(Ability sigil) => new(sigil);
 
-    public static implicit operator SigilData(Ability sigil) => Create(sigil);
-
     #region Equality
 
     public int CompareTo(SigilData? other) => string.Compare(Name, other?.Name, StringComparison.OrdinalIgnoreCase);

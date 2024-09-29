@@ -129,20 +129,19 @@ public class CardData
 
     private List<SigilData> GetSigils(bool includeTangential)
     {
-        List<SigilData> result = [];
+        List<Ability> abilities = [];
 
-        result.AddRange(TargetCardInfo.Abilities.Select(SigilData.Create));
+        abilities.AddRange(TargetCardInfo.Abilities);
 
-        // TODO: figure out if we should get rid of the implicit conversions
         if (includeTangential)
         {
-            if (TargetCardInfo.specialAbilities.Contains(SpecialTriggeredAbility.JerseyDevil)) result.Add(Ability.Flying);
-            if (TargetCardInfo.specialAbilities.Contains(SpecialTriggeredAbility.TrapSpawner)) result.AddRange([Ability.SteelTrap, Ability.Reach]);
-            if (TargetCardInfo.Abilities.Contains(Ability.BeesOnHit)) result.Add(Ability.Flying);
-            if (TargetCardInfo.Abilities.Contains(Ability.Reach)) result.Add(Ability.Flying);
+            if (TargetCardInfo.specialAbilities.Contains(SpecialTriggeredAbility.JerseyDevil)) abilities.Add(Ability.Flying);
+            if (TargetCardInfo.specialAbilities.Contains(SpecialTriggeredAbility.TrapSpawner)) abilities.AddRange([Ability.SteelTrap, Ability.Reach]);
+            if (TargetCardInfo.Abilities.Contains(Ability.BeesOnHit)) abilities.Add(Ability.Flying);
+            if (TargetCardInfo.Abilities.Contains(Ability.Reach)) abilities.Add(Ability.Flying);
         }
 
-        result = result.Distinct().ToList();
+        List<SigilData> result = abilities.Distinct().Select(SigilData.Create).ToList();
         result.Sort();
         return result;
     }
@@ -159,7 +158,7 @@ public class CardData
         if (GameFlowManager.Instance.CurrentGameState == GameState.CardBattle)
         {
             // boon lord and campfire stuff we don't care about while in a card battle
-            result.RemoveAll(t => t == Trait.KillsSurvivors || t == Trait.Goat || t == Trait.Pelt);
+            result.RemoveAll(t => t.TryGetTrait(out Trait trait) && trait is Trait.KillsSurvivors or Trait.Goat or Trait.Pelt);
         }
 
         result.Sort();

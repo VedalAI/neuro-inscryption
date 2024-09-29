@@ -54,7 +54,7 @@ public sealed class LoadoutState : IGameState
 
         List<SigilData> relevantSigils = PlayerDeck.SelectMany(c => c.RelevantSigils).ToList();
         List<TraitData> relevantTraits = PlayerDeck.SelectMany(c => c.Traits).ToList();
-        if (Totem != null) relevantSigils.Add(Totem.Sigil);
+        if (Totem != null) relevantSigils.Add(SigilData.Create(Totem.Sigil));
         if (TotemPieces != null) relevantSigils.AddRange(TotemPieces.Select(p => p.Sigil).WhereNotNull().Select(SigilData.Create));
         if (_contextInterface != null)
         {
