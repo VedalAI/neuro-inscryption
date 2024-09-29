@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
 
@@ -11,7 +12,7 @@ public sealed class BoonData
     private BoonData(DiskCardGame.BoonData boon)
     {
         Name = boon.displayedName;
-        Description = boon.description;
+        Description = boon.description.ParseDescription();
     }
 
     public static BoonData Create(DiskCardGame.BoonData boon) => new(boon);

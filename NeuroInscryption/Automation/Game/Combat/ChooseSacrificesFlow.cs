@@ -40,7 +40,7 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
         CombatState state = CombatState.Calculate();
         PlayableCard card = BoardManager.Instance.CurrentSacrificeDemandingCard;
 
-        SacrificeAction sacrificeAction = new(card, state);
+        SacrificeAction sacrificeAction = new(card, state.PlayerLanes);
 
         Description decisionString = DecisionStrings.ChooseSacrifices.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
         Decision decision = new(decisionString, state);
@@ -50,11 +50,10 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
 
         if (!action.Match(sacrificeAction, out IEnumerable<PlayableCardData>? sacrifices)) action.ThrowInvalid();
 
-        AllowManualInterruption = false;
-
         foreach (PlayableCardData sacrifice in sacrifices)
         {
             await NeuroMouse.MoveToAsync(sacrifice.TargetCard, 500, ct);
+            AllowManualInterruption = false;
             await NeuroMouse.ClickAsync(250, ct);
         }
     }

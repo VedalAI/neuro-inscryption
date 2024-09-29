@@ -32,7 +32,7 @@ public sealed class DeckTrialData : IIdentifiable
             DeckTrialSequencer.Trial.Type.Kin => TrialStrings.Kin,
             _ => throw new ArgumentOutOfRangeException()
         };
-        Description = trial.description.Replace("[c:bR]", "").Replace("[c:]", "");
+        Description = trial.description.ParseDescription();
         Card = card;
     }
 

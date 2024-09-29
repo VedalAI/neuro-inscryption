@@ -2,7 +2,6 @@
 using System.Linq;
 using DiskCardGame;
 using NeuroInscryption.Communication.Data.Serializable;
-using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
@@ -12,7 +11,7 @@ namespace NeuroInscryption.Communication.Actions.Combat;
 
 using Sacrifice = (string name, int blood);
 
-public sealed class SacrificeAction(PlayableCard cardToPlay, CombatState state) : IAction<IEnumerable<PlayableCardData>>
+public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary<string, PlayableCardData?> playerLanes) : IAction<IEnumerable<PlayableCardData>>
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
@@ -30,7 +29,7 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, CombatState state) 
     {
         List<Sacrifice> sacrificableSlots = BoardManager.Instance.playerSlots
             .Where(p => p.Card && p.Card.CanBeSacrificed)
-            .Select(p => (state.PlayerLanes.Values.First(c => c?.TargetCard == p.Card)!.Identifier, p.Card.HasAbility(Ability.TripleBlood) ? 3 : 1))
+            .Select(p => (playerLanes.Values.First(c => c?.TargetCard == p.Card)!.Identifier, p.Card.HasAbility(Ability.TripleBlood) ? 3 : 1))
             .ToList();
 
         List<List<Sacrifice>> possibilities = DontOpenJumpscareWarning.GenerateAllPermutationsOfSubsets(sacrificableSlots);
@@ -62,7 +61,7 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, CombatState state) 
             return false;
         }
 
-        response = cardIdentifiers.Select(id => state.PlayerLanes.Values.First(c => c?.Identifier == id)!);
+        response = cardIdentifiers.Select(id => playerLanes.Values.First(c => c?.Identifier == id)!);
         return true;
     }
 }

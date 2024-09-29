@@ -24,4 +24,5 @@ public static class DecisionStrings
     public static readonly Description ChooseBoulder = ("random_boulder_choice", "Choose a random boulder to break. 2 of the boulders contain an insect card with a random additional sigil, and 1 boulder contains a Golden Pelt.");
     public static readonly Description ChooseDeckTrial = ("deck_trial_choice", "Choose a deck trial from the available options. Afterwards, 3 random cards will be selected from your deck to check if they meet the requirements of the trial. If you pass, you will get a choice of 3 random cards with 2 additional sigils eaceh. If you fail, you will not get anything.");
     public static readonly Description ChooseItem = ("item_choice", "Choose an item to add to your pack from the available options.");
+    public static readonly DescriptionFormat ChooseTraderCards = ("trade_card_choice", "Choose {0} {0:card:cards} to buy from the Trader and add to your deck");
 }

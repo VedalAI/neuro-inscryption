@@ -33,4 +33,10 @@ public static class GameExtensions
         behaviour = (T?) card.TriggerHandler.specialAbilities.Find(t => t?.Item1 == ability)?.Item2;
         return behaviour != null;
     }
+
+    public static string ParseDescription(this string description)
+    {
+        string result = RuleBookPage.ParseCardDefinition(description.Replace("[creature]", "a card bearing this sigil").Replace("[c:bR]", "").Replace("[c:]", ""));
+        return char.ToUpperInvariant(result[0]) + result[1..];
+    }
 }

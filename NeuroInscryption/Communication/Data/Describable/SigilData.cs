@@ -1,6 +1,7 @@
 ﻿using System;
 using DiskCardGame;
 using NeuroInscryption.Communication.Strings;
+using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Communication.Data.Describable;
 
@@ -23,8 +24,7 @@ public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, I
         {
             AbilityInfo info = AbilitiesUtil.GetInfo(ability);
             Name = info.rulebookName;
-            Info = info.LocalizedRulebookDescription.Replace("[creature]", Localization.Translate("a card bearing this sigil"));
-            Info = char.ToUpper(Info[0]) + Info[1..];
+            Info = info.LocalizedRulebookDescription.ParseDescription();
         }
     }
 

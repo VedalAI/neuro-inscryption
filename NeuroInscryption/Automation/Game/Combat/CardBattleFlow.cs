@@ -48,7 +48,7 @@ public sealed class CardBattleFlow : AutomationFlow<object>
 
         ChooseAction<PlayableCardData> playCardAction = new(state.PlayerHand.Where(c => c.IsPlayable == true), false, ActionStrings.PlayCard);
         ChooseAction<ItemData> useItemAction = new(state.Items, false, ActionStrings.UseItem);
-        AcceptSurrenderAction acceptSurrenderAction = new(state);
+        AcceptSurrenderAction acceptSurrenderAction = new(state.IsOpponentSurrendering);
         EndTurnAction endTurnAction = new();
 
         Decision decision = new(DecisionStrings.CardBattleTurn, state);

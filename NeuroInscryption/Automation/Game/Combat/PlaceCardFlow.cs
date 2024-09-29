@@ -33,7 +33,7 @@ public sealed class PlaceCardFlow : AutomationFlow<object>
         CombatState state = CombatState.Calculate();
         PlayableCard card = PlayerHand.Instance.ChoosingSlotCard;
 
-        PlaceCardAction placeCardAction = new(state);
+        PlaceCardAction placeCardAction = new(state.PlayerLanes);
 
         Description decisionString = DecisionStrings.PlaceCard.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
         Decision decision = new(decisionString, state);

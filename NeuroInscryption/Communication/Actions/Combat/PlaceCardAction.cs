@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NeuroInscryption.Communication.Data.State;
+using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Combat;
 
-public sealed class PlaceCardAction(CombatState state) : IAction<int>
+public sealed class PlaceCardAction(IReadOnlyDictionary<string, PlayableCardData?> playerLanes) : IAction<int>
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
@@ -17,7 +17,7 @@ public sealed class PlaceCardAction(CombatState state) : IAction<int>
             Properties = new Dictionary<string, JsonSchema>
             {
                 ["action"] = QJS.Const(ActionName),
-                ["data"] = QJS.Enum(state.PlayerLanes.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key).Select(int.Parse))
+                ["data"] = QJS.Enum(playerLanes.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key).Select(int.Parse))
             }
         });
     }
