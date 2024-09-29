@@ -38,8 +38,6 @@ public sealed class MycologistsFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
     {
         DuplicateMergeSequencer instance = target.GetEnumeratorThis<DuplicateMergeSequencer>();

@@ -33,8 +33,6 @@ public sealed class CardBattleFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => true;
-
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         if (enumerator.GetType().Name.Contains(nameof(PlayerHand.SelectSlotForCard)))

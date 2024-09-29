@@ -39,8 +39,6 @@ public sealed class SacrificeEmpowerFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         CardMergeSequencer instance = enumerator.GetEnumeratorThis<CardMergeSequencer>();

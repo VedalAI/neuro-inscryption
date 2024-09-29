@@ -19,8 +19,6 @@ public sealed class WoodcarverFullFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         SelectableCard card = enumerator.GetEnumeratorField<SelectableCard>("<card>5__2");

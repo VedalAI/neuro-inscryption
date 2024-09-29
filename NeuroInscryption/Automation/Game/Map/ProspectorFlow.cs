@@ -24,8 +24,6 @@ public sealed class ProspectorFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         BoulderChoiceSequencer instance = enumerator.GetEnumeratorThis<BoulderChoiceSequencer>();

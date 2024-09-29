@@ -38,8 +38,6 @@ public sealed class DeckTrialRewardFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         DeckTrialSequencer instance = enumerator.GetEnumeratorThis<DeckTrialSequencer>();

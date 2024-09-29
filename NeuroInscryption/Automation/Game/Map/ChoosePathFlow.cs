@@ -37,8 +37,6 @@ public sealed class ChoosePathFlow : AutomationFlow<MapNodeManager>
         }
     ];
 
-    public override bool CanInterruptItself => true;
-
     protected override async UniTask ExecuteAsync(MapNodeManager instance, CancellationToken ct)
     {
         await UniTask.Delay(1000, cancellationToken: ct);

@@ -19,8 +19,6 @@ public sealed class ProspectorPickupFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
     {
         await UniTask.Delay(500, cancellationToken: ct);

@@ -19,8 +19,6 @@ public sealed class WoodcarverPickupFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         BuildTotemSequencer instance = enumerator.GetEnumeratorThis<BuildTotemSequencer>();

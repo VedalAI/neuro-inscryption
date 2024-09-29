@@ -39,8 +39,6 @@ public sealed class WoodcarverBuildFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     public override void ResetState()
     {
         AllowManualInterruption = true;

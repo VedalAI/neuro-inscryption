@@ -19,8 +19,6 @@ public sealed class BoneAltarPickupFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
     {
         CardRemoveSequencer instance = target.GetEnumeratorThis<CardRemoveSequencer>();

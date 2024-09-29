@@ -38,8 +38,6 @@ public sealed class GoobertFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         CopyCardSequencer instance = enumerator.GetEnumeratorThis<CopyCardSequencer>();

@@ -20,8 +20,6 @@ public sealed class RunEndScreenFlow : AutomationFlow<AscensionRunEndScreen>
 
     public override Type[] FlowsBlockedForInterruption => [typeof(StartScreenFlow)];
 
-    public override bool CanInterruptItself => true;
-
     public override ManualInterruptionBehaviour ManualInterruptionBehaviour => ManualInterruptionBehaviour.Cancel;
 
     protected override async UniTask ExecuteAsync(AscensionRunEndScreen target, CancellationToken ct)

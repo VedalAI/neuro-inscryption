@@ -19,8 +19,6 @@ public sealed class PackFullFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         GainConsumablesSequencer instance = enumerator.GetEnumeratorThis<GainConsumablesSequencer>();

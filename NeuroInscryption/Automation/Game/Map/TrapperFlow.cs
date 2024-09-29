@@ -39,8 +39,6 @@ public sealed class TrapperFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => true;
-
     protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
     {
         await UniTask.Delay(200, cancellationToken: ct);

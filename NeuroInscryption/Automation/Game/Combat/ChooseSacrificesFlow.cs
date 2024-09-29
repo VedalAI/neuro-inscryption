@@ -28,8 +28,6 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
         }
     ];
 
-    public override bool CanInterruptItself => true;
-
     public override void ResetState()
     {
         AllowManualInterruption = true;

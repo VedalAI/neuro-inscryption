@@ -19,8 +19,6 @@ public sealed class NewRunConfirmScreenFlow : AutomationFlow<AscensionMenuScreen
         }
     ];
 
-    public override bool CanInterruptItself => true;
-
     protected override async UniTask ExecuteAsync(AscensionMenuScreenTransition target, CancellationToken ct)
     {
         await NeuroMouse.MoveToAsync(target.screenInteractables.First(i => i.name == "ContinueButton"), 500, ct);

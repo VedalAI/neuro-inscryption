@@ -19,8 +19,6 @@ public sealed class StarterDeckScreenFlow : AutomationFlow<AscensionChooseStarte
         }
     ];
 
-    public override bool CanInterruptItself => true;
-
     protected override async UniTask ExecuteAsync(AscensionChooseStarterDeckScreen target, CancellationToken ct)
     {
         await UniTask.Delay(1000, cancellationToken: ct);
