@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using JetBrains.Annotations;
@@ -14,6 +15,13 @@ using LinkedFlowHook = (FlowHook hook, AutomationFlow flow);
 [HarmonyPatch]
 public sealed class AutomationManager : Singlyboi<AutomationManager>
 {
+    private static readonly IReadOnlyList<IAutomationFlow> _allFlows = Assembly.GetExecutingAssembly().GetTypes()
+        .Where(t => !t.IsAbstract)
+        .Where(t => typeof(IAutomationFlow).IsAssignableFrom(t))
+        .Select(Activator.CreateInstance)
+        .Cast<IAutomationFlow>()
+        .ToList();
+
     private static readonly Dictionary<string, List<LinkedFlowHook>> _flowCache = [];
     public static FlowRunner FlowRunner { get; } = new();
 
@@ -37,11 +45,16 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         }
     }
 
+    public static void TryStartFlow<T>() where T : ManualAutomationFlow
+    {
+        StartNewFlow(_allFlows.OfType<T>().First(), null);
+    }
+
     private new void Awake()
     {
         base.Awake();
 
-        foreach (AutomationFlow flow in AutomationFlow.Flows)
+        foreach (AutomationFlow flow in _allFlows.OfType<AutomationFlow>())
         {
             foreach (FlowHook hook in flow.Hooks)
             {
@@ -78,7 +91,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         }
     }
 
-    private void TryStartNewFlow(string description, HarmonyContext context)
+    private static void TryStartNewFlow(string description, HarmonyContext context)
     {
         if (!_flowCache.TryGetValue(description, out List<LinkedFlowHook> flows))
         {
@@ -101,14 +114,19 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
             }
             changed = true;
 
-            if (AllowManualInput)
-            {
-                FlowRunner.QueueFlow(linked.flow, context);
-            }
-            else
-            {
-                FlowRunner.StartFlow(linked.flow, context);
-            }
+            StartNewFlow(linked.flow, context);
+        }
+    }
+
+    private static void StartNewFlow(IAutomationFlow flow, HarmonyContext? context)
+    {
+        if (AllowManualInput)
+        {
+            FlowRunner.QueueFlow(flow, context);
+        }
+        else
+        {
+            FlowRunner.StartFlow(flow, context);
         }
     }
 
@@ -126,49 +144,49 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
     [UsedImplicitly]
     private static void PatchPrefixStaticVoid(MethodInfo __originalMethod, object[] __args)
     {
-        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, null, null, __args));
+        TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, null, null, __args));
     }
 
     [UsedImplicitly]
     private static void PatchPrefixStatic(MethodInfo __originalMethod, object __result, object[] __args)
     {
-        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, null, __result, __args));
+        TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, null, __result, __args));
     }
 
     [UsedImplicitly]
     private static void PatchPrefixVoid(MethodInfo __originalMethod, object __instance, object[] __args)
     {
-        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, __instance, null, __args));
+        TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, __instance, null, __args));
     }
 
     [UsedImplicitly]
     private static void PatchPrefix(MethodInfo __originalMethod, object __instance, object __result, object[] __args)
     {
-        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, __instance, __result, __args));
+        TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Prefix), new HarmonyContext(__originalMethod, __instance, __result, __args));
     }
 
     [UsedImplicitly]
     private static void PatchPostfixStaticVoid(MethodInfo __originalMethod, object[] __args)
     {
-        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, null, null, __args));
+        TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, null, null, __args));
     }
 
     [UsedImplicitly]
     private static void PatchPostfixStatic(MethodInfo __originalMethod, object __result, object[] __args)
     {
-        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, null, __result, __args));
+        TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, null, __result, __args));
     }
 
     [UsedImplicitly]
     private static void PatchPostfixVoid(MethodInfo __originalMethod, object __instance, object[] __args)
     {
-        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, __instance, null, __args));
+        TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, __instance, null, __args));
     }
 
     [UsedImplicitly]
     private static void PatchPostfix(MethodInfo __originalMethod, object __instance, object __result, object[] __args)
     {
-        Instance.TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, __instance, __result, __args));
+        TryStartNewFlow(FlowHook.GetDescription(__originalMethod, HarmonyPatchType.Postfix), new HarmonyContext(__originalMethod, __instance, __result, __args));
     }
 
     #endregion

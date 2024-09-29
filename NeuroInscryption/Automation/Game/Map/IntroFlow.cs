@@ -26,11 +26,6 @@ public sealed class IntroFlow : AutomationFlow<object>
 
     public override ManualInterruptionBehaviour ManualInterruptionBehaviour => ManualInterruptionBehaviour.Cancel;
 
-    public override void ResetState()
-    {
-        AllowManualInterruption = true;
-    }
-
     protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
     {
         OilPaintingPuzzle puzzle = GameObject.FindObjectOfType<OilPaintingPuzzle>();

@@ -8,15 +8,15 @@ namespace NeuroInscryption.Automation.API;
 
 public sealed class FlowRunner
 {
-    private AutomationFlow? _currentFlow;
-    private HarmonyContext? _currentContext;
+    private IAutomationFlow? _currentFlow;
+    private object? _currentContext;
     private CancellationTokenSource? _cts;
 
     public string FlowName => _currentFlow?.GetType().Name ?? "<none>";
 
     public bool AllowManualInterruption => _currentFlow?.AllowManualInterruption ?? true;
 
-    public void StartFlow(AutomationFlow flow, HarmonyContext context)
+    public void StartFlow(IAutomationFlow flow, object? context)
     {
         QueueFlow(flow, context);
         RestartLastFlow();
@@ -40,7 +40,7 @@ public sealed class FlowRunner
         _currentFlow = null;
     }
 
-    public void QueueFlow(AutomationFlow flow, HarmonyContext context)
+    public void QueueFlow(IAutomationFlow flow, object? context)
     {
         if (_currentFlow != null)
         {

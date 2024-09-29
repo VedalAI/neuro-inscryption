@@ -49,11 +49,6 @@ public sealed class CampfireFlow : AutomationFlow<object>
         }
     ];
 
-    public override void ResetState()
-    {
-        AllowManualInterruption = true;
-    }
-
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         CardStatBoostSequencer instance = enumerator.GetEnumeratorThis<CardStatBoostSequencer>();

@@ -16,7 +16,7 @@ public sealed class MainGameStartScreenFlow : AutomationFlow
         }
     ];
 
-    public override UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct)
+    public override UniTask ExecuteAsync(HarmonyContext? context, CancellationToken ct)
     {
         // Allow manual control of game for stuff like changing settings
         return UniTask.CompletedTask;

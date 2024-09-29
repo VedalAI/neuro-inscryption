@@ -49,11 +49,6 @@ public sealed class ChooseCardFlow : AutomationFlow<object>
         }
     ];
 
-    public override void ResetState()
-    {
-        AllowManualInterruption = true;
-    }
-
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
     {
         CardSingleChoicesSequencer instance = enumerator.GetEnumeratorThis<CardSingleChoicesSequencer>();

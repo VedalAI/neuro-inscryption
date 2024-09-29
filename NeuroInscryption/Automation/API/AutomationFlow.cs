@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using HarmonyLib;
@@ -9,20 +6,8 @@ using HarmonyLib;
 namespace NeuroInscryption.Automation.API;
 
 [HarmonyPatch]
-public abstract class AutomationFlow
+public abstract class AutomationFlow : IAutomationFlow
 {
-    public static IReadOnlyList<AutomationFlow> Flows { get; private set; }
-
-    static AutomationFlow()
-    {
-        Flows = Assembly.GetExecutingAssembly().GetTypes()
-            .Where(t => !t.IsAbstract)
-            .Where(t => typeof(AutomationFlow).IsAssignableFrom(t))
-            .Select(Activator.CreateInstance)
-            .Cast<AutomationFlow>()
-            .ToList();
-    }
-
     /// <summary>
     /// A list of Harmony patch hooks that are able to trigger this flow
     /// </summary>
@@ -38,7 +23,7 @@ public abstract class AutomationFlow
     /// <br/>
     /// Setting this to false is equivalent to adding the flow to <see cref="FlowsBlockedForInterruption"/>, but it will not output any logs
     /// </summary>
-    public virtual bool CanInterruptItself { get; }
+    public virtual bool CanInterruptItself => true;
 
     /// <summary>
     /// Whether or not this flow can be interrupted by manual input
@@ -50,7 +35,12 @@ public abstract class AutomationFlow
     /// </summary>
     public virtual ManualInterruptionBehaviour ManualInterruptionBehaviour => ManualInterruptionBehaviour.Restart;
 
-    public virtual void ResetState() {}
+    public virtual void ResetState()
+    {
+        AllowManualInterruption = true;
+    }
+
+    UniTask IAutomationFlow.ExecuteAsync(object? context, CancellationToken ct) => ExecuteAsync((HarmonyContext) context!, ct);
 
     public abstract UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct);
 }

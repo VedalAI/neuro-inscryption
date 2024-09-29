@@ -39,11 +39,6 @@ public sealed class TraderFlow : AutomationFlow<object>
         }
     ];
 
-    public override void ResetState()
-    {
-        AllowManualInterruption = true;
-    }
-
     protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
     {
         TradePeltsSequencer instance = target.GetEnumeratorThis<TradePeltsSequencer>();

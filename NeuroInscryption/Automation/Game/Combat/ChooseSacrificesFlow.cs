@@ -28,11 +28,6 @@ public sealed class ChooseSacrificesFlow : AutomationFlow<object>
         }
     ];
 
-    public override void ResetState()
-    {
-        AllowManualInterruption = true;
-    }
-
     protected override async UniTask ExecuteAsync(object _, CancellationToken ct)
     {
         CombatState state = CombatState.Calculate();
