@@ -84,6 +84,8 @@ public static class TraitStrings
 
     public static readonly Description Chime = ("Chime", "When a card bearing this trait is attacked, any cards bearing the Daus trait in play will attack the attacker.");
 
+    public static readonly Description Hodag = ("Hodag", "The power that a card bearing this trait gains from the Blood Lust sigil is kept for the rest of the run.");
+
     // ---
 
     public static Description? Get(Trait trait)

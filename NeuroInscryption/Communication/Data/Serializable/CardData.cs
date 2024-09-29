@@ -153,6 +153,7 @@ public class CardData
         result.AddRange(TargetCardInfo.traits.Select(TraitData.Create).WhereNotNull());
         result.AddRange(TargetCardInfo.specialAbilities.Select(TraitData.Create).WhereNotNull());
         if (TargetCardInfo.name.ToLowerInvariant().Contains("bell")) result.Add(TraitData.Create(TraitStrings.Chime));
+        if (TargetCardInfo.name.ToLowerInvariant() == "hodag") result.Add(TraitData.Create(TraitStrings.Hodag));
 
         if (GameFlowManager.Instance.CurrentGameState == GameState.CardBattle)
         {
