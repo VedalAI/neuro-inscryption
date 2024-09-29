@@ -18,7 +18,6 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-// todo: pickup card after success
 public sealed class DeckTrialFlow : AutomationFlow<object>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

@@ -21,7 +21,7 @@ namespace NeuroInscryption.Automation.Game.Map;
 public sealed class ChooseCardFlow : AutomationFlow<object>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(List<SelectableCard> cards, CardChoicesType type, IGameState state) : ILoadoutContext
+    private sealed class Context(IEnumerable<SelectableCard> cards, CardChoicesType type, IGameState state) : ILoadoutContext
     {
         public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
 
