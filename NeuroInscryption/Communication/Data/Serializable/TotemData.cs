@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using DiskCardGame;
-using JetBrains.Annotations;
 using NeuroInscryption.Communication.Data.Describable;
 using Newtonsoft.Json;
 

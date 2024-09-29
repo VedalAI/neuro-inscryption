@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DiskCardGame;
-using JetBrains.Annotations;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;

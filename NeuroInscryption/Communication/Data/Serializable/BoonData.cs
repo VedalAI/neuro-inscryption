@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using NeuroInscryption.Utilities;
+﻿using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
 

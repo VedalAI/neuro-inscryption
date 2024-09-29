@@ -15,7 +15,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
-public sealed class PlaceCardFlow : AutomationFlow<object>
+public sealed class PlaceCardFlow : HarmonyAutomationFlow<object>
 {
     public override FlowHook[] Hooks =>
     [

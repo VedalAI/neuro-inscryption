@@ -9,7 +9,7 @@ using NeuroInscryption.Input;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
-public sealed class StarterDeckScreenFlow : AutomationFlow<AscensionChooseStarterDeckScreen>
+public sealed class StarterDeckScreenFlow : HarmonyAutomationFlow<AscensionChooseStarterDeckScreen>
 {
     public override FlowHook[] Hooks =>
     [

@@ -8,7 +8,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class WoodcarverPickupFlow : AutomationFlow<object>
+public sealed class WoodcarverPickupFlow : HarmonyAutomationFlow<object>
 {
     public override FlowHook[] Hooks =>
     [

@@ -4,7 +4,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
-using JetBrains.Annotations;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
@@ -19,7 +18,7 @@ using Sirenix.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class TrapperFlow : AutomationFlow<object>
+public sealed class TrapperFlow : HarmonyAutomationFlow<object>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(int teeth, IEnumerable<SelectableCard> pelts, IEnumerable<int> peltPrices, bool knifeAvailable, MainInputInteractable knife, int knifePrice, IGameState state) : ILoadoutContext

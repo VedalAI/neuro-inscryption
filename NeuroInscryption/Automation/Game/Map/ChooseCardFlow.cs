@@ -4,7 +4,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
-using JetBrains.Annotations;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
@@ -18,7 +17,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class ChooseCardFlow : AutomationFlow<object>
+public sealed class ChooseCardFlow : HarmonyAutomationFlow<object>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(IEnumerable<SelectableCard> cards, CardChoicesType type, IGameState state) : ILoadoutContext

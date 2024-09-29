@@ -16,7 +16,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class BoneAltarFlow : AutomationFlow<object>
+public sealed class BoneAltarFlow : HarmonyAutomationFlow<object>
 {
     public override FlowHook[] Hooks =>
     [

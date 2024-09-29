@@ -4,7 +4,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
-using JetBrains.Annotations;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
@@ -18,7 +17,7 @@ using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class SacrificeFlow : AutomationFlow<object>
+public sealed class SacrificeFlow : HarmonyAutomationFlow<object>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(IEnumerable<SelectableCard> cards, IGameState state, CardMergeSequencer instance) : ILoadoutContext
@@ -62,5 +61,7 @@ public sealed class SacrificeFlow : AutomationFlow<object>
 
         await NeuroMouse.MoveToAsync(selected.TargetCard, 200, ct);
         await NeuroMouse.ClickAsync(ct);
+
+        AutomationManager.StartFlowManually<SacrificeEmpowerFlow, CardMergeSequencer>(instance);
     }
 }

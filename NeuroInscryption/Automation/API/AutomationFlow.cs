@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using HarmonyLib;
 
 namespace NeuroInscryption.Automation.API;
 
-[HarmonyPatch]
-public abstract class AutomationFlow : IAutomationFlow
+public abstract class AutomationFlow<TContext> : IAutomationFlow
 {
-    /// <summary>
-    /// A list of Harmony patch hooks that are able to trigger this flow
-    /// </summary>
-    public abstract FlowHook[] Hooks { get; }
+    public string FlowName => GetType().Name;
 
     /// <summary>
-    /// A list of <see cref="AutomationFlow"/> types that cannot interrupt this flow
+    /// A list of <see cref="HarmonyAutomationFlow"/> types that cannot interrupt this flow
     /// </summary>
     public virtual Type[] FlowsBlockedForInterruption => [];
 
@@ -35,19 +30,15 @@ public abstract class AutomationFlow : IAutomationFlow
     /// </summary>
     public virtual ManualInterruptionBehaviour ManualInterruptionBehaviour => ManualInterruptionBehaviour.Restart;
 
+    protected virtual bool ShouldAbort(TContext context) => false;
+
     public virtual void ResetState()
     {
         AllowManualInterruption = true;
     }
 
-    UniTask IAutomationFlow.ExecuteAsync(object? context, CancellationToken ct) => ExecuteAsync((HarmonyContext) context!, ct);
+    protected abstract UniTask ExecuteAsync(TContext context, CancellationToken ct);
 
-    public abstract UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct);
-}
-
-public abstract class AutomationFlow<T> : AutomationFlow
-{
-    protected abstract UniTask ExecuteAsync(T target, CancellationToken ct);
-
-    public sealed override UniTask ExecuteAsync(HarmonyContext context, CancellationToken ct) => ExecuteAsync(context.GetInstance<T>()!, ct);
+    bool IAutomationFlow.ShouldAbort(object? context) => ShouldAbort((TContext) context!);
+    UniTask IAutomationFlow.ExecuteAsync(object? context, CancellationToken ct) => ExecuteAsync((TContext) context!, ct);
 }

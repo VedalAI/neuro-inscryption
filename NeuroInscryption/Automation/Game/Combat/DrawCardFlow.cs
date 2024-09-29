@@ -13,7 +13,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
-public sealed class DrawCardFlow : AutomationFlow<object>
+public sealed class DrawCardFlow : HarmonyAutomationFlow<object>
 {
     public override FlowHook[] Hooks =>
     [

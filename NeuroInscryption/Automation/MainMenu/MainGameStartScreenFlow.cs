@@ -6,7 +6,7 @@ using NeuroInscryption.Automation.API;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
-public sealed class MainGameStartScreenFlow : AutomationFlow
+public sealed class MainGameStartScreenFlow : HarmonyAutomationFlow
 {
     public override FlowHook[] Hooks =>
     [
@@ -16,7 +16,7 @@ public sealed class MainGameStartScreenFlow : AutomationFlow
         }
     ];
 
-    public override UniTask ExecuteAsync(HarmonyContext? context, CancellationToken ct)
+    protected override UniTask ExecuteAsync(HarmonyContext? context, CancellationToken ct)
     {
         // Allow manual control of game for stuff like changing settings
         return UniTask.CompletedTask;

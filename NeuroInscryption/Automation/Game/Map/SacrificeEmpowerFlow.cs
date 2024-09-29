@@ -4,7 +4,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
-using JetBrains.Annotations;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
@@ -18,7 +17,7 @@ using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class SacrificeEmpowerFlow : AutomationFlow<object>
+public sealed class SacrificeEmpowerFlow : AutomationFlow<CardMergeSequencer>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(SelectableCard sacrifice, IEnumerable<SelectableCard> cards, IGameState state) : ILoadoutContext
@@ -30,19 +29,8 @@ public sealed class SacrificeEmpowerFlow : AutomationFlow<object>
         IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
     }
 
-    public override FlowHook[] Hooks =>
-    [
-        new()
-        {
-            Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(CardMergeSequencer), nameof(CardMergeSequencer.MergeSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 12 && context.GetInstance()!.GetEnumeratorThis<CardMergeSequencer>().sacrificeSlot.Card
-        }
-    ];
-
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(CardMergeSequencer instance, CancellationToken ct)
     {
-        CardMergeSequencer instance = enumerator.GetEnumeratorThis<CardMergeSequencer>();
-
         await UniTask.Delay(500, cancellationToken: ct);
 
         await NeuroMouse.MoveToAsync(instance.hostSlot, 200, ct);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using DiskCardGame;
-using JetBrains.Annotations;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Strings;

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using DiskCardGame;
-using JetBrains.Annotations;
 using NeuroInscryption.Communication.Data.State;
 using Newtonsoft.Json;
 

@@ -13,7 +13,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class ProspectorFlow : AutomationFlow<object>
+public sealed class ProspectorFlow : HarmonyAutomationFlow<object>
 {
     public override FlowHook[] Hooks =>
     [

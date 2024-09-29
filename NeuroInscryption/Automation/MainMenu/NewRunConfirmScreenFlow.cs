@@ -8,7 +8,7 @@ using NeuroInscryption.Input;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
-public sealed class NewRunConfirmScreenFlow : AutomationFlow<AscensionMenuScreenTransition>
+public sealed class NewRunConfirmScreenFlow : HarmonyAutomationFlow<AscensionMenuScreenTransition>
 {
     public override FlowHook[] Hooks =>
     [

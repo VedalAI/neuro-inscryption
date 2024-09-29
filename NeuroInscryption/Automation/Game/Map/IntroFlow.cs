@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class IntroFlow : AutomationFlow<object>
+public sealed class IntroFlow : HarmonyAutomationFlow<object>
 {
     public override FlowHook[] Hooks =>
     [

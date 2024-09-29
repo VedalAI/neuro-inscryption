@@ -17,7 +17,7 @@ using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
-public sealed class CardBattleFlow : AutomationFlow<object>
+public sealed class CardBattleFlow : HarmonyAutomationFlow<object>
 {
     public override FlowHook[] Hooks =>
     [

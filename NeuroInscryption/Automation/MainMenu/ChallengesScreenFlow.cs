@@ -9,7 +9,7 @@ using NeuroInscryption.Input;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
-public sealed class ChallengesScreenFlow : AutomationFlow<AscensionChallengeScreen>
+public sealed class ChallengesScreenFlow : HarmonyAutomationFlow<AscensionChallengeScreen>
 {
     public override FlowHook[] Hooks =>
     [

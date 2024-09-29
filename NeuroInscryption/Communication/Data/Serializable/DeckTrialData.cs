@@ -1,6 +1,5 @@
 ﻿using System;
 using DiskCardGame;
-using JetBrains.Annotations;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;

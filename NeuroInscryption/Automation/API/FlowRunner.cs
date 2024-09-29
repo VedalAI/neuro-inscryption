@@ -2,21 +2,20 @@
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 
 namespace NeuroInscryption.Automation.API;
 
 public sealed class FlowRunner
 {
     private IAutomationFlow? _currentFlow;
-    private object? _currentContext;
+    private object _currentContext = null!;
     private CancellationTokenSource? _cts;
 
-    public string FlowName => _currentFlow?.GetType().Name ?? "<none>";
+    public string FlowName => _currentFlow?.FlowName ?? "<none>";
 
     public bool AllowManualInterruption => _currentFlow?.AllowManualInterruption ?? true;
 
-    public void StartFlow(IAutomationFlow flow, object? context)
+    public void StartFlow(IAutomationFlow flow, object context)
     {
         QueueFlow(flow, context);
         RestartLastFlow();
@@ -40,7 +39,7 @@ public sealed class FlowRunner
         _currentFlow = null;
     }
 
-    public void QueueFlow(IAutomationFlow flow, object? context)
+    public void QueueFlow(IAutomationFlow flow, object context)
     {
         if (_currentFlow != null)
         {
@@ -96,18 +95,7 @@ public sealed class FlowRunner
     {
         try
         {
-            object? instance = _currentContext!.GetInstance();
-            if (instance == null || instance is UnityEngine.Object unityObject && unityObject == null)
-            {
-                Plugin.Logger.LogWarning($"Flow {FlowName} was cancelled because the target object was destroyed.");
-                return;
-            }
-
-            if (instance is GameObject { activeInHierarchy: false })
-            {
-                Plugin.Logger.LogWarning($"Flow {FlowName} was cancelled because the target object was inactive.");
-                return;
-            }
+            if (_currentFlow!.ShouldAbort(_currentContext)) return;
 
             _currentFlow!.ResetState();
             await _currentFlow.ExecuteAsync(_currentContext, _cts!.Token);

@@ -17,7 +17,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
-public sealed class ChooseSacrificesFlow : AutomationFlow<object>
+public sealed class ChooseSacrificesFlow : HarmonyAutomationFlow<object>
 {
     public override FlowHook[] Hooks =>
     [
