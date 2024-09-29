@@ -19,16 +19,16 @@ public abstract class HarmonyAutomationFlow : AutomationFlow<HarmonyContext>
         if (instance == null || instance is UnityEngine.Object unityObject && unityObject == null)
         {
             Plugin.Logger.LogWarning($"Flow {FlowName} was cancelled because the target object was destroyed.");
-            return false;
+            return true;
         }
 
         if (instance is UnityEngine.GameObject { activeInHierarchy: false })
         {
             Plugin.Logger.LogWarning($"Flow {FlowName} was cancelled because the target object was inactive.");
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 }
 

@@ -11,7 +11,7 @@ public sealed class FlowRunner
     private object _currentContext = null!;
     private CancellationTokenSource? _cts;
 
-    public string FlowName => _currentFlow?.FlowName ?? "<none>";
+    public string CurrentFlowName => _currentFlow?.FlowName ?? "<none>";
 
     public bool AllowManualInterruption => _currentFlow?.AllowManualInterruption ?? true;
 
@@ -27,14 +27,14 @@ public sealed class FlowRunner
 
         if (_currentFlow?.ManualInterruptionBehaviour == ManualInterruptionBehaviour.Cancel)
         {
-            Plugin.Logger.LogInfo($"Flow {FlowName} was cancelled for manual input and will not restart.");
+            Plugin.Logger.LogInfo($"Flow {CurrentFlowName} was cancelled for manual input and will not restart.");
             _currentFlow = null;
         }
     }
 
     public void CancelCurrentFlowForcefully()
     {
-        Plugin.Logger.LogInfo($"Forcefully cancelled current flow {FlowName}.");
+        Plugin.Logger.LogInfo($"Forcefully cancelled current flow {CurrentFlowName}.");
         _cts?.Cancel();
         _currentFlow = null;
     }
@@ -45,7 +45,7 @@ public sealed class FlowRunner
         {
             if (_currentFlow.FlowsBlockedForInterruption.Contains(flow.GetType()))
             {
-                Plugin.Logger.LogMessage($"Preventing changing flow from {FlowName} to {flow.GetType().Name}.");
+                Plugin.Logger.LogMessage($"Preventing changing flow from {_currentFlow.FlowName} to {flow.GetType().Name}.");
                 return;
             }
 
@@ -55,7 +55,7 @@ public sealed class FlowRunner
             }
         }
 
-        Plugin.Logger.LogMessage($"Changing flow from {FlowName} to {flow.GetType().Name}.");
+        Plugin.Logger.LogMessage($"Changing flow from {CurrentFlowName} to {flow.GetType().Name}.");
 
         _cts?.Cancel();
 
@@ -72,7 +72,7 @@ public sealed class FlowRunner
         {
             if (_currentFlow.FlowsBlockedForInterruption.Contains(_currentFlow.GetType()))
             {
-                Plugin.Logger.LogInfo($"Restarting flow {FlowName} was blocked.");
+                Plugin.Logger.LogInfo($"Restarting flow {_currentFlow.FlowName} was blocked.");
                 return;
             }
 
@@ -82,33 +82,40 @@ public sealed class FlowRunner
             }
         }
 
-        Plugin.Logger.LogMessage($"Starting flow {FlowName}.");
+        Plugin.Logger.LogMessage($"Starting flow {_currentFlow.FlowName}.");
 
         _cts?.Cancel();
         _cts?.Dispose();
 
         _cts = new CancellationTokenSource();
-        ExecuteCurrentFlowAsync().Forget();
+        ExecuteFlowAsync(_currentFlow).Forget();
     }
 
-    private async UniTaskVoid ExecuteCurrentFlowAsync()
+    private async UniTaskVoid ExecuteFlowAsync(IAutomationFlow flowToExecute)
     {
         try
         {
-            if (_currentFlow!.ShouldAbort(_currentContext)) return;
+            if (flowToExecute.ShouldAbort(_currentContext)) return;
 
-            _currentFlow!.ResetState();
-            await _currentFlow.ExecuteAsync(_currentContext, _cts!.Token);
-            Plugin.Logger.LogMessage($"Flow {FlowName} completed.");
+            flowToExecute.ResetState();
+            await flowToExecute.ExecuteAsync(_currentContext, _cts!.Token);
+
+            if (flowToExecute != _currentFlow)
+            {
+                Plugin.Logger.LogMessage($"Flow {flowToExecute.FlowName} was cancelled too late and still finished.");
+                return;
+            }
+
+            Plugin.Logger.LogMessage($"Flow {flowToExecute.FlowName} completed.");
             _currentFlow = null;
         }
         catch (OperationCanceledException)
         {
-            Plugin.Logger.LogMessage($"Flow {FlowName} was cancelled.");
+            Plugin.Logger.LogMessage($"Flow {flowToExecute.FlowName} was cancelled.");
         }
         catch (Exception e)
         {
-            Plugin.Logger.LogError($"Caught exception while executing flow {FlowName}. Flow will be restarted");
+            Plugin.Logger.LogError($"Caught exception while executing flow {flowToExecute.FlowName}. Flow will be restarted");
             Plugin.Logger.LogError(e);
             RestartLastFlow();
         }

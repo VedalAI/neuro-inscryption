@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
-using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
@@ -12,7 +11,6 @@ using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Utilities;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -22,7 +20,7 @@ public sealed class SacrificeEmpowerFlow : AutomationFlow<CardMergeSequencer>
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(SelectableCard sacrifice, IEnumerable<SelectableCard> cards, IGameState state) : ILoadoutContext
     {
-        public readonly IReadOnlyList<SigilData> SigilsToBeAdded = sacrifice.ChoiceInfo.CardInfo.Abilities.Select(SigilData.Create).ToList();
+        public readonly IReadOnlyList<SigilData> SigilsToBeAdded = sacrifice.Info.Abilities.Select(SigilData.Create).ToList();
         public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
 
         IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
@@ -42,7 +40,7 @@ public sealed class SacrificeEmpowerFlow : AutomationFlow<CardMergeSequencer>
 
         ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions, true);
 
-        Decision decision = new(DecisionStrings.SacrificeEmpower.Format(CardData.Create(instance.sacrificeSlot.Card.ChoiceInfo.CardInfo, state).GetDescription()), state);
+        Decision decision = new(DecisionStrings.SacrificeEmpower.Format(CardData.Create(instance.sacrificeSlot.Card.Info, state).GetDescription()), state);
         decision.AddAction(chooseCardAction);
 
         Action action = await decision.SendAsync(ct);

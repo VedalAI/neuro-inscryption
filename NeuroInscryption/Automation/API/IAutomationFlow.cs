@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 
 namespace NeuroInscryption.Automation.API;
 
+[UsedImplicitly(ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature, ImplicitUseTargetFlags.WithInheritors)]
 public interface IAutomationFlow
 {
     string FlowName { get; }

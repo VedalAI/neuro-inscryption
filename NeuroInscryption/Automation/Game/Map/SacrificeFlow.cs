@@ -33,7 +33,7 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(CardMergeSequencer), nameof(CardMergeSequencer.MergeSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 12 && !context.GetInstance()!.GetEnumeratorThis<CardMergeSequencer>().sacrificeSlot.Card
+            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 12
         }
     ];
 

@@ -1,10 +1,10 @@
-﻿using System.Linq;
+﻿#if DEBUG
+using System.Linq;
 using DiskCardGame;
 using HarmonyLib;
 
 namespace NeuroInscryption.Tweaks;
 
-#if DEBUG
 [HarmonyPatch]
 internal static class UnlockAllChallengesAndDecks
 {
