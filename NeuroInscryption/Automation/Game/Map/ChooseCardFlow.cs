@@ -46,6 +46,7 @@ public sealed class ChooseCardFlow : HarmonyAutomationFlow<object>
                 return enumerator.GetEnumeratorState() == 11 && enumerator.GetEnumeratorThis<CardSingleChoicesSequencer>().choicesRerolled == false;
             }
         }
+        // TODO: boss rares
     ];
 
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)

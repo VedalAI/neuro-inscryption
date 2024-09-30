@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
 
+// TODO: privatize json properties
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class CardData
 {
@@ -39,6 +40,11 @@ public class CardData
 
     [JsonProperty(Order = 80)]
     public bool? IsRare { get; protected set; }
+
+    // TODO: Is empowered
+    // TODO: about to be grabbed by hook
+    // TODO: about to be cannoned
+    // TODO: empty slot about to be cannoned
 
     // Excluded from JSON
 

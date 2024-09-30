@@ -30,6 +30,9 @@ public sealed class LoadoutState : IGameState
     public readonly IReadOnlyDictionary<string, string>? SigilDescriptions;
     public readonly IReadOnlyDictionary<string, string>? TraitDescriptions;
 
+    // TODO: Follow up nodes
+    // TODO: Oil paninting puzzle
+
     [JsonExtensionData]
     public JObject? Context { get; private set; }
 

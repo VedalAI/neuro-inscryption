@@ -8,6 +8,7 @@ using NeuroInscryption.Input;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
+// TODO: flows for reward screens
 public sealed class RunEndScreenFlow : HarmonyAutomationFlow<AscensionRunEndScreen>
 {
     public override FlowHook[] Hooks =>

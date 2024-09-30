@@ -80,6 +80,9 @@ public static class TraitStrings
     [Describes(SpecialTriggeredAbility.SpawnLice)]
     private static readonly Description _spawnLice = ("Lice Infested", "When a card bearing this trait is played, any cards bearing the Lice trait in your hand or deck are played automatically adjacent to it if possible.");
 
+    // TODO: Add bait bucket trait (spawn great white)
+    // TODO: Add limoncello trait (spawn skeletons)
+
     // Custom
 
     public static readonly Description Chime = ("Chime", "When a card bearing this trait is attacked, any cards bearing the Daus trait in play will attack the attacker.");

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using DiskCardGame;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
@@ -29,6 +28,7 @@ public sealed class CombatState : IGameState
 
     public readonly IReadOnlyList<PlayableCardData> PlayerHand;
     public IReadOnlyList<CardData>? RemainingDeck => _contextInterface is { IncludeDeck: false } ? null : _remainingDeck;
+    public string RemainingSquirrels;
     public readonly IReadOnlyList<BoonData>? Boons;
 
     public readonly int MaxItems;
@@ -36,13 +36,19 @@ public sealed class CombatState : IGameState
 
     public readonly TotemData? Totem;
 
-    public readonly IReadOnlyDictionary<string, string>? SigilDescriptions;
-    public readonly IReadOnlyDictionary<string, string>? TraitDescriptions;
-
+    public readonly int? OpponentLives;
+    public readonly TotemData? OpponentTotem;
+    public readonly string? BossAbilityDescription; // TODO
     public readonly bool? IsOpponentSurrendering;
+
+    // TODO: Follow up nodes
+    // TODO: Oil paninting puzzle
 
     [JsonProperty("Note")]
     private string? Note => Ijiraq.AnythingCouldBeIjiraq ? CardStrings.IjiraqPresent : null;
+
+    public readonly IReadOnlyDictionary<string, string>? SigilDescriptions;
+    public readonly IReadOnlyDictionary<string, string>? TraitDescriptions;
 
     [JsonExtensionData]
     public JObject? Context { get; private set; }
@@ -74,13 +80,18 @@ public sealed class CombatState : IGameState
 
         PlayerHand = DiskCardGame.PlayerHand.Instance.CardsInHand.Select(c => PlayableCardData.Create(c, this)).ToList();
         _remainingDeck = CardDrawPiles.Instance.Deck.Cards.Select((c, index) => CardData.Create(c, this, index)).ToList();
+        RemainingSquirrels = CardDrawPiles3D.Instance.SideDeck.Cards.Count > 4 ? "Many" : CardDrawPiles3D.Instance.SideDeck.Cards.Count.ToString();
         Boons = RunState.Run.playerDeck.Boons.Select(BoonData.Create).ToList().NullIfEmpty();
 
         MaxItems = RunState.Run.MaxConsumables;
         Items = ItemsManager.Instance.consumableSlots.Where(s => s.Item).Select(ItemData.Create).ToList();
 
-        // (TurnManager.Instance.Opponent as Part1Opponent).totem
         Totem = TotemData.Create(Part1ItemsManager.Instance.Totems.FirstOrDefault());
+
+        Part1Opponent opponent = (Part1Opponent) TurnManager.Instance.Opponent;
+        OpponentLives = opponent.StartingLives > 1 ? opponent.NumLives : null;
+        OpponentTotem = TotemData.Create(opponent.totem);
+        IsOpponentSurrendering = TurnManager.Instance.Opponent.OfferingSurrender ? true : null;
 
         List<CardData> allCardsInPlay = [..PlayerLanes.Values, ..OpponentLanes.Values, ..OpponentQueueLanes.Values, ..PlayerHand, .._remainingDeck];
         allCardsInPlay.RemoveAll(data => data == null);
@@ -89,8 +100,6 @@ public sealed class CombatState : IGameState
         if (Totem != null) relevantSigils = relevantSigils.Append(SigilData.Create(Totem.Sigil));
         SigilDescriptions = relevantSigils.ToDescriptionDictionary().NullIfEmpty();
         TraitDescriptions = allCardsInPlay.SelectMany(c => c.Traits).Distinct().ToDescriptionDictionary().NullIfEmpty();
-
-        IsOpponentSurrendering = TurnManager.Instance.Opponent.OfferingSurrender ? true : null;
     }
 
     public void SetContext(ICombatContext decisionContext)
@@ -98,14 +107,6 @@ public sealed class CombatState : IGameState
         Context = JObject.FromObject(decisionContext, new JsonSerializer { NullValueHandling = NullValueHandling.Ignore });
         _contextInterface = decisionContext;
     }
-
-    // ["playerTotem"]
-    // ["items"]
-    // ["remainingSquirrels"] ?
-    // ["enemyTotem"]
-    // ["enemyLives"]
-    // ["boons"]
-    // ["bossAbilityDescription"] ?
 
     public sealed class IjiraqState
     {

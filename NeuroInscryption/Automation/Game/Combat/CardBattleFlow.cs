@@ -31,6 +31,7 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<object>
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(PlayerHand), nameof(PlayerHand.SelectSlotForCard))),
             IsValid = context => context.GetResult<bool>() == false,
         }
+        // TODO: fix not restarting after item is used
     ];
 
     protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
