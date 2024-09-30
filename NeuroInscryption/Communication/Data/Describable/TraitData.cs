@@ -4,7 +4,7 @@ using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Communication.Data.Describable;
 
-public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, IDescriptionConvertible
+public sealed class TraitData : IComparable<TraitData>, IEquatable<TraitData>, IDescribable
 {
     private enum Type
     {

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using DiskCardGame;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using BoonData = NeuroInscryption.Communication.Data.Serializable.BoonData;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
@@ -26,7 +28,7 @@ public sealed class CombatState : IGameState
     public readonly IReadOnlyDictionary<string, PlayableCardData?> OpponentQueueLanes;
 
     public readonly IReadOnlyList<PlayableCardData> PlayerHand;
-    public readonly IReadOnlyList<CardData> RemainingDeck;
+    public IReadOnlyList<CardData>? RemainingDeck => _contextInterface is { IncludeDeck: false } ? null : _remainingDeck;
     public readonly IReadOnlyList<BoonData>? Boons;
 
     public readonly int MaxItems;
@@ -42,10 +44,19 @@ public sealed class CombatState : IGameState
     [JsonProperty("Note")]
     private string? Note => Ijiraq.AnythingCouldBeIjiraq ? CardStrings.IjiraqPresent : null;
 
+    [JsonExtensionData]
+    public JObject? Context { get; private set; }
+
     // Excluded from JSON
 
     [JsonIgnore]
     public readonly IjiraqState Ijiraq;
+
+    [JsonIgnore]
+    private readonly IReadOnlyList<CardData> _remainingDeck;
+
+    [JsonIgnore]
+    private ICombatContext? _contextInterface;
 
     bool IGameState.ShouldFakeIjiraq(int deckIndex) => Ijiraq.FakeIjiraqsInDeck.Contains(deckIndex);
 
@@ -62,7 +73,7 @@ public sealed class CombatState : IGameState
         OpponentQueueLanes = BoardManager.Instance.opponentSlots.Select(BoardManager.Instance.GetCardQueuedForSlot).ToIndexedDictionary(card => PlayableCardData.Create(card, this))!;
 
         PlayerHand = DiskCardGame.PlayerHand.Instance.CardsInHand.Select(c => PlayableCardData.Create(c, this)).ToList();
-        RemainingDeck = CardDrawPiles.Instance.Deck.Cards.Select((c, index) => CardData.Create(c, this, index)).ToList();
+        _remainingDeck = CardDrawPiles.Instance.Deck.Cards.Select((c, index) => CardData.Create(c, this, index)).ToList();
         Boons = RunState.Run.playerDeck.Boons.Select(BoonData.Create).ToList().NullIfEmpty();
 
         MaxItems = RunState.Run.MaxConsumables;
@@ -71,7 +82,7 @@ public sealed class CombatState : IGameState
         // (TurnManager.Instance.Opponent as Part1Opponent).totem
         Totem = TotemData.Create(Part1ItemsManager.Instance.Totems.FirstOrDefault());
 
-        List<CardData> allCardsInPlay = [..PlayerLanes.Values, ..OpponentLanes.Values, ..OpponentQueueLanes.Values, ..PlayerHand, ..RemainingDeck];
+        List<CardData> allCardsInPlay = [..PlayerLanes.Values, ..OpponentLanes.Values, ..OpponentQueueLanes.Values, ..PlayerHand, .._remainingDeck];
         allCardsInPlay.RemoveAll(data => data == null);
 
         IEnumerable<SigilData> relevantSigils = allCardsInPlay.SelectMany(c => c.RelevantSigils);
@@ -80,6 +91,12 @@ public sealed class CombatState : IGameState
         TraitDescriptions = allCardsInPlay.SelectMany(c => c.Traits).Distinct().ToDescriptionDictionary().NullIfEmpty();
 
         IsOpponentSurrendering = TurnManager.Instance.Opponent.OfferingSurrender ? true : null;
+    }
+
+    public void SetContext(ICombatContext decisionContext)
+    {
+        Context = JObject.FromObject(decisionContext, new JsonSerializer { NullValueHandling = NullValueHandling.Ignore });
+        _contextInterface = decisionContext;
     }
 
     // ["playerTotem"]

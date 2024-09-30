@@ -37,8 +37,10 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<object>
     {
         if (enumerator.GetType().Name.Contains(nameof(PlayerHand.SelectSlotForCard)))
         {
-            await UniTask.Delay(1000, cancellationToken: ct); // time it takes for the card to go back in the hand
+            await UniTask.Delay(500, cancellationToken: ct); // time it takes for the card to go back in the hand
         }
+
+        await UniTask.Delay(500, cancellationToken: ct);
 
         ViewManager.Instance.SwitchToView(BoardManager.Instance.DefaultView);
 

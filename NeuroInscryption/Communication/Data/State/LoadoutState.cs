@@ -38,7 +38,7 @@ public sealed class LoadoutState : IGameState
 
     bool IGameState.ShouldFakeIjiraq(int deckIndex) => false;
 
-    private LoadoutState(object? decisionContext = null)
+    private LoadoutState()
     {
         PlayerDeck = RunState.Run.playerDeck.Cards.Select(c => CardData.Create(c, this)).ToList();
         Boons = RunState.Run.playerDeck.Boons.Select(BoonData.Create).ToList().NullIfEmpty();
@@ -63,18 +63,11 @@ public sealed class LoadoutState : IGameState
 
         SigilDescriptions = relevantSigils.ToDescriptionDictionary().NullIfEmpty();
         TraitDescriptions = relevantTraits.ToDescriptionDictionary().NullIfEmpty();
-
-        SetContext((ILoadoutContext?) decisionContext);
     }
 
-    public void SetContext<T>(T? decisionContext) where T : class, ILoadoutContext
+    public void SetContext(ILoadoutContext decisionContext)
     {
-        Context = decisionContext != null ? JObject.FromObject(decisionContext, new JsonSerializer { NullValueHandling = NullValueHandling.Ignore }) : null;
+        Context = JObject.FromObject(decisionContext, new JsonSerializer { NullValueHandling = NullValueHandling.Ignore });
         _contextInterface = decisionContext;
-    }
-
-    public void ClearContext()
-    {
-        Context = null;
     }
 }

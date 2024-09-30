@@ -32,7 +32,6 @@ public abstract class HarmonyAutomationFlow : AutomationFlow<HarmonyContext>
     }
 }
 
-// TODO: maybe we can remove this
 public abstract class HarmonyAutomationFlow<T> : HarmonyAutomationFlow
 {
     protected abstract UniTask ExecuteAsync(T target, CancellationToken ct);

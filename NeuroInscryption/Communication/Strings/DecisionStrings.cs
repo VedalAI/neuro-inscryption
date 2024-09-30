@@ -8,6 +8,7 @@ public static class DecisionStrings
     public static readonly Description CardBattleTurn = ("card_battle_turn", "Choose the next action to take during this card battle.");
     public static readonly DescriptionFormat ChooseSacrifices = ("card_sacrifice_choice", "You have chosen to play {0}. Choose which cards to sacrifice for it.");
     public static readonly DescriptionFormat PlaceCard = ("card_lane_choice", "You have chosen to play {0}. Choose which lane to place it in.");
+    public static readonly Description MagpieDrawCard = ("specific_draw_card_choice", "Choose any card to draw from your deck.");
 
     public static readonly Description ChoosePath = ("path_choice", "Choose a path to continue on. Take into account where each path leads to next.");
     public static readonly Description ChooseCard = ("card_choice", "Choose a card to add to your deck from the provided list of options.");

@@ -5,7 +5,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Communication.Data.Describable;
 
-public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, IDescriptionConvertible
+public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, IDescribable
 {
     public string Name { get; }
     public string Info { get; }

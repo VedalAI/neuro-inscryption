@@ -10,8 +10,15 @@ namespace NeuroInscryption.Communication.Data.Serializable;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public sealed class SelectableCardData : IIdentifiable
 {
-    public string? Cost { get; private set; }
-    public string? Tribe { get; private set; }
+    [JsonProperty]
+    private string? Cost { get; set; }
+
+    [JsonProperty]
+    private string? Tribe { get; set; }
+
+    [JsonProperty("Identifier")]
+    private string? CardIdentifier { get; set; }
+
     public CardData? Card { get; private set; }
 
     // Excluded from JSON
@@ -29,14 +36,18 @@ public sealed class SelectableCardData : IIdentifiable
         if (card.Info != null)
         {
             Card = CardData.Create(card.Info, state);
-            Identifier = Card.DisplayName;
-            if (index != -1) Identifier += string.Format(CardStrings.GenericDiscriminator, index);
+            CardIdentifier = Card.DisplayName;
+            if (index != -1) CardIdentifier += string.Format(CardStrings.GenericDiscriminator, index);
+
+            Identifier = CardIdentifier;
         }
         else if (card.ChoiceInfo.CardInfo != null)
         {
             Card = CardData.Create(card.ChoiceInfo.CardInfo, state);
-            Identifier = Card.DisplayName;
-            if (index != -1) Identifier += string.Format(CardStrings.GenericDiscriminator, index);
+            CardIdentifier = Card.DisplayName;
+            if (index != -1) CardIdentifier += string.Format(CardStrings.GenericDiscriminator, index);
+
+            Identifier = CardIdentifier;
         }
         else if (card.ChoiceInfo.tribe != DiskCardGame.Tribe.None)
         {

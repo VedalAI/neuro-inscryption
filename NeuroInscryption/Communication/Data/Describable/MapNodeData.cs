@@ -5,10 +5,10 @@ using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Communication.Data.Describable;
 
-public sealed class MapNodeData : IComparable<MapNodeData>, IEquatable<MapNodeData>, IDescriptionConvertible, IIdentifiable
+public sealed class MapNodeData : IComparable<MapNodeData>, IEquatable<MapNodeData>, IDescribable, IIdentifiable
 {
-    public string Name { get; }
     public string Identifier { get; }
+    public string Name { get; }
     public string Info { get; }
     public MapNode MapNode { get; }
 
