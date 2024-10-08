@@ -46,6 +46,14 @@ public static class DialogueEvents
                 SendContext("", Priority.React);
                 break;
 
+            case "You took your time out there.": // leshy first time visible
+                SendContext("", Priority.React);
+                break;
+
+            case "Now <color=#D93846>that</color> is value.": // moon
+                SendContext("", Priority.React);
+                break;
+
             case "We will work together to amend that.": // deathcard
                 SendContext("", Priority.Context);
                 break;
@@ -53,6 +61,16 @@ public static class DialogueEvents
             case "<color=#D93846>Starvation</color> began to set in...":
                 SendContext("", Priority.React);
                 break;
+
+            case "Surely this food will please you.": // leshy cake
+                SendContext("", Priority.Context);
+                break;
+
+            case "The last challenger managed to defeat me.": // restart after winning
+                SendContext("", Priority.React);
+                break;
+
+
         }
     }
 
