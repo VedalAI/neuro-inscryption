@@ -2,6 +2,8 @@
 
 public static class BossStrings
 {
+    // TODO: Related sigils and traits (and also check this for other strings)
+
     public const string Prospector = "You are currently in a boss battle against the Prospector.";
     public const string ProspectorPhase1Ability = "If you kill his Pack Mule, you will get 4 extra cards.";
     public const string ProspectorPhase1Transition = "After defeating his first phase, he will kill all cards on your side of the board and transform them into Gold Nuggets (0 power, 2 health, cannot be sacrificed), as well as summon a Bloodhound (2 power, 3 health, Guardian).";

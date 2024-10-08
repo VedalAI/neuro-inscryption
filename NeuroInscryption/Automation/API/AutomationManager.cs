@@ -11,7 +11,6 @@ namespace NeuroInscryption.Automation.API;
 
 using LinkedFlowHook = (FlowHook hook, HarmonyAutomationFlow flow);
 
-[HarmonyPatch]
 public sealed class AutomationManager : Singlyboi<AutomationManager>
 {
     private static readonly IReadOnlyList<IAutomationFlow> _allFlows = Assembly.GetExecutingAssembly().GetTypes()
