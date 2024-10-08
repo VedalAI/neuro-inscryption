@@ -18,6 +18,8 @@ public static class DialogueEvents
     [HarmonyPrefix]
     private static void HandleLine(string message)
     {
+        Plugin.Logger.LogWarning(message);
+
         switch (message.Trim())
         {
             case "You noticed one of the survivors wiping drool from their mouth.":
@@ -32,10 +34,29 @@ public static class DialogueEvents
                 SendContext("", Priority.React);
                 break;
 
-            
+            case "I am <color=#D93846>The Angler</color>. Go fish.":
+                SendContext("", Priority.Context);
+                break;
+
+            case "Sorry. But today <color=#D93846>you</color> will supply the pelts.":
+                SendContext("", Priority.Context);
+                break;
+
+            case "<color=#D93846>Too fast. Too soon.</color>":
+                SendContext("", Priority.React);
+                break;
+
+            case "We will work together to amend that.": // deathcard
+                SendContext("", Priority.Context);
+                break;
+
+            case "<color=#D93846>Starvation</color> began to set in...":
+                SendContext("", Priority.React);
+                break;
         }
     }
 
+    // TODO: Certain events should only trigger once
     private static void SendContext(string context, Priority priority)
     {
         new Context(context, priority == Priority.Silent, priority == Priority.React).Send();

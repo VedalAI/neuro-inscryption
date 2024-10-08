@@ -34,15 +34,18 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Automation\**" />
-      <Compile Remove="Input\**" />
-      <Compile Remove="Tweaks\**" />
-      <Compile Remove="Communication\Actions\**" />
-      <Compile Remove="Communication\Messages\Incoming\Action.cs" />
-      <Compile Remove="Communication\Messages\Outgoing\Decision.cs" />
-      <Compile Remove="Configuration\ChallengeFlags.cs" />
-      <Compile Remove="Configuration\StarterDeckOption.cs" />
-      <Compile Remove="Configuration\ModConfig.Neuro.cs" />
+        <Compile Remove="Automation\**" />
+        <Compile Remove="Input\**" />
+        <Compile Remove="Communication\Actions\**" />
+        <Compile Remove="Communication\Messages\Incoming\Action.cs" />
+        <Compile Remove="Communication\Messages\Outgoing\Decision.cs" />
+        <Compile Remove="Configuration\ChallengeFlags.cs" />
+        <Compile Remove="Configuration\StarterDeckOption.cs" />
+        <Compile Remove="Configuration\ModConfig.Neuro.cs" />
+        <Compile Remove="Tweaks\InfoUI.cs" />
+        <Compile Remove="Tweaks\RedirectSaveFile.cs" />
+        <Compile Remove="Tweaks\UnlockAllChallengesAndDecks.cs" />
+        <Compile Remove="Tweaks\UnlockKayceesMod.cs" />
     </ItemGroup>
 
     <Target Name="Copy" AfterTargets="Build" Condition="'$(Inscryption)' != ''">
