@@ -33,6 +33,18 @@
         <EmbeddedResource Remove="Resources/**/*.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Automation\**" />
+      <Compile Remove="Input\**" />
+      <Compile Remove="Tweaks\**" />
+      <Compile Remove="Communication\Actions\**" />
+      <Compile Remove="Communication\Messages\Incoming\Action.cs" />
+      <Compile Remove="Communication\Messages\Outgoing\Decision.cs" />
+      <Compile Remove="Configuration\ChallengeFlags.cs" />
+      <Compile Remove="Configuration\StarterDeckOption.cs" />
+      <Compile Remove="Configuration\ModConfig.Neuro.cs" />
+    </ItemGroup>
+
     <Target Name="Copy" AfterTargets="Build" Condition="'$(Inscryption)' != ''">
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(Inscryption)/BepInEx/plugins/" UseSymboliclinksIfPossible="true" />
     </Target>

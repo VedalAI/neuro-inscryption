@@ -4,6 +4,16 @@ using NeuroInscryption.Communication.Websocket;
 
 namespace NeuroInscryption.Communication.Messages.Outgoing;
 
+public abstract class OutgoingMessage
+{
+    protected abstract WsMessage GetMessage();
+
+    public void Send()
+    {
+        WebsocketConnection.Send(GetMessage());
+    }
+}
+
 public abstract class OutgoingMessage<TResponse> where TResponse : class, new()
 {
     protected abstract WsMessage GetMessage();
