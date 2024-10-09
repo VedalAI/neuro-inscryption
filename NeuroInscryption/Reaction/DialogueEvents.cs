@@ -1,4 +1,6 @@
-﻿using DiskCardGame;
+﻿using System;
+using System.Collections.Generic;
+using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Communication.Messages.Outgoing;
 
@@ -7,11 +9,97 @@ namespace NeuroInscryption.Reaction;
 [HarmonyPatch]
 public static class DialogueEvents
 {
+    static DialogueEvents()
+    {
+        // Note: Most of these dialogue lines only happen on the first occurrence of the event.
+
+        AddEvent("You noticed one of the survivors wiping drool from their mouth.", num => num switch
+        {
+            0 => ("The survivors of the campfire offer shelter to a creature. They claim that the chosen creature will gain a buff as a result, however, these survivors look famished and untrustworthy.", Priority.React),
+            _ => null
+        });
+
+        AddEvent("Heeeeeeee-haaw! 'Twas <color=#D93846>The Prospector</color>!", num => num switch
+        {
+            0 => ("A hobbled figure appeared... the first boss encounter: 'Heeeeeeee-haaw! 'Twas The Prospector!'. His mule seems very dear to him.", Priority.React),
+            _ => null
+        });
+
+        AddEvent("G-G-GOLD! I'VE STRUCK GOLD!", num => num switch
+        {
+            0 => ("The Prospector just struck all played cards, killing them and replacing them with useless golden nuggets! He is breaking the rules of the game!", Priority.React),
+            1 => ("The Prospector replaced all cards with gold nuggets again.", Priority.Silent),
+            _ => null
+        });
+
+        AddEvent("I am <color=#D93846>The Angler</color>. Go fish.", num => num switch
+        {
+            0 => ("A hulking man sat by a brackish pond with his feet submerged in the dark water. He pulled a hook from a pile of rotting fish and rose to his feet. The second boss encounter is the Angler. Go fish.", Priority.React),
+            _ => null
+        });
+
+        AddEvent("Sorry. But today <color=#D93846>you</color> will supply the pelts.", num =>  num switch
+        {
+            0 => ("You took in the familiar sights and scents of The Trapper's pelts. However, the once friendly man now beheld you with a steelzy gaze. The third boss encounter is starting.", Priority.React),
+            _ => null
+        });
+
+        AddEvent("<color=#D93846>Too fast. Too soon.</color>", num => num switch
+        {
+            0 => ("The mysterious figure is a sore loser and is infuriated his boss encounters are getting defeated too fast. He resorts to cheating in order to prevent further progress! He plays an impassable wall of grizzlies.", Priority.React),
+            1 => ("The mysterious figure resorts to cheating once again and plays another impassable wall of grizzlies...", Priority.React),
+            >= 2 => ("Another wall of grizzlies is played by the cheating opponent.", Priority.Silent)
+        });
+
+        AddEvent("You took your time out there.", num => num switch
+        {
+            0 => ("The mysterious figure finally appears visible in the light, he looks like an old man with leathery skin covered in leafage.", Priority.React),
+            _ => null
+        });
+
+        AddEvent("Now <color=#D93846>that</color> is value.", num => num switch
+        {
+            0 => ("The old man snapped a picture of the MOON ITSELF, capturing it within a card. This seems to be the last obstacle to defeat him.", Priority.React),
+            _ => null
+        });
+
+        AddEvent("<color=#D93846>Starvation</color> began to set in...", num => num switch
+        {
+            0 => ("Having no cards to draw, starvation appears on the battlefield and occupies a card space. It is a race against time as each turn starvation will spread until no card spaces are left, and the player loses.", Priority.React),
+            _ => null
+        });
+
+        AddEvent("Surely this food will please you.", num => num switch
+        {
+            0 => ("The reward for defeating the old man is a disgusting pile of meat with a lit candle on top.", Priority.Context),
+            _ => null
+        });
+
+        AddEvent("The last challenger managed to defeat me.", num => num switch
+        {
+            0 => ("The mysterious figure refers to the last challenger winning against him. However, the cycle doesn't seem to be broken.", Priority.React),
+            _ => null
+        });
+    }
+
     private enum Priority
     {
         React,   // Neuro will react to the prompt
         Context, // Neuro may or may not react to the prompt, her choice
         Silent   // Neuro will not react to the prompt, but it will still be added to her context window
+    }
+
+    private record struct Event(string Context, Priority Priority)
+    {
+        public static implicit operator Event((string context, Priority priority) tuple) => new(tuple.context, tuple.priority);
+    }
+
+    private static readonly Dictionary<string, Func<uint, Event?>> _events = [];
+    private static readonly Dictionary<string, uint> _occurrences = [];
+
+    private static void AddEvent(string dialogue, Func<uint, Event?> getterFunc)
+    {
+        _events[dialogue] = getterFunc;
     }
 
     [HarmonyPatch(typeof(TextDisplayer), nameof(TextDisplayer.ShowMessage))]
@@ -20,63 +108,16 @@ public static class DialogueEvents
     {
         Plugin.Logger.LogWarning(message);
 
-        switch (message.Trim())
+        if (_events.TryGetValue(message.Trim(), out Func<uint, Event?>? getterFunc))
         {
-            case "You noticed one of the survivors wiping drool from their mouth.":
-                SendContext("The survivors of the campfire offer shelter to only one creature, the chosen creature will gain more stat as a result. However, these survivors look famished and untrustworthy.", Priority.React);
-                break;
-
-            case "Heeeeeeee-haaw! 'Twas <color=#D93846>The Prospector</color>!":
-                SendContext("The first boss encounter is the Prospector, his mule seems very dear to him.", Priority.Context);
-                break;
-
-            case "G-G-GOLD! I'VE STRUCK GOLD!":
-                SendContext("The Prospector just struck all played cards replacing them with golden rocks! Those rocks will need to be cleared to play more creatures.", Priority.React);
-                break;
-
-            case "I am <color=#D93846>The Angler</color>. Go fish.":
-                SendContext("The second boss encounter is the Angler, he will hook the last played card and use it has his own.", Priority.Context);
-                break;
-
-            case "Sorry. But today <color=#D93846>you</color> will supply the pelts.":
-                SendContext("The third boss encounter is the Trapper, he will use traps to skin opposing creatures, thankfully the player gets to keep the pelts.", Priority.Context);
-                break;
-
-            case "<color=#D93846>Too fast. Too soon.</color>":
-                SendContext("Leshy is infuriated his boss encounters are getting defeated too fast and places walls of grizzlies, a very difficult foe to vanquish.", Priority.React);
-                break;
-
-            case "You took your time out there.": // leshy first time visible
-                SendContext("The mysterious figure known as Leshy finally appears visible in the light, he looks like an old man with leathery skin covered in leafage.", Priority.React);
-                break;
-
-            case "Now <color=#D93846>that</color> is value.": // moon
-                SendContext("Leshy snapped a picture of the moon capturing it within a card, this seems to be the last obstacle to defeat Leshy.", Priority.React);
-                break;
-
-            case "We will work together to amend that.": // deathcard
-                SendContext("Leshy request a new card to be created, elements of the player's cards will be used to piece it together.", Priority.Context);
-                break;
-
-            case "<color=#D93846>Starvation</color> began to set in...":
-                SendContext("Having no card to draw, starvation appears on the battlefield and occupies a card space. It is a race against time as each turn starvation will spread until no card spaces are left.", Priority.React);
-                break;
-
-            case "Surely this food will please you.": // leshy cake
-                SendContext("The reward for defeating Leshy is a pile of meat with a lit candle on top.", Priority.Context);
-                break;
-
-            case "The last challenger managed to defeat me.": // restart after winning
-                SendContext("Leshy refers to the last challenger winning against him. However, the cycle doesn't seem to be broken.", Priority.React);
-                break;
-
-
+            Event? result = getterFunc(_occurrences.TryGetValue(message.Trim(), out uint count) ? count : 0);
+            if (result != null) SendContext(result.Value);
+            _occurrences[message.Trim()] = count + 1;
         }
     }
 
-    // TODO: Certain events should only trigger once
-    private static void SendContext(string context, Priority priority)
+    private static void SendContext(Event @event)
     {
-        new Context(context, priority == Priority.Silent, priority == Priority.React).Send();
+        new Context(@event.Context, @event.Priority == Priority.Silent, @event.Priority == Priority.React).Send();
     }
 }
