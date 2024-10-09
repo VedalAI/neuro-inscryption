@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using DiskCardGame;
 using HarmonyLib;
-using NeuroInscryption.Communication.Messages.Outgoing;
+using NeuroInscryption.Reaction.API;
+using Priority = NeuroInscryption.Reaction.API.Priority;
 
 namespace NeuroInscryption.Reaction;
 
 [HarmonyPatch]
-public static class DialogueEvents
+internal static class DialogueEvents
 {
     static DialogueEvents()
     {
@@ -82,18 +83,6 @@ public static class DialogueEvents
         });
     }
 
-    private enum Priority
-    {
-        React,   // Neuro will react to the prompt
-        Context, // Neuro may or may not react to the prompt, her choice
-        Silent   // Neuro will not react to the prompt, but it will still be added to her context window
-    }
-
-    private record struct Event(string Context, Priority Priority)
-    {
-        public static implicit operator Event((string context, Priority priority) tuple) => new(tuple.context, tuple.priority);
-    }
-
     private static readonly Dictionary<string, Func<uint, Event?>> _events = [];
     private static readonly Dictionary<string, uint> _occurrences = [];
 
@@ -110,14 +99,8 @@ public static class DialogueEvents
 
         if (_events.TryGetValue(message.Trim(), out Func<uint, Event?>? getterFunc))
         {
-            Event? result = getterFunc(_occurrences.TryGetValue(message.Trim(), out uint count) ? count : 0);
-            if (result != null) SendContext(result.Value);
+            getterFunc(_occurrences.TryGetValue(message.Trim(), out uint count) ? count : 0)?.Send();
             _occurrences[message.Trim()] = count + 1;
         }
-    }
-
-    private static void SendContext(Event @event)
-    {
-        new Context(@event.Context, @event.Priority == Priority.Silent, @event.Priority == Priority.React).Send();
     }
 }

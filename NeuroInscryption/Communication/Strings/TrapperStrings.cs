@@ -2,7 +2,7 @@
 
 namespace NeuroInscryption.Communication.Strings;
 
-public class TrapperStrings
+public static class TrapperStrings
 {
     public const string TeethCost = "{0} {0:tooth|teeth}";
 
