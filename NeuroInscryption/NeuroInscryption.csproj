@@ -47,6 +47,9 @@
         <Compile Remove="Tweaks\RedirectSaveFile.cs" />
         <Compile Remove="Tweaks\UnlockAllChallengesAndDecks.cs" />
         <Compile Remove="Tweaks\UnlockKayceesMod.cs" />
+        <Compile Remove="Communication\Data\**" />
+        <Compile Remove="Communication\Strings\**" />
+        <Compile Remove="Communication\Json\**" />
     </ItemGroup>
 
     <Target Name="Copy" AfterTargets="Build" Condition="'$(Inscryption)' != ''">
