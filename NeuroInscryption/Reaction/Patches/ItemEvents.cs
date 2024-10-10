@@ -1,10 +1,8 @@
 ﻿using DiskCardGame;
 using HarmonyLib;
-using NeuroInscryption.Reaction.API;
 using NeuroInscryption.Utilities;
-using Priority = NeuroInscryption.Reaction.API.Priority;
 
-namespace NeuroInscryption.Reaction;
+namespace NeuroInscryption.Reaction.Patches;
 
 [HarmonyPatch]
 internal static class ItemEvents

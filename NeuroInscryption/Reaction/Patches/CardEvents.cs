@@ -5,7 +5,7 @@ using HarmonyLib;
 using NeuroInscryption.Utilities;
 using UnityEngine;
 
-namespace NeuroInscryption.Reaction;
+namespace NeuroInscryption.Reaction.Patches;
 
 [HarmonyPatch]
 public static class CardEvents
