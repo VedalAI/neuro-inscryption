@@ -2,6 +2,7 @@
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Reaction.API;
+using NeuroInscryption.Reaction.Strings;
 
 namespace NeuroInscryption.Reaction.Patches;
 

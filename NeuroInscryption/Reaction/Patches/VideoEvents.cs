@@ -1,5 +1,7 @@
 ﻿using DiskCardGame;
 using HarmonyLib;
+using NeuroInscryption.Communication.Messages.Outgoing;
+using NeuroInscryption.Reaction.Strings;
 
 namespace NeuroInscryption.Reaction.Patches;
 
@@ -9,7 +11,7 @@ internal static class VideoEvents
     [HarmonyPatch(typeof(FootageController), nameof(FootageController.Pause))]
     [HarmonyPatch(typeof(FootageController), nameof(FootageController.OnStopPressed))]
     [HarmonyPrefix]
-    private static void OnPause(FootageController __instance)
+    private static void HandleContext(FootageController __instance)
     {
         switch (__instance.subsData != null ? __instance.subsData.name : null)
         {
@@ -45,5 +47,20 @@ internal static class VideoEvents
                 Videos.Video8.Send(__instance.player.time);
                 break;
         }
+    }
+
+    [HarmonyPatch(typeof(FootageController), nameof(FootageController.Play))]
+    [HarmonyPrefix]
+    private static void OnVideoStart()
+    {
+        new RequestMute(true).Send();
+    }
+
+    [HarmonyPatch(typeof(FootageController), nameof(FootageController.Pause))]
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.Last)]
+    private static void OnVideoStop()
+    {
+        new RequestMute(false).Send();
     }
 }

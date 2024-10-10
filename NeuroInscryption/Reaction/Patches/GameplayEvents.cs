@@ -1,5 +1,6 @@
 ﻿using DiskCardGame;
 using HarmonyLib;
+using NeuroInscryption.Reaction.Strings;
 using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Reaction.Patches;

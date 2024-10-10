@@ -2,6 +2,7 @@
 using System.Linq;
 using DiskCardGame;
 using HarmonyLib;
+using NeuroInscryption.Reaction.Strings;
 using NeuroInscryption.Utilities;
 using UnityEngine;
 

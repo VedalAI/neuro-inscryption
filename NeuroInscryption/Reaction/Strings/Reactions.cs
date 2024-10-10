@@ -1,6 +1,6 @@
 ﻿using NeuroInscryption.Reaction.API;
 
-namespace NeuroInscryption.Reaction;
+namespace NeuroInscryption.Reaction.Strings;
 
 public static class Reactions
 {
