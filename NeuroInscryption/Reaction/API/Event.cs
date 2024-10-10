@@ -8,7 +8,7 @@ public class Event(string context, Priority priority)
 {
     public static implicit operator Event((string context, Priority priority) tuple) => new(tuple.context, tuple.priority);
 
-    public static Priority? Override;
+    public static Priority? OverridePriority;
 
     private const string OverridePrioCommand = "prio";
     static Event()
@@ -21,15 +21,15 @@ public class Event(string context, Priority priority)
         if (message.Split(' ') is [OverridePrioCommand, string prio])
         {
             if (prio is "clear")
-                Override = null;
+                OverridePriority = null;
             else if (Enum.TryParse(prio, ignoreCase: true, out Priority @override))
-                Override = @override;
+                OverridePriority = @override;
         }
     }
 
     public void Send(params object[] format)
     {
-        Priority prioUsed = Override ?? priority;
+        Priority prioUsed = OverridePriority ?? priority;
         new Context(string.Format(context, format), prioUsed == Priority.Silent, prioUsed == Priority.Force).Send();
     }
 }
