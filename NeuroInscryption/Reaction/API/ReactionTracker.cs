@@ -14,8 +14,8 @@ public sealed class ReactionTracker(Func<uint, Event?> getterFunc)
     {
     }
 
-    public void Send()
+    public void Send(params object[] format)
     {
-        getterFunc(_occ++)?.Send();
+        getterFunc(_occ++)?.Send(format);
     }
 }

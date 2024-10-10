@@ -11,29 +11,29 @@ internal static class ItemEvents
 {
     private static readonly ReactionTracker _pliersReaction = new(num => num switch
     {
-        0 => ("The player used some pliers to pluck their own tooth out!!!! What a gruesome display and such disturbing sounds!", Priority.React),
+        0 => ("The player used some pliers to pluck their own tooth out!!!! What a gruesome display and such disturbing sounds!", Priority.Context),
         1 or 2 => ("The player used some pliers to pluck their own tooth out again! It's as gruesome and disturbing as ever!", Priority.Context),
         _ => null
     });
 
     private static readonly ReactionTracker _knifeReaction = new(num => num switch
     {
-        0 => ("The player used a dagger to carve one of their OWN EYES out!!!!!!!!!!!", Priority.React),
+        0 => ("The player used a dagger to carve one of their OWN EYES out!!!!!!!!!!!", Priority.Context),
         1 or 2 => ("The player used a dagger to carve one of their own eyes out again!", Priority.Context),
         _ => null,
     });
 
     [HarmonyPatch(typeof(PliersItem), nameof(PliersItem.ActivateSequence), MethodType.Enumerator)]
     [HarmonyPostfix]
-    private static void Pliers(object enumerator)
+    private static void Pliers(object __instance)
     {
-        if (enumerator.GetEnumeratorState() == 6) _pliersReaction.Send();
+        if (__instance.GetEnumeratorState() == 6) _pliersReaction.Send();
     }
 
     [HarmonyPatch(typeof(SpecialDaggerItem), nameof(SpecialDaggerItem.ActivateSequence), MethodType.Enumerator)]
     [HarmonyPostfix]
-    private static void Knife(object enumerator)
+    private static void Knife(object __instance)
     {
-        if (enumerator.GetEnumeratorState() == 4) _knifeReaction.Send();
+        if (__instance.GetEnumeratorState() == 4) _knifeReaction.Send();
     }
 }

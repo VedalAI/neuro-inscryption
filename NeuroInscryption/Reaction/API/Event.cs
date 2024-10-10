@@ -6,8 +6,8 @@ public class Event(string context, Priority priority)
 {
     public static implicit operator Event((string context, Priority priority) tuple) => new(tuple.context, tuple.priority);
 
-    public void Send()
+    public void Send(params object[] format)
     {
-        new Context(context, priority == Priority.Silent, priority == Priority.React).Send();
+        new Context(string.Format(context, format), priority == Priority.Silent, priority == Priority.Force).Send();
     }
 }
