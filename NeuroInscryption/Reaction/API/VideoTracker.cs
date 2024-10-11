@@ -44,6 +44,6 @@ public sealed class VideoTracker(List<VideoTracker.VideoEvent> events)
                 message = message.Remove(firstHe, 2).Insert(firstHe, "The Lucky Carder");
         }
 
-        new Event(prompt.ToString(), Priority.Context).Send();
+        new Event(message, Priority.Context).Send();
     }
 }
