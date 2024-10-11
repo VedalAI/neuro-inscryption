@@ -19,5 +19,10 @@ internal static class ManualEvents
             Reactions.PlayerTouchedEverything.Send();
             Plugin.Logger.LogMessage($"Twitch Backdoor - Sending WrapItUp reaction");
         }
+        else if (message.ToLowerInvariant() == "blindge")
+        {
+            Reactions.PlayerCantReadUI.Send();
+            Plugin.Logger.LogMessage($"Twitch Backdoor - Sending Blindge reaction");
+        }
     }
 }

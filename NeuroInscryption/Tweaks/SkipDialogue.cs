@@ -1,4 +1,5 @@
-﻿using DiskCardGame;
+﻿/*
+using DiskCardGame;
 using HarmonyLib;
 
 namespace NeuroInscryption.Tweaks;
@@ -13,3 +14,4 @@ internal static class SkipDialogue
         __instance.continuePressed = true;
     }
 }
+*/

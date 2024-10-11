@@ -16,14 +16,14 @@ internal static class StoryEvents
         Reactions.VideoBrowsingStarted.Send();
     }
 
-    [HarmonyPatch(typeof(ChooseEyeballSequencer), nameof(ChooseEyeballSequencer.EyeballSelectedSequence))]
+    [HarmonyPatch(typeof(ChooseEyeballSequencer), nameof(ChooseEyeballSequencer.EyeballSelectedSequence), MethodType.Enumerator)]
     [HarmonyPostfix]
     private static void WizardEyeballSelected(object __instance)
     {
         if (__instance.GetEnumeratorState() == 8 && RunState.Run.eyeState == EyeballState.Wizard) Reactions.WizardEyeballSelected.Send();
     }
 
-    [HarmonyPatch(typeof(SanctumSceneSequencer), nameof(SanctumSceneSequencer.UseFilmRollSequence))]
+    [HarmonyPatch(typeof(SanctumSceneSequencer), nameof(SanctumSceneSequencer.UseFilmRollSequence), MethodType.Enumerator)]
     [HarmonyPostfix]
     private static void UseFilmRoll(object __instance)
     {

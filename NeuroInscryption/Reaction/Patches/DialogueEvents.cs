@@ -23,7 +23,7 @@ internal static class DialogueEvents
         AddEvent("You took your time out there.", Reactions.LeshyRevealed);
         AddEvent("Now <color=#D93846>that</color> is value.", Reactions.LeshyPlayedMoon);
         AddEvent("<color=#D93846>Starvation</color> began to set in...", Reactions.Starvation);
-        AddEvent("Surely this food will please you.", Reactions.LeshyCake);
+        AddEvent("I do not celebrate often and I seldom give gifts.", Reactions.LeshyCake);
         AddEvent("The last challenger managed to defeat me.", Reactions.LeshyCommentedOnPreviousRun);
         AddEvent("Oh... oh no. You can't use that.", Reactions.GooBottleAppeared);
     }
@@ -39,8 +39,6 @@ internal static class DialogueEvents
     [HarmonyPrefix]
     private static void HandleLine(string message)
     {
-        Plugin.Logger.LogWarning(message);
-
         if (_events.TryGetValue(message.Trim().ToLowerInvariant(), out ReactionTracker? reaction))
         {
             reaction.Send();

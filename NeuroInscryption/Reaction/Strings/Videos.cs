@@ -36,11 +36,6 @@ public static class Videos
         (44, "He wonders if there will actually be anything to find, or if this is a waste of time. Suddenly, the video glitches and cuts out abruptly.")
     });
 
-    public static readonly VideoTracker Video5 = new(new()
-    {
-        (0, "A video dated <ERROR> started. A bunch of glitchy static fills the screen, accompanied by an unpleasant glitchy noise.")
-    });
-
     public static readonly VideoTracker Video6 = new(new()
     {
         (0, "A video dated 3rd of October started. The Lucky Carder is outside, filming himself in the forest. "),

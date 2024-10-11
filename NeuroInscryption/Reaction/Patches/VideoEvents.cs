@@ -13,7 +13,9 @@ internal static class VideoEvents
     [HarmonyPrefix]
     private static void HandleContext(FootageController __instance)
     {
-        switch (__instance.subsData != null ? __instance.subsData.name : null)
+        if (__instance.subsData == null) return;
+
+        switch (__instance.subsData.name)
         {
             case "Subs_Blooper":
                 Videos.Video1.Send(__instance.player.time);
@@ -31,10 +33,6 @@ internal static class VideoEvents
                 Videos.Video4.Send(__instance.player.time);
                 break;
 
-            case null:
-                Videos.Video5.Send(__instance.player.time);
-                break;
-
             case "Subs_Forest-2":
                 Videos.Video6.Send(__instance.player.time);
                 break;
@@ -47,20 +45,16 @@ internal static class VideoEvents
                 Videos.Video8.Send(__instance.player.time);
                 break;
         }
+
+        new RequestMute(false).Send();
     }
 
     [HarmonyPatch(typeof(FootageController), nameof(FootageController.Play))]
-    [HarmonyPrefix]
-    private static void OnVideoStart()
+    [HarmonyPostfix]
+    private static void OnVideoStart(FootageController __instance)
     {
-        new RequestMute(true).Send();
-    }
+        if (__instance.subsData == null) return;
 
-    [HarmonyPatch(typeof(FootageController), nameof(FootageController.Pause))]
-    [HarmonyPrefix]
-    [HarmonyPriority(Priority.Last)]
-    private static void OnVideoStop()
-    {
-        new RequestMute(false).Send();
+        new RequestMute(true).Send();
     }
 }

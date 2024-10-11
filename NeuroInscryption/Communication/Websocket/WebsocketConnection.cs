@@ -9,7 +9,6 @@ using WebSocketSharp;
 
 namespace NeuroInscryption.Communication.Websocket;
 
-[HarmonyPatch]
 public sealed class WebsocketConnection : Singlyboi<WebsocketConnection>
 {
     private static readonly Queue<string> _messageQueue = [];

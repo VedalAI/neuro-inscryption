@@ -9,6 +9,7 @@ namespace NeuroInscryption.Reaction.Patches;
 public static class GameplayEvents
 {
     [HarmonyPatch(typeof(Part1Opponent), nameof(Part1Opponent.DefeatedPlayerSequence), MethodType.Enumerator)]
+    [HarmonyPatch(typeof(Part1BossOpponent), nameof(Part1BossOpponent.DefeatedPlayerSequence), MethodType.Enumerator)]
     [HarmonyPostfix]
     private static void PlayerLost(object __instance)
     {

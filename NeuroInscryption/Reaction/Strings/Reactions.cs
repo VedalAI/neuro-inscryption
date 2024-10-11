@@ -82,6 +82,8 @@ public static class Reactions
 
     public static readonly ReactionTracker PlayerTouchedEverything = new("Touching everything doesn't seem to solve a thing, these puzzles might be too hard for Vedal.", Priority.Force);
 
+    public static readonly ReactionTracker PlayerCantReadUI = new("It seems that Vedal cannot read the UI, right clicking on certain cards might do something important...", Priority.Force);
+
     // Story
 
     public static readonly ReactionTracker VideoBrowsingStarted = new("A weird effect happens, the game appears to be a recording and now there is a camera menu, with videos.", Priority.Context, true);

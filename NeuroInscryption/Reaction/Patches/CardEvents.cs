@@ -11,7 +11,7 @@ namespace NeuroInscryption.Reaction.Patches;
 [HarmonyPatch]
 public static class CardEvents
 {
-    [HarmonyPatch(typeof(AnglerBattleSequencer), nameof(AnglerBattleSequencer.OnOtherCardDie))]
+    [HarmonyPatch(typeof(AnglerBattleSequencer), nameof(AnglerBattleSequencer.OnOtherCardDie), MethodType.Enumerator)]
     [HarmonyPostfix]
     private static void SpawnShark(object __instance)
     {
@@ -27,6 +27,7 @@ public static class CardEvents
 
     [HarmonyPatch(typeof(SelectableCard), nameof(SelectableCard.Initialize), typeof(Texture), typeof(Action<SelectableCard>), typeof(Action<SelectableCard>), typeof(Action<SelectableCard>))]
     [HarmonyPatch(typeof(SelectableCard), nameof(SelectableCard.Initialize), typeof(CardInfo), typeof(Action<SelectableCard>), typeof(Action<SelectableCard>), typeof(bool), typeof(Action<SelectableCard>))]
+    [HarmonyPostfix]
     private static void CardRevealedHandler(SelectableCard __instance)
     {
         if (!__instance.Info) return;
@@ -59,11 +60,15 @@ public static class CardEvents
         }
     }
 
-    [HarmonyPatch(typeof(PlayableCard), nameof(PlayableCard.OnPlayed))]
+    [HarmonyPatch(typeof(Opponent), nameof(Opponent.QueueCard), MethodType.Enumerator)]
     [HarmonyPostfix]
-    private static void OnCardPlayed(PlayableCard __instance)
+    private static void OnCardPlayed(object __instance)
     {
-        if (__instance.OpponentCard && GetCustomDeathcard(__instance.Info) is { } mod)
+        if (__instance.GetEnumeratorState() != 1) return;
+
+        CardInfo cardInfo = __instance.GetEnumeratorField<CardInfo>("cardInfo");
+        Plugin.Logger.LogMessage(cardInfo + " " + GetCustomDeathcard(cardInfo));
+        if (GetCustomDeathcard(cardInfo) is { } mod)
         {
             Reactions.LeshyPlayedDeathCard.Send(mod.nameReplacement);
         }
@@ -71,6 +76,6 @@ public static class CardEvents
 
     private static CardModificationInfo? GetCustomDeathcard(CardInfo card)
     {
-        return card.Mods.FirstOrDefault(m => m.deathCardInfo != null && m.nameReplacement is not ("Reginald" or "Kaycee" or "Louis" or "Kaminski"));
+        return card.Mods.FirstOrDefault(m => m is { deathCardInfo: not null, nameReplacement: not ("Reginald" or "Kaycee" or "Louis" or "Kaminski") });
     }
 }

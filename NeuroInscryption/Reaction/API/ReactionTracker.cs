@@ -16,6 +16,13 @@ public sealed class ReactionTracker(Func<uint, Event?> getterFunc)
 
     public void Send(params object[] format)
     {
-        getterFunc(_occ++)?.Send(format);
+        try
+        {
+            getterFunc(_occ++)?.Send(format);
+        }
+        catch (Exception e)
+        {
+            Plugin.Logger.LogError(e);
+        }
     }
 }
