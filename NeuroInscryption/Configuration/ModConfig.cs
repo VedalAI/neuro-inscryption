@@ -4,5 +4,7 @@ namespace NeuroInscryption.Configuration;
 
 public sealed class ModConfig(ConfigFile file)
 {
-    public ConfigEntry<string> WebsocketUrl { get; } = file.Bind("Configuration", "WebsocketUrl", "ws://localhost:8000");
+    private const string Section = "Configuration";
+    public ConfigEntry<string> WebsocketUrl { get; } = file.Bind(Section, nameof(WebsocketUrl), "ws://localhost:8000");
+    public ConfigEntry<string> TwitchToken { get; } = file.Bind(Section, nameof(TwitchToken), "");
 }

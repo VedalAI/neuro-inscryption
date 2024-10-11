@@ -12,7 +12,6 @@ namespace NeuroInscryption.Tweaks;
 internal sealed class TwitchIntegration : Singlyboi<TwitchIntegration>
 {
     private const string TwitchUsername = "alexejherodev";
-    private const string TokenEnvVarName = "SCHIZO_TWITCH_TOKEN";
     private const string CommandPrefix = "pls";
     private const string TargetChannel = "vedal987";
 
@@ -40,11 +39,11 @@ internal sealed class TwitchIntegration : Singlyboi<TwitchIntegration>
         _client.OnFailureToReceiveJoinConfirmation += (_, evt) => Plugin.Logger.LogError($"Could not join Twitch channel: {evt.Exception.Details}");
         _client.OnMessageReceived += Client_OnMessageReceived;
 
-        string? token = Environment.GetEnvironmentVariable(TokenEnvVarName);
+        string? token = Plugin.Config.TwitchToken.Value;
         if (string.IsNullOrWhiteSpace(token))
         {
             Plugin.Logger.LogWarning("Twitch OAuth token is not set, Twitch Integration will be disabled.");
-            Plugin.Logger.LogMessage($"Token should be set the {TokenEnvVarName} environment variable.");
+            Plugin.Logger.LogMessage($"Set the token in the BepInEx config.");
             return;
         }
         ConnectionCredentials credentials = new(TwitchUsername, token);
