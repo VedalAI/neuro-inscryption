@@ -13,7 +13,7 @@ internal sealed class TwitchIntegration : Singlyboi<TwitchIntegration>
 {
     private const string CommandWhitelist = "alexejherodev";
     private const string CommandPrefix = "pls ";
-    private const string TargetChannel = "alexejherodev";
+    private const string TargetChannel = "vedal987";
 
     public static event Action<string>? HandleTwitchMessage;
 
