@@ -21,10 +21,10 @@ public sealed class VideoTracker(List<VideoTracker.VideoEvent> events)
             .TakeWhile(kf => kf.Timestamp <= time)
             .ToList();
 
-        if (_lastTimeSent != -1 && newEvents.Count > 0)
+        bool continuing = _lastTimeSent != -1;
+        if (continuing && newEvents.Count > 0)
             prompt.Append("The video continues. ");
 
-        // TODO: replace first "He" with "The Lucky Carder"
         foreach (VideoEvent videoEvent in newEvents)
         {
             prompt.Append(videoEvent.Description);
@@ -33,6 +33,16 @@ public sealed class VideoTracker(List<VideoTracker.VideoEvent> events)
         _lastTimeSent = time;
 
         if (prompt.Length <= 0) return;
+
+        string message = prompt.ToString();
+        if (continuing)
+        {
+            // if continuing, it's not obvious who "he" is
+            int luckyCarder = message.IndexOf("The Lucky Carder");
+            int firstHe = message.IndexOf("He", System.StringComparison.OrdinalIgnoreCase);
+            if (firstHe >= 0 && (luckyCarder < 0 || firstHe < luckyCarder))
+                message = message.Remove(firstHe, 2).Insert(firstHe, "The Lucky Carder");
+        }
 
         new Event(prompt.ToString(), Priority.Context).Send();
     }
