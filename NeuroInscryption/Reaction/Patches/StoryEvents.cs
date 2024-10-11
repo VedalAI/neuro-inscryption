@@ -1,4 +1,5 @@
 ﻿using DiskCardGame;
+using GBC;
 using HarmonyLib;
 using NeuroInscryption.Reaction.Strings;
 using NeuroInscryption.Utilities;
@@ -27,5 +28,12 @@ internal static class StoryEvents
     private static void UseFilmRoll(object __instance)
     {
         if (__instance.GetEnumeratorState() == 9) Reactions.LeshyPhotoTaken.Send();
+    }
+
+    [HarmonyPatch(typeof(GBCIntroScene), nameof(GBCIntroScene.IntroSequence), MethodType.Enumerator)]
+    [HarmonyPostfix]
+    private static void Act2Started(object __instance)
+    {
+        if (__instance.GetEnumeratorState() == 3) Reactions.Act2Started.Send();
     }
 }

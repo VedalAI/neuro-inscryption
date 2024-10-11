@@ -25,6 +25,7 @@ internal static class DialogueEvents
         AddEvent("<color=#D93846>Starvation</color> began to set in...", Reactions.Starvation);
         AddEvent("Surely this food will please you.", Reactions.LeshyCake);
         AddEvent("The last challenger managed to defeat me.", Reactions.LeshyCommentedOnPreviousRun);
+        AddEvent("Oh... oh no. You can't use that.", Reactions.GooBottleAppeared);
     }
 
     private static readonly Dictionary<string, ReactionTracker> _events = [];

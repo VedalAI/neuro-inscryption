@@ -11,9 +11,9 @@ namespace NeuroInscryption.Tweaks;
 
 internal sealed class TwitchIntegration : Singlyboi<TwitchIntegration>
 {
-    private const string TwitchUsername = "alexejherodev";
-    private const string CommandPrefix = "pls";
-    private const string TargetChannel = "vedal987";
+    private const string CommandWhitelist = "alexejherodev";
+    private const string CommandPrefix = "pls ";
+    private const string TargetChannel = "alexejherodev";
 
     public static event Action<string>? HandleTwitchMessage;
 
@@ -40,13 +40,14 @@ internal sealed class TwitchIntegration : Singlyboi<TwitchIntegration>
         _client.OnMessageReceived += Client_OnMessageReceived;
 
         string? token = Plugin.Config.TwitchToken.Value;
-        if (string.IsNullOrWhiteSpace(token))
+        string? username = Plugin.Config.TwitchUsername.Value;
+        if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(username))
         {
-            Plugin.Logger.LogWarning("Twitch OAuth token is not set, Twitch Integration will be disabled.");
+            Plugin.Logger.LogWarning("Twitch OAuth token or username is not set, Twitch Integration will be disabled.");
             Plugin.Logger.LogMessage($"Set the token in the BepInEx config.");
             return;
         }
-        ConnectionCredentials credentials = new(TwitchUsername, token);
+        ConnectionCredentials credentials = new(username, token);
 
         _client.Initialize(credentials, TargetChannel);
 
@@ -65,7 +66,7 @@ internal sealed class TwitchIntegration : Singlyboi<TwitchIntegration>
 
     private static bool IsUserWhitelisted(string username)
     {
-        return username == TwitchUsername;
+        return username == CommandWhitelist;
     }
 
     private static bool CheckPrefix(string message)
@@ -80,6 +81,7 @@ internal sealed class TwitchIntegration : Singlyboi<TwitchIntegration>
 
     private static void HandleMessage(string message)
     {
+        Plugin.Logger.LogInfo("Handling twitch command: " + message);
         HandleTwitchMessage?.Invoke(message);
     }
 }

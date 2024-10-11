@@ -4,7 +4,10 @@ using BepInEx.Logging;
 using BepInEx.Unity.Mono;
 using Cysharp.Threading.Tasks;
 using HarmonyLib;
+using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Configuration;
+using NeuroInscryption.Reaction.API;
+using NeuroInscryption.Reaction.Patches;
 using NeuroInscryption.Resources;
 using NeuroInscryption.Utilities;
 using UnityEngine.LowLevel;
@@ -28,6 +31,12 @@ public sealed partial class Plugin : BaseUnityPlugin
         Singlyboi.AddAll(gameObject);
 
         Harmony.PatchAll();
+
+        #region Out of sight, out of mind
+        _ = new Event(null!, 0);
+        _ = new RequestMute(false);
+        ManualEvents.HandleTwitchMessage("");
+        #endregion
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]

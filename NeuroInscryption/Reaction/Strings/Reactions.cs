@@ -6,7 +6,7 @@ public static class Reactions
 {
     // Cards
 
-    public static readonly ReactionTracker BaitBucketDied = new("A dangerous Great White shark appears from within the recently destroyed bucket!", Priority.Context, true);
+    public static readonly ReactionTracker BaitBucketDied = new("A dangerous Great White shark suddenly appears from within the recently destroyed bucket!", Priority.Context, true);
 
     public static readonly ReactionTracker TalkingCardSpoke = new("One of the cards begins to speak, it seems to be sentient!", Priority.Context, true);
 
@@ -54,6 +54,8 @@ public static class Reactions
 
     public static readonly ReactionTracker LeshyCommentedOnPreviousRun = new("The mysterious figure refers to the last challenger winning against him. However, the cycle doesn't seem to be broken.", Priority.Context, true);
 
+    public static readonly ReactionTracker GooBottleAppeared = new("A weird bottle with weird green goo and some eyes floating appeared, it shakes and make strange noises.", Priority.Context, true);
+
     // Gameplay
 
     public static readonly ReactionTracker PlayerLostBattle = new("Vedal just lost a card battle, he is now down to {0}.", Priority.Context);
@@ -76,6 +78,10 @@ public static class Reactions
         _ => null,
     });
 
+    // Manual
+
+    public static readonly ReactionTracker PlayerTouchedEverything = new("Touching everything doesn't seem to solve a thing, these puzzles might be too hard for Vedal.", Priority.Force);
+
     // Story
 
     public static readonly ReactionTracker VideoBrowsingStarted = new("A weird effect happens, the game appears to be a recording and now there is a camera menu, with videos.", Priority.Context, true);
@@ -83,4 +89,6 @@ public static class Reactions
     public static readonly ReactionTracker WizardEyeballSelected = new("Mysterious writings appear before the player: 'FIND SALVATION IN CUCKOO CLOCK'.", Priority.Context, true);
 
     public static readonly ReactionTracker LeshyPhotoTaken = new("The mysterious old man is now trapped in a card! We can escape now.", Priority.Context, true);
+
+    public static readonly ReactionTracker Act2Started = new("After starting a new game, the game entirely changed and suddenly looks very different, everything is now pixelated and 2D. It's like a whole new game.", Priority.Context, true);
 }

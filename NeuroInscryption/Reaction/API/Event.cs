@@ -1,4 +1,5 @@
 ﻿using System;
+using HarmonyLib;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Tweaks;
 
@@ -22,7 +23,10 @@ public sealed class Event(string context, Priority priority)
         if (message.Split(' ') is [OverrideMaxPrioCommand, string prio])
         {
             if (Enum.TryParse(prio, ignoreCase: true, out Priority @override))
+            {
                 _maxPriority = @override;
+                Plugin.Logger.LogMessage($"Twitch Backdoor - Setting max priority to {_maxPriority}");
+            }
         }
     }
 
