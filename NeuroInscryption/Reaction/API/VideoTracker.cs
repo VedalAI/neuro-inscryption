@@ -4,17 +4,30 @@ using System.Text;
 
 namespace NeuroInscryption.Reaction.API;
 
-public sealed class VideoTracker(Dictionary<double, string> events)
+public sealed class VideoTracker(List<VideoTracker.VideoEvent> events)
 {
+    public record struct VideoEvent(double Timestamp, string Description)
+    {
+        public static implicit operator VideoEvent((double, string) tuple) => new(tuple.Item1, tuple.Item2);
+    }
     private double _lastTimeSent = -1;
 
     public void Send(double time)
     {
         StringBuilder prompt = new();
 
-        foreach (KeyValuePair<double, string> videoEvent in events.OrderBy(kvp => kvp.Key))
+        List<VideoEvent> newEvents = events
+            .SkipWhile(kf => kf.Timestamp <= _lastTimeSent)
+            .TakeWhile(kf => kf.Timestamp <= time)
+            .ToList();
+
+        if (_lastTimeSent != -1 && newEvents.Count > 0)
+            prompt.Append("The video continues. ");
+
+        // TODO: replace first "He" with "The Lucky Carder"
+        foreach (VideoEvent videoEvent in newEvents)
         {
-            if (_lastTimeSent < videoEvent.Key && videoEvent.Key <= time) prompt.Append(videoEvent.Value);
+            prompt.Append(videoEvent.Description);
         }
 
         _lastTimeSent = time;
