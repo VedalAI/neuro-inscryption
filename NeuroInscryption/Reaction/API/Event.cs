@@ -1,5 +1,4 @@
 ﻿using System;
-using HarmonyLib;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Tweaks;
 

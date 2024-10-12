@@ -1,10 +1,8 @@
-﻿using HarmonyLib;
-using NeuroInscryption.Reaction.Strings;
+﻿using NeuroInscryption.Reaction.Strings;
 using NeuroInscryption.Tweaks;
 
 namespace NeuroInscryption.Reaction.Patches;
 
-[HarmonyPatch] // calls static constructor
 internal static class ManualEvents
 {
     static ManualEvents()

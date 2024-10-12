@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using HarmonyLib;
 using NeuroInscryption.Communication.Websocket;
 using NeuroInscryption.Tweaks;
 using Newtonsoft.Json;
