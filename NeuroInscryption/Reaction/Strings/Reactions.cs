@@ -54,7 +54,7 @@ public static class Reactions
 
     public static readonly ReactionTracker LeshyCommentedOnPreviousRun = new("The mysterious figure refers to the last challenger winning against him. However, the cycle doesn't seem to be broken.", Priority.Context, true);
 
-    public static readonly ReactionTracker GooBottleAppeared = new("A weird bottle with weird green goo and some eyes floating appeared, it shakes and make strange noises.", Priority.Context, true);
+    public static readonly ReactionTracker GooBottleAppeared = new("A bottle filled with weird green goo appeared. There is a pair of eyes sticking out of the goo. It shakes and makes strange noises as it looks at you.", Priority.Context, true);
 
     // Gameplay
 
