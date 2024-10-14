@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -17,7 +18,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class TraderFlow : HarmonyAutomationFlow<object>
+public sealed class TraderFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(List<SelectableCard> cards, int amount, IGameState state) : ILoadoutContext
@@ -34,13 +35,13 @@ public sealed class TraderFlow : HarmonyAutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TradePeltsSequencer), nameof(TradePeltsSequencer.TradePelts))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 18
+            IsValid = FlowHookHelpers.EnumeratorStateIs(18)
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator target, CancellationToken ct)
     {
-        TradePeltsSequencer instance = target.GetEnumeratorThis<TradePeltsSequencer>();
+        TradePeltsSequencer instance = target.GetThis<TradePeltsSequencer>();
 
         await UniTask.Delay(500, cancellationToken: ct);
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -17,7 +18,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class ChooseCardFlow : HarmonyAutomationFlow<object>
+public sealed class ChooseCardFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(IEnumerable<SelectableCard> cards, CardChoicesType type, IGameState state) : ILoadoutContext
@@ -42,17 +43,18 @@ public sealed class ChooseCardFlow : HarmonyAutomationFlow<object>
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(CardSingleChoicesSequencer), nameof(CardSingleChoicesSequencer.CardSelectionSequence))),
             IsValid = context =>
             {
-                object enumerator = context.GetInstance()!;
-                return enumerator.GetEnumeratorState() == 11 && enumerator.GetEnumeratorThis<CardSingleChoicesSequencer>().choicesRerolled == false;
+                EnumeratorWrapper<CardSingleChoicesSequencer> enumerator = new(context.GetInstance<IEnumerator>()!);
+                return enumerator.State == 11 && !enumerator.This.choicesRerolled;
             }
         }
         // TODO: boss rares
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        CardSingleChoicesSequencer instance = enumerator.GetEnumeratorThis<CardSingleChoicesSequencer>();
-        CardChoicesType choiceType = enumerator.GetEnumeratorField<CardChoicesNodeData>("<choicesData>5__2").choicesType;
+        EnumeratorWrapper<CardSingleChoicesSequencer> wrapper = new(enumerator);
+        CardSingleChoicesSequencer instance = wrapper.This;
+        CardChoicesType choiceType = wrapper.GetFieldValue<CardChoicesNodeData>("<choicesData>5__2").choicesType;
 
         await UniTask.Delay(500, cancellationToken: ct);
 

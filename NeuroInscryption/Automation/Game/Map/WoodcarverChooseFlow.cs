@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -17,7 +18,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class WoodcarverChooseFlow : HarmonyAutomationFlow<object>
+public sealed class WoodcarverChooseFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(IEnumerable<SelectableItemSlot> items) : ILoadoutContext
@@ -33,13 +34,13 @@ public sealed class WoodcarverChooseFlow : HarmonyAutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(BuildTotemSequencer), nameof(BuildTotemSequencer.NewPiecePhase))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 4,
+            IsValid = FlowHookHelpers.EnumeratorStateIs(4),
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        BuildTotemSequencer instance = enumerator.GetEnumeratorThis<BuildTotemSequencer>();
+        BuildTotemSequencer instance = enumerator.GetThis<BuildTotemSequencer>();
 
         Context context = new(instance.slots);
         LoadoutState state = LoadoutState.Calculate();

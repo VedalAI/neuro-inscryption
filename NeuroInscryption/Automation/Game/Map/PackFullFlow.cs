@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
@@ -8,20 +9,20 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class PackFullFlow : HarmonyAutomationFlow<object>
+public sealed class PackFullFlow : HarmonyAutomationFlow<IEnumerator>
 {
     public override FlowHook[] Hooks =>
     [
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(GainConsumablesSequencer), nameof(GainConsumablesSequencer.FullConsumablesSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 5
+            IsValid = FlowHookHelpers.EnumeratorStateIs(5)
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        GainConsumablesSequencer instance = enumerator.GetEnumeratorThis<GainConsumablesSequencer>();
+        GainConsumablesSequencer instance = enumerator.GetThis<GainConsumablesSequencer>();
 
         await UniTask.Delay(500, cancellationToken: ct);
         await NeuroMouse.MoveToAsync(instance.ratCard, 200, ct);

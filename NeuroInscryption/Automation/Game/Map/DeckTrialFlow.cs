@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -17,7 +18,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class DeckTrialFlow : HarmonyAutomationFlow<object>
+public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(IEnumerable<DeckTrialSequencer.Trial> trials, IEnumerable<SelectableCard> cards) : ILoadoutContext
@@ -33,13 +34,13 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(DeckTrialSequencer), nameof(DeckTrialSequencer.DeckTrialSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 7
+            IsValid = FlowHookHelpers.EnumeratorStateIs(7)
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        DeckTrialSequencer instance = enumerator.GetEnumeratorThis<DeckTrialSequencer>();
+        DeckTrialSequencer instance = enumerator.GetThis<DeckTrialSequencer>();
 
         await UniTask.Delay(500, cancellationToken: ct);
 

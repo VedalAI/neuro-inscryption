@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -17,7 +18,7 @@ using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class CampfireFlow : HarmonyAutomationFlow<object>
+public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context1(IEnumerable<SelectableCard> cards, IGameState state, bool isAttack) : ILoadoutContext
@@ -44,14 +45,15 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(CardStatBoostSequencer), nameof(CardStatBoostSequencer.StatBoostSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 7
+            IsValid = FlowHookHelpers.EnumeratorStateIs(7),
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        CardStatBoostSequencer instance = enumerator.GetEnumeratorThis<CardStatBoostSequencer>();
-        bool isAttack = enumerator.GetEnumeratorField<object>("<>8__1").GetEnumeratorField<bool>("attackMod");
+        EnumeratorWrapper<CardStatBoostSequencer> wrapper = new(enumerator);
+        CardStatBoostSequencer instance = wrapper.This;
+        bool isAttack = wrapper.GetFieldValue<object>("<>8__1").GetFieldValue<bool>("attackMod");
 
         await UniTask.Delay(500, cancellationToken: ct);
 

@@ -1,4 +1,5 @@
-﻿using DiskCardGame;
+﻿using System.Collections;
+using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Utilities;
@@ -12,9 +13,9 @@ public static class WoodcarverTotemTracker
 
     [HarmonyPatch(typeof(BuildTotemSequencer), nameof(BuildTotemSequencer.BuildTotem), MethodType.Enumerator)]
     [HarmonyPrefix]
-    private static void TrackTotem(object __instance)
+    private static void TrackTotem(IEnumerator __instance)
     {
-        if (__instance.GetEnumeratorState() != 0) return;
+        if (__instance.GetState() != 0) return;
 
         if (Part1ItemsManager.Instance.Totems.Count > 0)
         {

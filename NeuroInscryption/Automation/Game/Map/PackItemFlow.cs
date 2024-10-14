@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -17,7 +18,7 @@ using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class PackItemFlow : HarmonyAutomationFlow<object>
+public sealed class PackItemFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(IEnumerable<SelectableItemSlot> items) : ILoadoutContext
@@ -33,13 +34,13 @@ public sealed class PackItemFlow : HarmonyAutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(GainConsumablesSequencer), nameof(GainConsumablesSequencer.RegularGainConsumables))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 5
+            IsValid = FlowHookHelpers.EnumeratorStateIs(5)
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        GainConsumablesSequencer instance = enumerator.GetEnumeratorThis<GainConsumablesSequencer>();
+        GainConsumablesSequencer instance = enumerator.GetThis<GainConsumablesSequencer>();
 
         await UniTask.Delay(500, cancellationToken: ct);
 

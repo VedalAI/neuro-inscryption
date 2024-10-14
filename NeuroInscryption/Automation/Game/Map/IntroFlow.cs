@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
@@ -10,14 +11,14 @@ using UnityEngine;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class IntroFlow : HarmonyAutomationFlow<object>
+public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
 {
     public override FlowHook[] Hooks =>
     [
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(RunIntroSequencer), nameof(RunIntroSequencer.RunIntroSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 18
+            IsValid = FlowHookHelpers.EnumeratorStateIs(18)
         }
     ];
 
@@ -26,7 +27,7 @@ public sealed class IntroFlow : HarmonyAutomationFlow<object>
 
     public override ManualInterruptionBehaviour ManualInterruptionBehaviour => ManualInterruptionBehaviour.Cancel;
 
-    protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator _, CancellationToken ct)
     {
         OilPaintingPuzzle puzzle = GameObject.FindObjectOfType<OilPaintingPuzzle>();
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -16,20 +17,20 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class BoneAltarFlow : HarmonyAutomationFlow<object>
+public sealed class BoneAltarFlow : HarmonyAutomationFlow<IEnumerator>
 {
     public override FlowHook[] Hooks =>
     [
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(CardRemoveSequencer), nameof(CardRemoveSequencer.RemoveSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 7
+            IsValid = FlowHookHelpers.EnumeratorStateIs(7),
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator target, CancellationToken ct)
     {
-        CardRemoveSequencer instance = target.GetEnumeratorThis<CardRemoveSequencer>();
+        CardRemoveSequencer instance = target.GetThis<CardRemoveSequencer>();
 
         await UniTask.Delay(500, cancellationToken: ct);
 

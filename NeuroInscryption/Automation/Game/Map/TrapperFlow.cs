@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -18,7 +19,7 @@ using Sirenix.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class TrapperFlow : HarmonyAutomationFlow<object>
+public sealed class TrapperFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(int teeth, IEnumerable<SelectableCard> pelts, IEnumerable<int> peltPrices, bool knifeAvailable, MainInputInteractable knife, int knifePrice, IGameState state) : ILoadoutContext
@@ -34,14 +35,14 @@ public sealed class TrapperFlow : HarmonyAutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(BuyPeltsSequencer), nameof(BuyPeltsSequencer.BuyPelts))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 21,
+            IsValid = FlowHookHelpers.EnumeratorStateIs(21),
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator target, CancellationToken ct)
     {
         await UniTask.Delay(200, cancellationToken: ct);
-        await RunFlowAsync(target.GetEnumeratorThis<BuyPeltsSequencer>(), ct);
+        await RunFlowAsync(target.GetThis<BuyPeltsSequencer>(), ct);
     }
 
     private async UniTask RunFlowAsync(BuyPeltsSequencer instance, CancellationToken ct)

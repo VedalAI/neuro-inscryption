@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
@@ -15,18 +16,18 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
-public sealed class PlaceCardFlow : HarmonyAutomationFlow<object>
+public sealed class PlaceCardFlow : HarmonyAutomationFlow<IEnumerator>
 {
     public override FlowHook[] Hooks =>
     [
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(BoardManager), nameof(BoardManager.ChooseSlot))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 1
+            IsValid = FlowHookHelpers.EnumeratorStateIs(1)
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator _, CancellationToken ct)
     {
         CombatState state = CombatState.Calculate();
         PlayableCard card = PlayerHand.Instance.ChoosingSlotCard;

@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Linq;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Utilities;
@@ -20,14 +19,16 @@ public sealed class BoneTokenIdentifier : MonoBehaviour
 
     [HarmonyPatch(typeof(Part1ResourcesManager), nameof(Part1ResourcesManager.ShowAddBones), MethodType.Enumerator)]
     [HarmonyPostfix]
-    public static void AddIdentifierComponent(object __instance, bool __result)
+    public static void AddIdentifierComponent(IEnumerator __instance, bool __result)
     {
-        if (__instance.GetEnumeratorState() != 1 || __result == false) return;
+        if (!__result) return;
+        EnumeratorWrapper<Part1ResourcesManager> wrapper = new(__instance);
+        if (wrapper.State != 1) return;
 
-        Part1ResourcesManager instance = __instance.GetEnumeratorThis<Part1ResourcesManager>();
-        CardSlot slot = __instance.GetEnumeratorField<CardSlot>("slot");
+        Part1ResourcesManager instance = wrapper.This;
+        CardSlot slot = wrapper.GetFieldValue<CardSlot>("slot");
 
-        BoneTokenIdentifier id = instance.boneTokens.Last().gameObject.AddComponent<BoneTokenIdentifier>();
+        BoneTokenIdentifier id = instance.boneTokens[^1].gameObject.AddComponent<BoneTokenIdentifier>();
         id.slot = slot;
     }
 }

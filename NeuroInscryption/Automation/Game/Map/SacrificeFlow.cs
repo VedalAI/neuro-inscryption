@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -17,7 +18,7 @@ using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class SacrificeFlow : HarmonyAutomationFlow<object>
+public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(IEnumerable<SelectableCard> cards, IGameState state, CardMergeSequencer instance) : ILoadoutContext
@@ -33,13 +34,13 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(CardMergeSequencer), nameof(CardMergeSequencer.MergeSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 12
+            IsValid = FlowHookHelpers.EnumeratorStateIs(12)
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        CardMergeSequencer instance = enumerator.GetEnumeratorThis<CardMergeSequencer>();
+        CardMergeSequencer instance = enumerator.GetThis<CardMergeSequencer>();
 
         await UniTask.Delay(500, cancellationToken: ct);
 

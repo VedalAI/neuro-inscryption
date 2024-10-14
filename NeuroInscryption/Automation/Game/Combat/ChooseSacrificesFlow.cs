@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -17,18 +18,18 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
-public sealed class ChooseSacrificesFlow : HarmonyAutomationFlow<object>
+public sealed class ChooseSacrificesFlow : HarmonyAutomationFlow<IEnumerator>
 {
     public override FlowHook[] Hooks =>
     [
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(BoardManager), nameof(BoardManager.ChooseSacrificesForCard))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 1
+            IsValid = FlowHookHelpers.EnumeratorStateIs(1),
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object _, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator _, CancellationToken ct)
     {
         CombatState state = CombatState.Calculate();
         PlayableCard card = BoardManager.Instance.CurrentSacrificeDemandingCard;

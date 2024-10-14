@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
@@ -8,20 +9,20 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class WoodcarverFullFlow : HarmonyAutomationFlow<object>
+public sealed class WoodcarverFullFlow : HarmonyAutomationFlow<IEnumerator>
 {
     public override FlowHook[] Hooks =>
     [
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(BuildTotemSequencer), nameof(BuildTotemSequencer.TotemSlotsFullSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 4,
+            IsValid = FlowHookHelpers.EnumeratorStateIs(4),
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        SelectableCard card = enumerator.GetEnumeratorField<SelectableCard>("<card>5__2");
+        SelectableCard card = enumerator.GetFieldValue<SelectableCard>("<card>5__2");
 
         await UniTask.Delay(500, cancellationToken: ct);
         await NeuroMouse.MoveToAsync(card, 200, ct);

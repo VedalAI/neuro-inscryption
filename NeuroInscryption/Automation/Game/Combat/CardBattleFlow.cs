@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
@@ -17,24 +18,24 @@ using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
-public sealed class CardBattleFlow : HarmonyAutomationFlow<object>
+public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
 {
     public override FlowHook[] Hooks =>
     [
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TurnManager), nameof(TurnManager.PlayerTurn))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 8,
+            IsValid = FlowHookHelpers.EnumeratorStateIs(8),
         },
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(PlayerHand), nameof(PlayerHand.SelectSlotForCard))),
-            IsValid = context => context.GetResult<bool>() == false,
+            IsValid = context => !context.GetResult<bool>(),
         }
         // TODO: fix not restarting after item is used
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
         if (enumerator.GetType().Name.Contains(nameof(PlayerHand.SelectSlotForCard)))
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -17,7 +18,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class MycologistsFlow : HarmonyAutomationFlow<object>
+public sealed class MycologistsFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(IEnumerable<SelectableCardPair> pairs, IGameState state) : ILoadoutContext
@@ -33,13 +34,13 @@ public sealed class MycologistsFlow : HarmonyAutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(DuplicateMergeSequencer), nameof(DuplicateMergeSequencer.MergeSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 11
+            IsValid = FlowHookHelpers.EnumeratorStateIs(11)
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object target, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator target, CancellationToken ct)
     {
-        DuplicateMergeSequencer instance = target.GetEnumeratorThis<DuplicateMergeSequencer>();
+        DuplicateMergeSequencer instance = target.GetThis<DuplicateMergeSequencer>();
 
         await UniTask.Delay(500, cancellationToken: ct);
 

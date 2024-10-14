@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
@@ -13,20 +14,20 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class ProspectorFlow : HarmonyAutomationFlow<object>
+public sealed class ProspectorFlow : HarmonyAutomationFlow<IEnumerator>
 {
     public override FlowHook[] Hooks =>
     [
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(BoulderChoiceSequencer), nameof(BoulderChoiceSequencer.BoulderChoiceSequence))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 5
+            IsValid = FlowHookHelpers.EnumeratorStateIs(5)
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        BoulderChoiceSequencer instance = enumerator.GetEnumeratorThis<BoulderChoiceSequencer>();
+        BoulderChoiceSequencer instance = enumerator.GetThis<BoulderChoiceSequencer>();
 
         await UniTask.Delay(500, cancellationToken: ct);
 

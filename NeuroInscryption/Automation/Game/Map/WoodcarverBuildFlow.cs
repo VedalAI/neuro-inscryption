@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -18,7 +19,7 @@ using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
-public sealed class WoodcarverBuildFlow : HarmonyAutomationFlow<object>
+public sealed class WoodcarverBuildFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context : ILoadoutContext
@@ -34,13 +35,13 @@ public sealed class WoodcarverBuildFlow : HarmonyAutomationFlow<object>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(BuildTotemSequencer), nameof(BuildTotemSequencer.BuildPhase))),
-            IsValid = context => context.GetInstance()!.GetEnumeratorState() == 12 && RunState.Run.totemTops.Count + RunState.Run.totemBottoms.Count > 2
+            IsValid = context => context.GetInstance<IEnumerator>()!.GetState() == 12 && RunState.Run.totemTops.Count + RunState.Run.totemBottoms.Count > 2
         }
     ];
 
-    protected override async UniTask ExecuteAsync(object enumerator, CancellationToken ct)
+    protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        BuildTotemSequencer instance = enumerator.GetEnumeratorThis<BuildTotemSequencer>();
+        BuildTotemSequencer instance = enumerator.GetThis<BuildTotemSequencer>();
 
         await UniTask.Delay(500, cancellationToken: ct);
 
