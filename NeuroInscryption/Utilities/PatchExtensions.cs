@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using HarmonyLib;
 
 namespace NeuroInscryption.Utilities;
 
@@ -14,8 +13,7 @@ public static class PatchExtensions
     {
         try
         {
-            // todo reflection cache pls
-            return (T) AccessTools.Field(instance.GetType(), fieldName).GetValue(instance);
+            return (T) ReflectionCache.GetField(instance.GetType(), fieldName).GetValue(instance);
         }
         catch (Exception e)
         {
@@ -32,7 +30,7 @@ public static class PatchExtensions
     {
         try
         {
-            AccessTools.Field(instance.GetType(), fieldName).SetValue(instance, value);
+            ReflectionCache.GetField(instance.GetType(), fieldName).SetValue(instance, value);
         }
         catch (Exception e)
         {
