@@ -42,7 +42,7 @@ public sealed class CombatState : IGameState
     public readonly bool? IsOpponentSurrendering;
 
     // TODO: Follow up nodes
-    // TODO: Oil paninting puzzle
+    // TODO: Oil painting puzzle
 
     [JsonProperty("Note")]
     private string? Note => Ijiraq.AnythingCouldBeIjiraq ? CardStrings.IjiraqPresent : null;

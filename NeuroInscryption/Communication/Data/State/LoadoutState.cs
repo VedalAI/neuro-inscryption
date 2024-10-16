@@ -31,7 +31,7 @@ public sealed class LoadoutState : IGameState
     public readonly IReadOnlyDictionary<string, string>? TraitDescriptions;
 
     // TODO: Follow up nodes
-    // TODO: Oil paninting puzzle
+    // TODO: Oil painting puzzle
 
     [JsonExtensionData]
     public JObject? Context { get; private set; }
