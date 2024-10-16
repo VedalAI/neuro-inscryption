@@ -5,6 +5,7 @@ using DiskCardGame;
 using HarmonyLib;
 using JetBrains.Annotations;
 using NeuroInscryption.Communication.Data.Describable;
+using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Communication.Strings;
 
@@ -93,13 +94,13 @@ public static class TraitStrings
 
     public static Description? Get(Trait trait)
     {
-        FieldInfo? fieldInfo = AccessTools.GetDeclaredFields(typeof(TraitStrings)).SingleOrDefault(f => f.GetCustomAttribute<DescribesAttribute>()?.Matches(trait) ?? false);
+        FieldInfo? fieldInfo = ReflectionCache.GetAllFields(typeof(TraitStrings)).SingleOrDefault(f => f.GetCustomAttribute<DescribesAttribute>()?.Matches(trait) ?? false);
         return fieldInfo != null ? (Description) fieldInfo.GetValue(null) : null;
     }
 
     public static Description? Get(SpecialTriggeredAbility ability)
     {
-        FieldInfo? fieldInfo = AccessTools.GetDeclaredFields(typeof(TraitStrings)).SingleOrDefault(f => f.GetCustomAttribute<DescribesAttribute>()?.Matches(ability) ?? false);
+        FieldInfo? fieldInfo = ReflectionCache.GetAllFields(typeof(TraitStrings)).SingleOrDefault(f => f.GetCustomAttribute<DescribesAttribute>()?.Matches(ability) ?? false);
         return fieldInfo != null ? (Description) fieldInfo.GetValue(null) : default;
     }
 }

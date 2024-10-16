@@ -5,6 +5,7 @@ using DiskCardGame;
 using HarmonyLib;
 using JetBrains.Annotations;
 using NeuroInscryption.Communication.Data.Describable;
+using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Communication.Strings;
 
@@ -66,7 +67,7 @@ public static class MapStrings
 
     public static Description? Get(NodeData nodeData)
     {
-        FieldInfo? fieldInfo = AccessTools.GetDeclaredFields(typeof(MapStrings)).SingleOrDefault(f => f.GetCustomAttributes<DescribesAttribute>().Any(a => a.Matches(nodeData)));
+        FieldInfo? fieldInfo = ReflectionCache.GetAllFields(typeof(MapStrings)).SingleOrDefault(f => f.GetCustomAttributes<DescribesAttribute>().Any(a => a.Matches(nodeData)));
         return fieldInfo != null ? (Description) fieldInfo.GetValue(null) : null;
     }
 }
