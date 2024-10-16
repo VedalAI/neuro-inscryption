@@ -14,6 +14,7 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Input.Helpers;
 using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -49,8 +50,8 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
             await NeuroMouse.MoveToAsync(card, 100, ct);
             await NeuroMouse.ClickAsync(ct);
 
-            await UniTask.WaitUntil(() => ViewManager.Instance.Controller.LockState == ViewLockState.Locked, cancellationToken: ct);
-            await UniTask.WaitUntil(() => ViewManager.Instance.Controller.LockState == ViewLockState.Unlocked, cancellationToken: ct);
+            await InputHelpers.WaitUntilViewLocked(ct);
+            await InputHelpers.WaitUntilViewUnlocked(ct);
             await UniTask.Delay(150, cancellationToken: ct);
         }
 

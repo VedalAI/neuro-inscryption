@@ -14,6 +14,7 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Input.Helpers;
 using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -67,8 +68,8 @@ public sealed class ChooseCardFlow : HarmonyAutomationFlow<IEnumerator>
 
             if (hasTutorial)
             {
-                await UniTask.WaitUntil(() => ViewManager.Instance.Controller.LockState == ViewLockState.Locked, cancellationToken: ct);
-                await UniTask.WaitUntil(() => ViewManager.Instance.Controller.LockState == ViewLockState.Unlocked, cancellationToken: ct);
+                await InputHelpers.WaitUntilViewLocked(ct);
+                await InputHelpers.WaitUntilViewUnlocked(ct);
                 await UniTask.Delay(350, cancellationToken: ct);
             }
         }

@@ -6,6 +6,7 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Input;
+using NeuroInscryption.Input.Helpers;
 using NeuroInscryption.Utilities;
 using UnityEngine;
 
@@ -35,13 +36,13 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
         ViewManager.Instance.SwitchToView(View.MapDefault);
         if (puzzle.state.puzzleSolved) return;
 
-        await UniTask.WaitUntil(() => ViewManager.Instance.Controller.LockState == ViewLockState.Unlocked, cancellationToken: ct);
+        await InputHelpers.WaitUntilViewUnlocked(ct);
         await UniTask.Delay(1000, cancellationToken: ct);
         AllowManualInterruption = false;
         // Stand up
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 1000, ct);
         await UniTask.WaitUntil(() => ViewManager.Instance.CurrentView == View.FirstPerson, cancellationToken: ct);
-        await UniTask.WaitUntil(() => ViewManager.Instance.Controller.LockState == ViewLockState.Unlocked, cancellationToken: ct);
+        await InputHelpers.WaitUntilViewUnlocked(ct);
 
         // Move to painting
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);

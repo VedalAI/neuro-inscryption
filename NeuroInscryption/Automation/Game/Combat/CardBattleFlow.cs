@@ -12,6 +12,7 @@ using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Input.Helpers;
 using NeuroInscryption.Utilities;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
@@ -25,15 +26,16 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TurnManager), nameof(TurnManager.PlayerTurn))),
-            IsValid = FlowHookHelpers.EnumeratorStateIs(8),
+            IsValid = FlowHookHelpers.EnumeratorStateIs(10),
         },
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(PlayerHand), nameof(PlayerHand.SelectSlotForCard))),
             IsValid = context => !context.GetResult<bool>(),
         }
-        // TODO: fix not restarting after item is used
     ];
+
+    public override bool CanInterruptItself => false;
 
     protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
@@ -70,6 +72,7 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
         {
             await NeuroMouse.MoveToAsync(itemData.Slot!, 500, ct);
             await NeuroMouse.ClickAsync(ct);
+            await InputHelpers.WaitUntilViewUnlocked(ct);
         }
         else if (action.Match(acceptSurrenderAction))
         {
