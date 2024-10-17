@@ -12,15 +12,10 @@ internal static class ManualEvents
 
     internal static void HandleTwitchMessage(string message)
     {
-        if (message.ToLowerInvariant() == "wrapitup")
+        if (message.ToLowerInvariant() == "nospoilers")
         {
-            Reactions.PlayerTouchedEverything.Send();
-            Plugin.Logger.LogMessage($"Twitch Backdoor - Sending WrapItUp reaction");
-        }
-        else if (message.ToLowerInvariant() == "blindge")
-        {
-            Reactions.PlayerCantReadUI.Send();
-            Plugin.Logger.LogMessage($"Twitch Backdoor - Sending Blindge reaction");
+            Reactions.NoSpoilers.Send();
+            Plugin.Logger.LogMessage($"Twitch Backdoor - Sending no spoilers reaction");
         }
     }
 }

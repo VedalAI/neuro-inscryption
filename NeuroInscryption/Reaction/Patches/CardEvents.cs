@@ -18,13 +18,6 @@ public static class CardEvents
         if (__instance.GetEnumeratorState() == 3) Reactions.BaitBucketDied.Send();
     }
 
-    [HarmonyPatch(typeof(TalkingCard), nameof(TalkingCard.PlayLine), MethodType.Enumerator)]
-    [HarmonyPostfix]
-    private static void TalkingCardDialogue(object __instance)
-    {
-        if (__instance.GetEnumeratorState() is 2 or 3) Reactions.TalkingCardSpoke.Send();
-    }
-
     [HarmonyPatch(typeof(SelectableCard), nameof(SelectableCard.Initialize), typeof(Texture), typeof(Action<SelectableCard>), typeof(Action<SelectableCard>), typeof(Action<SelectableCard>))]
     [HarmonyPatch(typeof(SelectableCard), nameof(SelectableCard.Initialize), typeof(CardInfo), typeof(Action<SelectableCard>), typeof(Action<SelectableCard>), typeof(bool), typeof(Action<SelectableCard>))]
     [HarmonyPostfix]
