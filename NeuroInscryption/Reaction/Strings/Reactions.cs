@@ -18,7 +18,7 @@ public static class Reactions
 
     public static readonly ReactionTracker BridgeThreeLanes = new("There is railings occupying the first and last lane, this board is now only three lanes, that is one less than in the previous two acts.", Priority.Context, true);
 
-    public static readonly ReactionTracker BountyHunterAppeared = new("One of the bounty hunters just join the battle, they are powerful cards and will keep showing up as the player bounty progress.", Priority.Context, true);
+    public static readonly ReactionTracker BountyHunterAppeared = new("One of the bounty hunters just joined the battle, they are powerful cards and will keep showing up as the player bounty progress.", Priority.Context, true);
 
     public static readonly ReactionTracker MycologistsFound = new("P03 face changes into a horrifying one, it is the Mycologists and they claim to have taken control over P03.", Priority.Force, true);
 
@@ -38,7 +38,7 @@ public static class Reactions
 
     public static readonly ReactionTracker HiddenScrybes = new("The player is meeting with familiar figures, who are the three other scrybes. They are planning together to prevent P03 from achieving his plan of great transcendence.", Priority.Context, true);
 
-    public static readonly ReactionTracker LukeAppears = new("P03 face switches and shows the face of Luke, revealing that the game can access Luke's webcam.", Priority.Context, true);
+    public static readonly ReactionTracker LukeAppears = new("P03 face changes into the face of Luke, revealing that the game can access Luke's webcam.", Priority.Context, true);
 
     // play womp womp
     public static readonly ReactionTracker GoodbyeP03 = new("Leshy grasped P03 head and twisted it until it was detached from it's body. That is a womp womp moment right there.", Priority.Context, true);
