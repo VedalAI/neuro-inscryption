@@ -6,7 +6,6 @@ using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Messages.Incoming;
 
-// TODO: cancel action for things that can be cancelled (maybe?)
 public class Action : ICustomIncomingMessageHandler
 {
     public string? ActionName { get; private set; }
