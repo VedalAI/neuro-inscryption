@@ -1,6 +1,7 @@
 ﻿using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Communication.Messages.Outgoing;
+using NeuroInscryption.Reaction.API;
 using NeuroInscryption.Reaction.Strings;
 
 namespace NeuroInscryption.Reaction.Patches;
@@ -15,37 +16,25 @@ internal static class VideoEvents
     {
         if (__instance.subsData == null) return;
 
-        switch (__instance.subsData.name)
+        VideoTracker? video = __instance.player.clip.name switch
         {
-            case "Subs_Blooper":
-                Videos.Video1.Send(__instance.player.time);
-                break;
+            "email_drafting" => Videos.Set2Video1,
+            "question_to_audience" => Videos.Set2Video2,
+            "email_response" => Videos.Set2Video3,
+            "employee_visit" => Videos.Set2Video5,
+            "not_normal" => Videos.Set2Video7,
 
-            case "Subs_The-Lucky-Carder":
-                Videos.Video2.Send(__instance.player.time);
-                break;
+            "garage_sale" => Videos.Set3Video1,
+            "long_night_1" => Videos.Set3Video2,
+            "long_night_2" => Videos.Set3Video3,
+            "long_night_3" => Videos.Set3Video4,
+            "break_in" => Videos.Set3Video6,
+            "luke-insane" => Videos.Set3Video8,
 
-            case "Subs_Strange-Inscription":
-                Videos.Video3.Send(__instance.player.time);
-                break;
+            _ => null
+        };
 
-            case "Subs_Forest-1":
-                Videos.Video4.Send(__instance.player.time);
-                break;
-
-            case "Subs_Forest-2":
-                Videos.Video6.Send(__instance.player.time);
-                break;
-
-            case "Subs_Buy-Floppy-Drive":
-                Videos.Video7.Send(__instance.player.time);
-                break;
-
-            case "Subs_Inserting-Disk":
-                Videos.Video8.Send(__instance.player.time);
-                break;
-        }
-
+        video?.Send(__instance.player.time);
         new RequestMute(false).Send();
     }
 

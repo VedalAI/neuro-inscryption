@@ -1,16 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace NeuroInscryption.Reaction.API;
 
-public sealed class VideoTracker(List<VideoTracker.VideoEvent> events)
+public sealed class VideoTracker(List<VideoTracker.VideoEvent> events) : IEnumerable
 {
     public record struct VideoEvent(double Timestamp, string Description)
     {
         public static implicit operator VideoEvent((double, string) tuple) => new(tuple.Item1, tuple.Item2);
     }
+
     private double _lastTimeSent = -1;
+
+    #region Collection expression support
+
+    public VideoTracker() : this([])
+    {
+    }
+
+    public void Add(VideoEvent tuple)
+    {
+        events.Add(tuple);
+    }
+
+    public IEnumerator GetEnumerator() => events.GetEnumerator();
+
+    #endregion
 
     public void Send(double time)
     {
@@ -21,7 +39,7 @@ public sealed class VideoTracker(List<VideoTracker.VideoEvent> events)
             .TakeWhile(kf => kf.Timestamp <= time)
             .ToList();
 
-        bool continuing = _lastTimeSent != -1;
+        bool continuing = _lastTimeSent > 0;
         if (continuing && newEvents.Count > 0)
             prompt.Append("The video continues. ");
 
@@ -38,8 +56,8 @@ public sealed class VideoTracker(List<VideoTracker.VideoEvent> events)
         if (continuing)
         {
             // if continuing, it's not obvious who "he" is
-            int luckyCarder = message.IndexOf("The Lucky Carder");
-            int firstHe = message.IndexOf("He", System.StringComparison.OrdinalIgnoreCase);
+            int luckyCarder = message.IndexOf("The Lucky Carder", StringComparison.OrdinalIgnoreCase);
+            int firstHe = message.IndexOf("He", StringComparison.OrdinalIgnoreCase);
             if (firstHe >= 0 && (luckyCarder < 0 || firstHe < luckyCarder))
                 message = message.Remove(firstHe, 2).Insert(firstHe, "The Lucky Carder");
         }
