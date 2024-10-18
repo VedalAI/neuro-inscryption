@@ -3,6 +3,7 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Communication.Data.Helpers;
 

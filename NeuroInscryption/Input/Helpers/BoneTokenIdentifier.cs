@@ -2,6 +2,7 @@
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Enumerators;
 using UnityEngine;
 
 namespace NeuroInscryption.Input.Helpers;
@@ -22,6 +23,7 @@ public sealed class BoneTokenIdentifier : MonoBehaviour
     public static void AddIdentifierComponent(IEnumerator __instance, bool __result)
     {
         if (!__result) return;
+
         EnumeratorWrapper<Part1ResourcesManager> wrapper = new(__instance);
         if (wrapper.State != 1) return;
 

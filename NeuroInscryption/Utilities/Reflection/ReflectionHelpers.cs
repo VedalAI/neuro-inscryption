@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NeuroInscryption.Utilities;
+namespace NeuroInscryption.Utilities.Reflection;
 
 public static class ReflectionHelpers
 {

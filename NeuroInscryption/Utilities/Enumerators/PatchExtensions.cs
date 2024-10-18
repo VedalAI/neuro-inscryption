@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections;
+using NeuroInscryption.Utilities.Reflection;
 using UnityEngine;
 
-namespace NeuroInscryption.Utilities;
+namespace NeuroInscryption.Utilities.Enumerators;
 
 public static class PatchExtensions
 {
@@ -25,7 +26,7 @@ public static class PatchExtensions
     }
 
     public static int GetState(this IEnumerator instance) => instance.GetFieldValue<int>(StateFieldName);
-    public static object GetCurrent(this IEnumerator instance) => instance.GetFieldValue<object>(CurrentFieldName);
+    public static object? GetCurrent(this IEnumerator instance) => instance.GetFieldValue<object?>(CurrentFieldName);
     public static T GetThis<T>(this IEnumerator instance) => instance.GetFieldValue<T>(ThisFieldName);
 
     public static void SetFieldValue<T>(this object instance, string fieldName, T value)
@@ -40,9 +41,8 @@ public static class PatchExtensions
             Plugin.Logger.LogDebug(StackTraceUtility.ExtractStackTrace());
         }
     }
-    public static void SetEnumeratorState(this IEnumerator instance, int value) => instance.SetFieldValue(StateFieldName, value);
-    public static void SetEnumeratorCurrent(this IEnumerator instance, object value) => instance.SetFieldValue(CurrentFieldName, value);
-    public static void SetEnumeratorThis<T>(this IEnumerator instance, T value) => instance.SetFieldValue(ThisFieldName, value);
+    public static void SetState(this IEnumerator instance, int value) => instance.SetFieldValue(StateFieldName, value);
+    public static void SetCurrent(this IEnumerator instance, object value) => instance.SetFieldValue(CurrentFieldName, value);
 
     public static EnumeratorWrapper<object> Wrap(this IEnumerator enumerator) => new(enumerator);
     public static EnumeratorWrapper<TThis> Wrap<TThis>(this IEnumerator enumerator) => new(enumerator);

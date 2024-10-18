@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 
-namespace NeuroInscryption.Utilities;
+namespace NeuroInscryption.Utilities.Reflection;
 
 public static class ReflectionCache
 {

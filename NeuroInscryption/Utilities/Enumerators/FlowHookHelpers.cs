@@ -2,7 +2,7 @@
 using System.Collections;
 using NeuroInscryption.Automation.API;
 
-namespace NeuroInscryption.Utilities;
+namespace NeuroInscryption.Utilities.Enumerators;
 
 internal static class FlowHookHelpers
 {

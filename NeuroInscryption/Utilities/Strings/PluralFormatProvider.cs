@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace NeuroInscryption.Utilities;
+namespace NeuroInscryption.Utilities.Strings;
 
-public sealed class PluralFormatProvider : IFormatProvider, ICustomFormatter
+internal sealed class PluralFormatProvider : IFormatProvider, ICustomFormatter
 {
     public object GetFormat(Type formatType) => this;
 
@@ -18,8 +18,7 @@ public sealed class PluralFormatProvider : IFormatProvider, ICustomFormatter
         {
             return count == 1 ? formats[0] : formats[1];
         }
+
         return arg.ToString();
     }
-
-    public static string Format(string format, params object[] args) => string.Format(new PluralFormatProvider(), format, args);
 }

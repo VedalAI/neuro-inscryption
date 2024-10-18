@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using DiskCardGame;
 using NeuroInscryption.Communication.Strings;
+using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Strings;
 
 namespace NeuroInscryption.Communication.Data.Describable;
 
@@ -25,7 +27,7 @@ public sealed class MapNodeData : IComparable<MapNodeData>, IEquatable<MapNodeDa
         List<MapNode> connectedNodes = MapNodeManager.Instance.GetNodeWithId(RunState.Run.currentNodeId).connectedNodes;
         if (connectedNodes.Contains(node))
         {
-            Identifier = Name + string.Format(ActionStrings.PathDiscriminator, connectedNodes.IndexOf(node));
+            Identifier = Name + StringFormatter.Format(ActionStrings.PathDiscriminator, connectedNodes.IndexOf(node));
         }
         else
         {

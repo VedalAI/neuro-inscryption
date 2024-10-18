@@ -15,6 +15,7 @@ using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
@@ -51,7 +52,7 @@ public sealed class TraderFlow : HarmonyAutomationFlow<IEnumerator>
 
         ChooseTraderCardsAction chooseAction = new(context.CardOptions, context.NumberOfCardsToBuy);
 
-        Decision decision = new(DecisionStrings.ChooseTraderCards.FormatPlural(context.NumberOfCardsToBuy), state);
+        Decision decision = new(DecisionStrings.ChooseTraderCards.Format(context.NumberOfCardsToBuy), state);
         decision.AddAction(chooseAction);
 
         Action action = await decision.SendAsync(ct);

@@ -7,6 +7,7 @@ using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Strings;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
@@ -24,7 +25,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
     public int? TimesSacrificed { get; private set; }
 
     [JsonProperty(Order = 100)]
-    private string? Note => _maybeIjiraq ? string.Format(CardStrings.IjiraqNarrowedDown, TargetCardInfo.DisplayedNameEnglish) : null;
+    private string? Note => _maybeIjiraq ? StringFormatter.Format(CardStrings.IjiraqNarrowedDown, TargetCardInfo.DisplayedNameEnglish) : null;
 
     // Excluded from JSON
 
@@ -59,7 +60,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             Identifier = GetIdentifier(ijiraq.DisplayedNameEnglish);
             Health = ijiraq.Health;
             Power = ijiraq.Attack.ToString();
-            if (TargetCard.Info.BonesCost > 0) Cost = PluralFormatProvider.Format(CardStrings.BonesCost + CardStrings.IjiraqBonesCostSuffix, TargetCard.Info.BonesCost);
+            if (TargetCard.Info.BonesCost > 0) Cost = StringFormatter.Format(CardStrings.BonesCost + CardStrings.IjiraqBonesCostSuffix, TargetCard.Info.BonesCost);
             CanBeSacrificed = true;
             Tribes = null;
 
@@ -83,7 +84,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
 
     public override string GetDescription()
     {
-        return string.Format(CardStrings.Description,
+        return StringFormatter.Format(CardStrings.Description,
             DisplayName,
             Power,
             Health,
@@ -100,24 +101,24 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             switch (ability)
             {
                 case SpecialTriggeredAbility.Ant:
-                    return PowerStrings.Ant + string.Format(PowerStrings.InPlaySuffix, BoardManager.Instance.playerSlots.Where(s => s.Card && s.Card.Info.traits.Contains(Trait.Ant)));
+                    return PowerStrings.Ant + StringFormatter.Format(PowerStrings.InPlaySuffix, BoardManager.Instance.playerSlots.Where(s => s.Card && s.Card.Info.traits.Contains(Trait.Ant)));
 
                 case SpecialTriggeredAbility.Lammergeier:
-                    return PowerStrings.Lammergeier + string.Format(PowerStrings.LammergeierInPlaySuffix, _state.Bones, _state.Bones / 2);
+                    return PowerStrings.Lammergeier + StringFormatter.Format(PowerStrings.LammergeierInPlaySuffix, _state.Bones, _state.Bones / 2);
 
                 case SpecialTriggeredAbility.SacrificesThisTurn:
-                    return PowerStrings.SacrificesThisTurn + string.Format(PowerStrings.InPlaySuffix, BoardManager.Instance.SacrificesMadeThisTurn);
+                    return PowerStrings.SacrificesThisTurn + StringFormatter.Format(PowerStrings.InPlaySuffix, BoardManager.Instance.SacrificesMadeThisTurn);
 
                 case SpecialTriggeredAbility.Mirror:
                     if (TargetCard.InHand) return PowerStrings.Mirror;
-                    return PowerStrings.Mirror + string.Format(PowerStrings.InPlaySuffix, TargetCard.Attack);
+                    return PowerStrings.Mirror + StringFormatter.Format(PowerStrings.InPlaySuffix, TargetCard.Attack);
 
                 case SpecialTriggeredAbility.BellProximity:
                     if (TargetCard.InHand) return PowerStrings.BellProximity;
-                    return PowerStrings.BellProximity + string.Format(PowerStrings.InPlaySuffix, TargetCard.Attack);
+                    return PowerStrings.BellProximity + StringFormatter.Format(PowerStrings.InPlaySuffix, TargetCard.Attack);
 
                 case SpecialTriggeredAbility.CardsInHand:
-                    return PowerStrings.CardsInHand + string.Format(PowerStrings.InPlaySuffix, _state.PlayerHand.Count);
+                    return PowerStrings.CardsInHand + StringFormatter.Format(PowerStrings.InPlaySuffix, _state.PlayerHand.Count);
             }
         }
 

@@ -16,6 +16,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Input.Helpers;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
@@ -42,11 +43,7 @@ public sealed class ChooseCardFlow : HarmonyAutomationFlow<IEnumerator>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(CardSingleChoicesSequencer), nameof(CardSingleChoicesSequencer.CardSelectionSequence))),
-            IsValid = context =>
-            {
-                EnumeratorWrapper<CardSingleChoicesSequencer> enumerator = new(context.GetInstance<IEnumerator>()!);
-                return enumerator.State == 11 && !enumerator.This.choicesRerolled;
-            }
+            IsValid = context => context.GetInstance<IEnumerator>()!.Wrap<CardSingleChoicesSequencer>() is { State: 11, This.choicesRerolled: false }
         }
         // TODO: boss rares
     ];

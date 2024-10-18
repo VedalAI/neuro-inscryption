@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -8,11 +9,12 @@ using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Combat;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Enumerators;
+using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
@@ -26,6 +28,8 @@ public sealed class PlaceCardFlow : HarmonyAutomationFlow<IEnumerator>
             IsValid = FlowHookHelpers.EnumeratorStateIs(1)
         }
     ];
+
+    public override bool CanInterruptItself => false;
 
     protected override async UniTask ExecuteAsync(IEnumerator _, CancellationToken ct)
     {

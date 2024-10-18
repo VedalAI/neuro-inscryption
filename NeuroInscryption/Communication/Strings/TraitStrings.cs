@@ -41,6 +41,6 @@ public static class TraitStrings
     public static readonly Description BaitBucket = ("Bait Bucket", "On death, gets replaced by a Great White (4 power, 2 health, Waterborne).");
     public static readonly Description Limoncello = ("Mutiny", "After its turn, spawns some Skeleton Crew [2 power, 1 health, Brittle] on your side depending on how low its health is.");
 
-    public static Description? Get(Trait trait) => _traitDescriptions[trait];
-    public static Description? Get(SpecialTriggeredAbility ability) => _abilityDescriptions[ability];
+    public static Description? Get(Trait trait) => _traitDescriptions.TryGetValue(trait, out Description description) ? description : null;
+    public static Description? Get(SpecialTriggeredAbility ability) => _abilityDescriptions.TryGetValue(ability, out Description description) ? description : null;
 }

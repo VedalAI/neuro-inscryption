@@ -8,6 +8,7 @@ using NeuroInscryption.Automation.API;
 using NeuroInscryption.Input;
 using NeuroInscryption.Input.Helpers;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Enumerators;
 using UnityEngine;
 
 namespace NeuroInscryption.Automation.Game.Map;

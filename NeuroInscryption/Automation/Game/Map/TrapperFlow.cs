@@ -15,6 +15,7 @@ using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Enumerators;
 using Sirenix.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -56,7 +57,7 @@ public sealed class TrapperFlow : HarmonyAutomationFlow<IEnumerator>
         ChooseAction<TrapperWareData> buyAction = new(context.ItemsForSale, false, ActionStrings.BuyTrapperItem);
         LeaveAction leaveAction = new(!buyAction.Applicable);
 
-        Decision decision = new(DecisionStrings.BuyTrapperItems.FormatPlural(state.Teeth), state);
+        Decision decision = new(DecisionStrings.BuyTrapperItems.Format(state.Teeth), state);
         decision.AddAction(buyAction);
         decision.AddAction(leaveAction);
 

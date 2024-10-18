@@ -38,6 +38,7 @@ public sealed class ChoosePathFlow : HarmonyAutomationFlow<MapNodeManager>
 
     protected override async UniTask ExecuteAsync(MapNodeManager instance, CancellationToken ct)
     {
+        // TODO: if only one option click on it
         await UniTask.Delay(1000, cancellationToken: ct);
 
         List<List<MapNodeData>> paths = GetPaths(instance.ActiveNode);

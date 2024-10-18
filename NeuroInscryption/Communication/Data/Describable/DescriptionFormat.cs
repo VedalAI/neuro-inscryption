@@ -1,4 +1,5 @@
 ﻿using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Strings;
 
 namespace NeuroInscryption.Communication.Data.Describable;
 
@@ -8,11 +9,6 @@ public sealed record DescriptionFormat(string Name, string Info)
 
     public Description Format(params object[] args)
     {
-        return (string.Format(Name, args), string.Format(Info, args));
-    }
-
-    public Description FormatPlural(params object[] args)
-    {
-        return (PluralFormatProvider.Format(Name, args), PluralFormatProvider.Format(Info, args));
+        return (StringFormatter.Format(Name, args), StringFormatter.Format(Info, args));
     }
 }

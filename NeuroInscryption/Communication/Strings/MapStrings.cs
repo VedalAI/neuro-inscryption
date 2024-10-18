@@ -5,6 +5,7 @@ using DiskCardGame;
 using JetBrains.Annotations;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Reflection;
 
 namespace NeuroInscryption.Communication.Strings;
 

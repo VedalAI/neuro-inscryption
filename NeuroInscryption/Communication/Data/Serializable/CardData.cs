@@ -6,6 +6,7 @@ using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Strings;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
@@ -98,7 +99,7 @@ public class CardData
 
     public virtual string GetDescription()
     {
-        return string.Format(CardStrings.Description,
+        return StringFormatter.Format(CardStrings.Description,
             DisplayName,
             Power,
             Health,
@@ -139,8 +140,8 @@ public class CardData
 
     private string GetCost()
     {
-        if (TargetCardInfo.BonesCost > 0) return PluralFormatProvider.Format(CardStrings.BonesCost, TargetCardInfo.BonesCost);
-        if (TargetCardInfo.BloodCost > 0) return string.Format(CardStrings.BloodCost, TargetCardInfo.BloodCost);
+        if (TargetCardInfo.BonesCost > 0) return StringFormatter.Format(CardStrings.BonesCost, TargetCardInfo.BonesCost);
+        if (TargetCardInfo.BloodCost > 0) return StringFormatter.Format(CardStrings.BloodCost, TargetCardInfo.BloodCost);
         return CardStrings.FreeCost;
     }
 

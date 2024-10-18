@@ -3,6 +3,7 @@ using DiskCardGame;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Strings;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
@@ -28,7 +29,7 @@ public sealed class TrapperWareData : IIdentifiable
 
     private TrapperWareData(SelectableCard card, int price, IGameState state)
     {
-        Price = PluralFormatProvider.Format(TrapperStrings.TeethCost, price);
+        Price = StringFormatter.Format(TrapperStrings.TeethCost, price);
         PriceNum = price;
         Interactable = card;
         IsKnife = false;
@@ -61,7 +62,7 @@ public sealed class TrapperWareData : IIdentifiable
         IsKnife = true;
         Identifier = TrapperStrings.SkinningKnife.Name;
         Description = TrapperStrings.SkinningKnife.Info;
-        Price = PluralFormatProvider.Format(TrapperStrings.TeethCost, price);
+        Price = StringFormatter.Format(TrapperStrings.TeethCost, price);
         PriceNum = price;
     }
 

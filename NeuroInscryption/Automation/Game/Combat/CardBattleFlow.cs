@@ -14,6 +14,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Input.Helpers;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Enumerators;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
@@ -26,20 +27,23 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TurnManager), nameof(TurnManager.PlayerTurn))),
-            IsValid = FlowHookHelpers.EnumeratorStateIs(10),
+            IsValid = FlowHookHelpers.EnumeratorStateIs(8),
         },
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(PlayerHand), nameof(PlayerHand.SelectSlotForCard))),
-            IsValid = context => !context.GetResult<bool>(),
+            IsValid = context => context.GetResult<bool>() == false
+        },
+        new()
+        {
+            Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(ConsumableItemSlot), nameof(ConsumableItemSlot.ConsumeItem))),
+            IsValid = context => context.GetResult<bool>() == false
         }
     ];
 
-    public override bool CanInterruptItself => false;
-
     protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        if (enumerator.GetType().Name.Contains(nameof(PlayerHand.SelectSlotForCard)))
+        if (!enumerator.GetType().Name.Contains(nameof(TurnManager.PlayerTurn)))
         {
             await UniTask.Delay(500, cancellationToken: ct); // time it takes for the card to go back in the hand
         }

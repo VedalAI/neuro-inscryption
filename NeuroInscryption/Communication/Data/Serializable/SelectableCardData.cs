@@ -3,6 +3,7 @@ using DiskCardGame;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
+using NeuroInscryption.Utilities.Strings;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
@@ -37,7 +38,7 @@ public sealed class SelectableCardData : IIdentifiable
         {
             Card = CardData.Create(card.Info, state);
             CardIdentifier = Card.DisplayName;
-            if (index != -1) CardIdentifier += string.Format(CardStrings.GenericDiscriminator, index);
+            if (index != -1) CardIdentifier += StringFormatter.Format(CardStrings.GenericDiscriminator, index);
 
             Identifier = CardIdentifier;
         }
@@ -45,7 +46,7 @@ public sealed class SelectableCardData : IIdentifiable
         {
             Card = CardData.Create(card.ChoiceInfo.CardInfo, state);
             CardIdentifier = Card.DisplayName;
-            if (index != -1) CardIdentifier += string.Format(CardStrings.GenericDiscriminator, index);
+            if (index != -1) CardIdentifier += StringFormatter.Format(CardStrings.GenericDiscriminator, index);
 
             Identifier = CardIdentifier;
         }
@@ -58,10 +59,10 @@ public sealed class SelectableCardData : IIdentifiable
             switch (card.ChoiceInfo.resourceType)
             {
                 case ResourceType.Blood:
-                    Identifier = Cost = string.Format(CardStrings.BloodCost, card.ChoiceInfo.resourceAmount);
+                    Identifier = Cost = StringFormatter.Format(CardStrings.BloodCost, card.ChoiceInfo.resourceAmount);
                     break;
                 case ResourceType.Bone:
-                    Identifier = Cost = PluralFormatProvider.Format(CardStrings.BonesCost, card.ChoiceInfo.resourceAmount);
+                    Identifier = Cost = StringFormatter.Format(CardStrings.BonesCost, card.ChoiceInfo.resourceAmount);
                     break;
 
                 case ResourceType.None:
