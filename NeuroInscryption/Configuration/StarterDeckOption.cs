@@ -2,6 +2,7 @@
 
 public enum StarterDeckOption
 {
+    LetNeuroChoose = -1, // todo
     Vanilla,
     HighCost,
     Ant,

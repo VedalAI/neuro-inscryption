@@ -6,6 +6,7 @@ namespace NeuroInscryption.Configuration;
 [Flags]
 public enum ChallengeFlags
 {
+    LetNeuroChoose = -1, // todo
     None = 0,
     NoHook = 1 << 1,
     SmallerBackpack = 1 << 2,
