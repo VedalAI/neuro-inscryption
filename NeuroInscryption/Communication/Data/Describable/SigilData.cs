@@ -13,7 +13,7 @@ public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, I
     private SigilData(Ability sigil)
     {
         Sigil = sigil;
-        Description desc = SigilStrings.GetDescription(sigil);
+        Description desc = SigilStrings.Get(sigil);
         Name = desc.Name;
         Info = desc.Info;
     }

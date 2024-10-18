@@ -170,7 +170,9 @@ public class CardData
         result.AddRange(TargetCardInfo.traits.Select(TraitData.Create).WhereNotNull());
         result.AddRange(TargetCardInfo.specialAbilities.Select(TraitData.Create).WhereNotNull());
         if (TargetCardInfo.name.ToLowerInvariant().Contains("bell")) result.Add(TraitData.Create(TraitStrings.Chime));
-        if (TargetCardInfo.name.ToLowerInvariant() == "hodag") result.Add(TraitData.Create(TraitStrings.Hodag));
+        if (TargetCardInfo.name == "Hodag") result.Add(TraitData.Create(TraitStrings.Hodag));
+        if (TargetCardInfo.name == "BaitBucket") result.Add(TraitData.Create(TraitStrings.BaitBucket));
+        if (TargetCardInfo.name == "!GIANTCARD_SHIP") result.Add(TraitData.Create(TraitStrings.Limoncello));
 
         if (GameFlowManager.Instance.CurrentGameState == GameState.CardBattle)
         {

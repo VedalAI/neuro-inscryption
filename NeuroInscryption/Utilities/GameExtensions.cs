@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DiskCardGame;
+using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Utilities;
 
@@ -36,6 +37,7 @@ public static class GameExtensions
 
     public static string ParseDescription(this string description)
     {
+        if (string.IsNullOrEmpty(description)) return GenericStrings.MissingDescription;
         string result = RuleBookPage.ParseCardDefinition(description.Replace("[creature]", "a card bearing this sigil").Replace("[c:bR]", "").Replace("[c:]", ""));
         return char.ToUpperInvariant(result[0]) + result[1..];
     }

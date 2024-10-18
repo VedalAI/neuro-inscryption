@@ -9,6 +9,7 @@ public sealed class ItemData : IIdentifiable
 {
     [JsonProperty("Name")]
     public string Identifier { get; }
+
     public string Description { get; }
 
     // Ignored from json
@@ -18,10 +19,11 @@ public sealed class ItemData : IIdentifiable
 
     private ItemData(ItemSlot slot)
     {
-        ConsumableItemData itemData = (ConsumableItemData) slot.Item.Data;
+        ConsumableItemData? itemData = (ConsumableItemData) slot.Item.Data;
 
         Identifier = itemData.rulebookName;
         Description = itemData.rulebookDescription.ParseDescription();
+
         Slot = slot;
     }
 
