@@ -1,7 +1,6 @@
 ﻿using System;
 using DiskCardGame;
 using NeuroInscryption.Communication.Strings;
-using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Communication.Data.Describable;
 
@@ -11,21 +10,12 @@ public sealed class SigilData : IComparable<SigilData>, IEquatable<SigilData>, I
     public string Info { get; }
     public Ability Sigil { get; }
 
-    private SigilData(Ability ability)
+    private SigilData(Ability sigil)
     {
-        Sigil = ability;
-
-        if (ability == Ability.SubmergeSquid)
-        {
-            Name = SigilStrings.SubmergeSquidName;
-            Info = SigilStrings.SubmergeSquidDescription;
-        }
-        else
-        {
-            AbilityInfo info = AbilitiesUtil.GetInfo(ability);
-            Name = info.rulebookName;
-            Info = info.LocalizedRulebookDescription.ParseDescription();
-        }
+        Sigil = sigil;
+        Description desc = SigilStrings.GetDescription(sigil);
+        Name = desc.Name;
+        Info = desc.Info;
     }
 
     public static SigilData Create(Ability sigil) => new(sigil);

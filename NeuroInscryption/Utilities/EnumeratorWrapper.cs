@@ -23,4 +23,9 @@ public readonly struct EnumeratorWrapper<TThis>(IEnumerator enumerator)
         get => Enumerator.GetThis<TThis>();
         set => Enumerator.SetEnumeratorThis(value);
     }
+
+    public T GetFieldValue<T>(string fieldName)
+        => Enumerator.GetFieldValue<T>(fieldName);
+    public void SetFieldValue<T>(string fieldName, T value)
+        => Enumerator.SetFieldValue(fieldName, value);
 }

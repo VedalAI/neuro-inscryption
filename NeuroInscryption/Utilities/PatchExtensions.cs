@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using UnityEngine;
 
 namespace NeuroInscryption.Utilities;
 
@@ -18,6 +19,7 @@ public static class PatchExtensions
         catch (Exception e)
         {
             Plugin.Logger.LogError(e);
+            Plugin.Logger.LogDebug(StackTraceUtility.ExtractStackTrace());
             return default!;
         }
     }
@@ -35,6 +37,7 @@ public static class PatchExtensions
         catch (Exception e)
         {
             Plugin.Logger.LogError(e);
+            Plugin.Logger.LogDebug(StackTraceUtility.ExtractStackTrace());
         }
     }
     public static void SetEnumeratorState(this IEnumerator instance, int value) => instance.SetFieldValue(StateFieldName, value);
