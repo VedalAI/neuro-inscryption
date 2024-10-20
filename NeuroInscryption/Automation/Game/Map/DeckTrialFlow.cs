@@ -14,8 +14,6 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Input.Helpers;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -46,15 +44,7 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
 
         await UniTask.Delay(500, cancellationToken: ct);
 
-        foreach (SelectableCard card in instance.selectableCards.Where(c => c.Flipped))
-        {
-            await NeuroMouse.MoveToAsync(card, 100, ct);
-            await NeuroMouse.ClickAsync(ct);
-
-            await InputHelpers.WaitUntilViewLocked(ct);
-            await InputHelpers.WaitUntilViewUnlocked(ct);
-            await UniTask.Delay(150, cancellationToken: ct);
-        }
+        await Neuro.Cards.UnflipCards(instance);
 
         Context context = new(instance.trialChoices, instance.selectableCards);
         LoadoutState state = LoadoutState.Calculate();

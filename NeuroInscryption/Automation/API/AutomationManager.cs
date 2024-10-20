@@ -77,10 +77,15 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
 
     private void Update()
     {
-        if (UnityEngine.Input.GetKeyDown(KeyCode.U) && FlowRunner.AllowManualInterruption)
+        if (UnityEngine.Input.GetKeyDown(KeyCode.U))
         {
-            AllowManualInput = !AllowManualInput;
-            Plugin.Logger.LogWarning($"Manual input {(AllowManualInput ? "enabled" : "disabled")}");
+            bool allowInterrupt = AllowManualInput || FlowRunner.AllowManualInterruption;
+            bool forceInterrupt = !allowInterrupt && UnityEngine.Input.GetKey(KeyCode.LeftControl) && UnityEngine.Input.GetKey(KeyCode.LeftShift);
+            if (allowInterrupt || forceInterrupt)
+            {
+                AllowManualInput = !AllowManualInput;
+                Plugin.Logger.LogWarning($"Manual input {(AllowManualInput ? "enabled" : "disabled")}" + (forceInterrupt ? " (forced)" : ""));
+            }
         }
 
         if (UnityEngine.Input.GetKeyDown(KeyCode.P) && AllowManualInput)

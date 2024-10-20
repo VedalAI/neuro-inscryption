@@ -48,8 +48,15 @@ public static class NeuroMouse
     {
         Button button = !alt ? Button.Select : Button.AltSelect;
         InputHandler.EnqueueInput(button, true);
-        await UniTask.Delay(85, cancellationToken: ct);
-        InputHandler.EnqueueInput(button, false);
+        // release if cancelled
+        try
+        {
+            await UniTask.Delay(85, cancellationToken: ct);
+        }
+        finally
+        {
+            InputHandler.EnqueueInput(button, false);
+        }
     }
 
     public static async UniTask ClickAsync(int msDelay, CancellationToken ct = default, bool alt = false)
