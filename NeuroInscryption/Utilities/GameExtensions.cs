@@ -41,4 +41,7 @@ public static class GameExtensions
         string result = RuleBookPage.ParseCardDefinition(description.Replace("[creature]", "a card bearing this sigil").Replace("[c:bR]", "").Replace("[c:]", ""));
         return char.ToUpperInvariant(result[0]) + result[1..];
     }
+
+    public static bool Is(this ViewManager vm, ViewLockState state) => vm.Controller.LockState == state;
+    public static bool Is(this ViewManager vm, View view) => vm.CurrentView == view;
 }

@@ -12,7 +12,9 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Input.Helpers;
 using NeuroInscryption.Utilities;
+using UnityEngine;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
@@ -38,11 +40,18 @@ public sealed class ChoosePathFlow : HarmonyAutomationFlow<MapNodeManager>
 
     protected override async UniTask ExecuteAsync(MapNodeManager instance, CancellationToken ct)
     {
+        // don't send decision after manually picking node (also fixes decision after area boss)
+        if (!instance.ActiveNode || !instance.ActiveNode.connectedNodes.Any(IsActive))
+        {
+            Plugin.Logger.LogMessage($"No active nodes, cancelling {nameof(ChoosePathFlow)}");
+            return;
+        }
+
         // TODO: if only one option click on it
-        await UniTask.Delay(1000, cancellationToken: ct);
+        await InputHelpers.WaitUntilViewUnlocked(ct);
 
         List<List<MapNodeData>> paths = GetPaths(instance.ActiveNode);
-        List<MapNodeData> nextNodes = paths.Select(p => p.First()).Distinct().ToList();
+        List<MapNodeData> nextNodes = paths.Select(p => p[0]).Distinct().ToList();
 
         LoadoutState state = LoadoutState.Calculate();
         state.SetContext(new Context(paths));
@@ -85,5 +94,10 @@ public sealed class ChoosePathFlow : HarmonyAutomationFlow<MapNodeManager>
         }
 
         return result;
+    }
+
+    private static bool IsActive(MapNode node)
+    {
+        return node && node.isActiveAndEnabled && node.GetComponent<BoxCollider>().enabled; // yep
     }
 }

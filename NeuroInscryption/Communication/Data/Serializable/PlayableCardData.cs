@@ -118,7 +118,8 @@ public sealed class PlayableCardData : CardData, IIdentifiable
                     return PowerStrings.BellProximity + StringFormatter.Format(PowerStrings.InPlaySuffix, TargetCard.Attack);
 
                 case SpecialTriggeredAbility.CardsInHand:
-                    return PowerStrings.CardsInHand + StringFormatter.Format(PowerStrings.InPlaySuffix, _state.PlayerHand.Count);
+                    // we can get here from inside the LINQ expression that constructs _state.PlayerHand so it's not available
+                    return PowerStrings.CardsInHand + StringFormatter.Format(PowerStrings.InPlaySuffix, PlayerHand.Instance.CardsInHand.Count);
             }
         }
 
