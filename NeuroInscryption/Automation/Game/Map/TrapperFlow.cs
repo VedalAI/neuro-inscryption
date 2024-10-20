@@ -49,15 +49,24 @@ public sealed class TrapperFlow : HarmonyAutomationFlow<IEnumerator>
     private async UniTask RunFlowAsync(BuyPeltsSequencer instance, CancellationToken ct)
     {
         await UniTask.Delay(300, cancellationToken: ct);
+        int teeth = RunState.Run.currency;
+        int cheapest = instance.PeltPrices[0]; // at most 4 and always cheaper than the others wares
+        if (teeth < cheapest)
+        {
+            Plugin.Logger.LogMessage($"Can't buy anything with {teeth} teeth (pelt costs {cheapest}), leaving");
+            await NeuroMouse.MoveToAsync(instance.purchasedPile, 200, ct);
+            await NeuroMouse.ClickAsync(ct);
+            return;
+        }
 
         LoadoutState state = LoadoutState.Calculate();
-        Context context = new(state.Teeth, instance.peltsForSale, instance.PeltPrices, !RunState.Run.trapperKnifeBought && RunState.Run.consumables.Count < RunState.Run.MaxConsumables, instance.purchaseKnifeInteractable, 7, state);
+        Context context = new(teeth, instance.peltsForSale, instance.PeltPrices, !RunState.Run.trapperKnifeBought && RunState.Run.consumables.Count < RunState.Run.MaxConsumables, instance.purchaseKnifeInteractable, 7, state);
         state.SetContext(context);
 
         ChooseAction<TrapperWareData> buyAction = new(context.ItemsForSale, false, ActionStrings.BuyTrapperItem);
         LeaveAction leaveAction = new(!buyAction.Applicable);
 
-        Decision decision = new(DecisionStrings.BuyTrapperItems.Format(state.Teeth), state);
+        Decision decision = new(DecisionStrings.BuyTrapperItems.Format(teeth), state);
         decision.AddAction(buyAction);
         decision.AddAction(leaveAction);
 

@@ -47,24 +47,32 @@ public sealed class ChoosePathFlow : HarmonyAutomationFlow<MapNodeManager>
             return;
         }
 
-        // TODO: if only one option click on it
-        await InputHelpers.WaitUntilViewUnlocked(ct);
+        MapNodeData? node;
 
         List<List<MapNodeData>> paths = GetPaths(instance.ActiveNode);
         List<MapNodeData> nextNodes = paths.Select(p => p[0]).Distinct().ToList();
 
-        LoadoutState state = LoadoutState.Calculate();
-        state.SetContext(new Context(paths));
+        if (nextNodes.Count == 1)
+        {
+            Plugin.Logger.LogDebug($"Only one path ({nextNodes[0].MapNode}), not gonna bother asking");
+            node = nextNodes[0];
+        }
+        else
+        {
+            LoadoutState state = LoadoutState.Calculate();
+            state.SetContext(new Context(paths));
 
-        ChooseAction<MapNodeData> choosePathAction = new(nextNodes, true);
+            ChooseAction<MapNodeData> choosePathAction = new(nextNodes, true);
 
-        Decision decision = new(DecisionStrings.ChoosePath, state);
-        decision.AddAction(choosePathAction);
+            Decision decision = new(DecisionStrings.ChoosePath, state);
+            decision.AddAction(choosePathAction);
 
-        Action action = await decision.SendAsync(ct);
+            Action action = await decision.SendAsync(ct);
 
-        if (!action.Match(choosePathAction, out MapNodeData? node)) action.ThrowInvalid();
+            if (!action.Match(choosePathAction, out node)) action.ThrowInvalid();
+        }
 
+        await InputHelpers.WaitUntilViewUnlocked(ct);
         await NeuroMouse.MoveToAsync(node.MapNode, 300, ct);
         await NeuroMouse.ClickAsync(ct);
     }
