@@ -63,8 +63,8 @@ public sealed class TrapperFlow : HarmonyAutomationFlow<IEnumerator>
         Context context = new(teeth, instance.peltsForSale, instance.PeltPrices, !RunState.Run.trapperKnifeBought && RunState.Run.consumables.Count < RunState.Run.MaxConsumables, instance.purchaseKnifeInteractable, 7, state);
         state.SetContext(context);
 
-        ChooseAction<TrapperWareData> buyAction = new(context.ItemsForSale, false, ActionStrings.BuyTrapperItem);
-        LeaveAction leaveAction = new(!buyAction.Applicable);
+        ChooseAction<TrapperWareData> buyAction = new(context.ItemsForSale, ActionStrings.BuyTrapperItem);
+        LeaveAction leaveAction = new();
 
         Decision decision = new(DecisionStrings.BuyTrapperItems.Format(teeth), state);
         decision.AddAction(buyAction);

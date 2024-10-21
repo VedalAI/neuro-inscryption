@@ -47,7 +47,7 @@ public sealed class WoodcarverChooseFlow : HarmonyAutomationFlow<IEnumerator>
         LoadoutState state = LoadoutState.Calculate();
         state.SetContext(context);
 
-        ChooseAction<TotemPieceData> chooseAction = new(context.TotemPieceOptions, true);
+        ChooseAction<TotemPieceData> chooseAction = new(context.TotemPieceOptions);
 
         Decision decision = new(DecisionStrings.ChooseTotemPiece, state);
         decision.AddAction(chooseAction);

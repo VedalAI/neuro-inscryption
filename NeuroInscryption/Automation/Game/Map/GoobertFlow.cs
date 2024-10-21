@@ -52,7 +52,7 @@ public sealed class GoobertFlow : HarmonyAutomationFlow<IEnumerator>
         Context context = new(instance.selectionSlot.cardSelector.displayedCards, state);
         state.SetContext(context);
 
-        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions, true);
+        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
 
         Decision decision = new(DecisionStrings.GoobertChooseCard, state);
         decision.AddAction(chooseCardAction);

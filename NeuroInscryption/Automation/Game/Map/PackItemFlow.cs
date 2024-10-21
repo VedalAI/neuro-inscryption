@@ -49,7 +49,7 @@ public sealed class PackItemFlow : HarmonyAutomationFlow<IEnumerator>
         LoadoutState state = LoadoutState.Calculate();
         state.SetContext(context);
 
-        ChooseAction<ItemData> chooseAction = new(context.ItemOptions, true);
+        ChooseAction<ItemData> chooseAction = new(context.ItemOptions);
 
         Decision decision = new(DecisionStrings.ChooseItem, state);
         decision.AddAction(chooseAction);

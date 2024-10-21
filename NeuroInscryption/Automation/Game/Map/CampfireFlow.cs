@@ -65,7 +65,7 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
         Context1 context = new(instance.selectionSlot.cardSelector.displayedCards, state, isAttack);
         state.SetContext(context);
 
-        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions, true);
+        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
 
         Decision decision = new(DecisionStrings.CampfireChooseCard, state);
         decision.AddAction(chooseCardAction);
@@ -89,8 +89,9 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
         Context2 context = new(CardData.Create(oldCardData.TargetCardInfo, state), isAttack);
         state.SetContext(context);
 
+        // todo: just ask for a bool instead
         CampfireSecondUpgradeAction campfireSecondUpgradeAction = new();
-        LeaveAction leaveAction = new(false);
+        LeaveAction leaveAction = new();
 
         Decision decision = new(!RunState.Run.survivorsDead ? DecisionStrings.CampfireRiskUpgrade : DecisionStrings.CampfireNoRiskUpgrade, state);
         decision.AddAction(campfireSecondUpgradeAction);

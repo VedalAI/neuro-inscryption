@@ -38,7 +38,7 @@ public sealed class SacrificeEmpowerFlow : AutomationFlow<CardMergeSequencer>
         Context context = new(instance.sacrificeSlot.Card, instance.sacrificeSlot.cardSelector.displayedCards, state);
         state.SetContext(context);
 
-        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions, true);
+        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
 
         Decision decision = new(DecisionStrings.SacrificeEmpower.Format(CardData.Create(instance.sacrificeSlot.Card.Info, state).GetDescription()), state);
         decision.AddAction(chooseCardAction);

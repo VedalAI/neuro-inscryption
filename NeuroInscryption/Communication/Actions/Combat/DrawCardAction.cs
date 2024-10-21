@@ -10,13 +10,10 @@ public sealed class DrawCardAction : IAction<bool>
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
-        schema.OneOf.Add(new JsonSchema
+        schema.Add(new Dictionary<string, JsonSchema>
         {
-            Properties = new Dictionary<string, JsonSchema>
-            {
-                ["action"] = QJS.Const(ActionName),
-                ["data"] = QJS.Enum(["Random", "Squirrel"])
-            }
+            ["action"] = QJS.Const(ActionName),
+            ["data"] = QJS.Enum(["Random", "Squirrel"])
         });
     }
 

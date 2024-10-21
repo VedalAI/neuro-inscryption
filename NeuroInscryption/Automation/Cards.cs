@@ -39,7 +39,7 @@ internal sealed class Cards
         CardSingleChoicesSequencer rerollable = (choicer as CardSingleChoicesSequencer)!; // day 999 of hating the way unity works with nulls
         MainInputInteractable clover = rerollable ? rerollable.rerollInteractable : null!;
         RerollAction rerollAction = new(clover);
-        ChooseAction<SelectableCardData> chooseAction = new(context.CardOptions, !rerollAction.Applicable);
+        ChooseAction<SelectableCardData> chooseAction = new(context.CardOptions);
 
         Decision decision = new(DecisionStrings.ChooseCard, state);
         decision.AddAction(chooseAction);

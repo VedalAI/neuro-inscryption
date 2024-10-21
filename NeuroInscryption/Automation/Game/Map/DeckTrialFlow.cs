@@ -50,7 +50,7 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
         LoadoutState state = LoadoutState.Calculate();
         state.SetContext(context);
 
-        ChooseAction<DeckTrialData> chooseAction = new(context.TrialOptions, true);
+        ChooseAction<DeckTrialData> chooseAction = new(context.TrialOptions);
 
         Decision decision = new(DecisionStrings.ChooseDeckTrial, state);
         decision.AddAction(chooseAction);

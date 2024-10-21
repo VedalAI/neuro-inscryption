@@ -45,7 +45,7 @@ public sealed class MagpieDrawFlow : HarmonyAutomationFlow<IEnumerator>
         Context context = new(BoardManager.Instance.CardSelector.displayedCards, state);
         state.SetContext(context);
 
-        ChooseAction<SelectableCardData> chooseCardAction = new(context.RemainingDeckToDrawFrom, true, ActionStrings.DrawCard);
+        ChooseAction<SelectableCardData> chooseCardAction = new(context.RemainingDeckToDrawFrom, ActionStrings.DrawCard);
 
         Decision decision = new(DecisionStrings.MagpieDrawCard, state);
         decision.AddAction(chooseCardAction);

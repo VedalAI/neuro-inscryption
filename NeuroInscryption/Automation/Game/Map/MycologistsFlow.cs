@@ -52,7 +52,7 @@ public sealed class MycologistsFlow : HarmonyAutomationFlow<IEnumerator>
         Context context = new(((SelectableCardPairArray) instance.selectionSlot.cardSelector).pairs, state);
         state.SetContext(context);
 
-        ChooseAction<SelectableCardPairData> choosePairAction = new(context.PairOptions, true);
+        ChooseAction<SelectableCardPairData> choosePairAction = new(context.PairOptions);
 
         Decision decision = new(DecisionStrings.MycologistsChoosePair, state);
         decision.AddAction(choosePairAction);

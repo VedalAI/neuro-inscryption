@@ -10,13 +10,10 @@ public sealed class AcceptSurrenderAction(bool? isOpponentSurrendering) : IActio
     {
         if (isOpponentSurrendering != true) return;
 
-        schema.OneOf.Add(new JsonSchema
+        schema.Add(new Dictionary<string, JsonSchema>
         {
-            Properties = new Dictionary<string, JsonSchema>
-            {
-                ["action"] = QJS.Const(ActionName),
-                ["data"] = QJS.ConstNull
-            }
+            ["action"] = QJS.Const(ActionName),
+            ["data"] = QJS.ConstNull
         });
     }
 

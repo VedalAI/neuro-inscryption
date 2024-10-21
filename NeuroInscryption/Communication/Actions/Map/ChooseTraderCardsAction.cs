@@ -11,19 +11,16 @@ public sealed class ChooseTraderCardsAction(IEnumerable<SelectableCardData> card
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
-        schema.OneOf.Add(new JsonSchema
+        schema.Add(new Dictionary<string, JsonSchema>
         {
-            Properties = new Dictionary<string, JsonSchema>
+            ["action"] = QJS.Const(ActionName),
+            ["data"] = new()
             {
-                ["action"] = QJS.Const(ActionName),
-                ["data"] = new()
-                {
-                    Type = JsonSchemaType.Array,
-                    MinItems = amount,
-                    MaxItems = amount,
-                    UniqueItems = true,
-                    Items = QJS.Enum(cards.Select(c => c.Identifier)),
-                }
+                Type = JsonSchemaType.Array,
+                MinItems = amount,
+                MaxItems = amount,
+                UniqueItems = true,
+                Items = QJS.Enum(cards.Select(c => c.Identifier)),
             }
         });
     }

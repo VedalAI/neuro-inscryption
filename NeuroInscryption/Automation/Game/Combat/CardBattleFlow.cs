@@ -54,8 +54,8 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
 
         CombatState state = CombatState.Calculate();
 
-        ChooseAction<PlayableCardData> playCardAction = new(state.PlayerHand.Where(c => c.IsPlayable == true), false, ActionStrings.PlayCard);
-        ChooseAction<ItemData> useItemAction = new(state.Items, false, ActionStrings.UseItem);
+        ChooseAction<PlayableCardData> playCardAction = new(state.PlayerHand.Where(c => c.IsPlayable == true), ActionStrings.PlayCard);
+        ChooseAction<ItemData> useItemAction = new(state.Items, ActionStrings.UseItem);
         AcceptSurrenderAction acceptSurrenderAction = new(state.IsOpponentSurrendering);
         EndTurnAction endTurnAction = new();
 

@@ -52,7 +52,7 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
         Context context = new(instance.sacrificeSlot.cardSelector.displayedCards, state, instance);
         state.SetContext(context);
 
-        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions, true);
+        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
 
         Decision decision = new(DecisionStrings.Sacrifice, state);
         decision.AddAction(chooseCardAction);

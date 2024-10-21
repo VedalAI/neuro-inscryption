@@ -7,21 +7,18 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 
-namespace NeuroInscryption.Communication.Actions.Combat;
-
 using Sacrifice = (string name, int blood);
+
+namespace NeuroInscryption.Communication.Actions.Combat;
 
 public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary<string, PlayableCardData?> playerLanes) : IAction<IEnumerable<PlayableCardData>>
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
-        schema.OneOf.Add(new JsonSchema
+        schema.Add(new Dictionary<string, JsonSchema>
         {
-            Properties = new Dictionary<string, JsonSchema>
-            {
-                ["action"] = QJS.Const(ActionName),
-                ["data"] = QJS.Enum(GetSacrificeCombinations(cardToPlay.Info.BloodCost))
-            }
+            ["action"] = QJS.Const(ActionName),
+            ["data"] = QJS.Enum(GetSacrificeCombinations(cardToPlay.Info.BloodCost))
         });
     }
 

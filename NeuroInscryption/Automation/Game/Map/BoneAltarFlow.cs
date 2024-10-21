@@ -42,7 +42,7 @@ public sealed class BoneAltarFlow : HarmonyAutomationFlow<IEnumerator>
 
         IEnumerable<SelectableCardData> cards = instance.sacrificeSlot.cardSelector.displayedCards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
 
-        ChooseAction<SelectableCardData> chooseCardAction = new(cards, true);
+        ChooseAction<SelectableCardData> chooseCardAction = new(cards);
 
         Decision decision = new(DecisionStrings.BoneAltarChooseCard, state);
         decision.AddAction(chooseCardAction);

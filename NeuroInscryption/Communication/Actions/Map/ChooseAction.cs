@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Map;
 
-public sealed class ChooseAction<T>(IEnumerable<T> items, bool isOnlyOption, string actionName = ActionStrings.MakeChoice) : IAction<T>
+public sealed class ChooseAction<T>(IEnumerable<T> items, string actionName = ActionStrings.MakeChoice) : IAction<T>
     where T : class, IIdentifiable
 {
     public bool Applicable { get; } = items.Any();
@@ -23,8 +23,7 @@ public sealed class ChooseAction<T>(IEnumerable<T> items, bool isOnlyOption, str
             ["data"] = QJS.Enum(items.Select(card => card.Identifier).Distinct())
         };
 
-        if (isOnlyOption) schema.Properties = properties;
-        else schema.OneOf.Add(new JsonSchema { Properties = properties });
+        schema.Add(properties);
     }
 
     public string ActionName => actionName;
