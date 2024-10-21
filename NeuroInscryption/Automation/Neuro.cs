@@ -5,4 +5,5 @@ internal static class Neuro
 {
     public static readonly Cards Cards = new();
     public static readonly Map Map = new();
+    public static readonly Trade Shop = new();
 }

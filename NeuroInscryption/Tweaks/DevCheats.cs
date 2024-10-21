@@ -16,9 +16,15 @@ internal sealed class DevCheats : Singlyboi<DevCheats>
 
     private void Update()
     {
+        // Ctrl(+Shift)+Q ("quick win")
         if (UInput.GetKey(KeyCode.LeftControl) && UInput.GetKeyDown(KeyCode.Q))
         {
             StartCoroutine(Win(UInput.GetKey(KeyCode.LeftShift)));
+        }
+        // Ctrl+Shift+4 ($)
+        if (UInput.GetKey(KeyCode.LeftControl) && UInput.GetKey(KeyCode.LeftShift) && UInput.GetKeyDown(KeyCode.Alpha4))
+        {
+            RunState.Run.currency++;
         }
     }
 

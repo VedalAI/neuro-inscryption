@@ -2,7 +2,6 @@
 using DiskCardGame;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Strings;
 using Newtonsoft.Json;
 
@@ -27,7 +26,10 @@ public sealed class TrapperWareData : IIdentifiable
     [JsonIgnore]
     public int PriceNum { get; private set; }
 
-    private TrapperWareData(SelectableCard card, int price, IGameState state)
+    [JsonIgnore]
+    public View TargetView => IsKnife ? View.Default : View.TradingTopDown;
+
+    private TrapperWareData(SelectableCard card, int price)
     {
         Price = StringFormatter.Format(TrapperStrings.TeethCost, price);
         PriceNum = price;
@@ -66,6 +68,6 @@ public sealed class TrapperWareData : IIdentifiable
         PriceNum = price;
     }
 
-    public static TrapperWareData CreatePelt(SelectableCard card, int price, IGameState state) => new(card, price, state);
+    public static TrapperWareData CreatePelt(SelectableCard card, int price) => new(card, price);
     public static TrapperWareData CreateKnife(MainInputInteractable interactable, int price) => new(interactable, price);
 }

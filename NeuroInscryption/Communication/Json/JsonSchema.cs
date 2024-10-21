@@ -200,27 +200,11 @@ public sealed class JsonSchema
 
     public void Add(JsonSchema option)
     {
-        if (_properties is { Count: >0 })
-        {
-            OneOf.Add(new() { Properties = _properties });
-            _properties = null;
-            OneOf.Add(option);
-        }
-        else
-        {
-            Properties = option.Properties;
-        }
+        OneOf.Add(option);
     }
 
     public void Add(Dictionary<string, JsonSchema> properties)
     {
-        if (_properties is { Count: >0 })
-        {
-            Add(new JsonSchema() { Properties = properties });
-        }
-        else
-        {
-            Properties = properties;
-        }
+        Add(new JsonSchema() { Properties = properties });
     }
 }

@@ -1,36 +1,17 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions.Map;
-using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
-using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
-using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
-using Sirenix.Utilities;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
 public sealed class TrapperFlow : HarmonyAutomationFlow<IEnumerator>
 {
-    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(int teeth, IEnumerable<SelectableCard> pelts, IEnumerable<int> peltPrices, bool knifeAvailable, MainInputInteractable knife, int knifePrice, IGameState state) : ILoadoutContext
-    {
-        public readonly IReadOnlyList<TrapperWareData> ItemsForSale = pelts.Zip(peltPrices, (c, p) => TrapperWareData.CreatePelt(c, p, state)).AppendIf(knifeAvailable, TrapperWareData.CreateKnife(knife, knifePrice)).Where(w => w.PriceNum <= teeth).ToList();
-
-        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
-        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
-    }
-
     public override FlowHook[] Hooks =>
     [
         new()
@@ -42,71 +23,20 @@ public sealed class TrapperFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator target, CancellationToken ct)
     {
-        await UniTask.Delay(200, cancellationToken: ct);
-        await RunFlowAsync(target.GetThis<BuyPeltsSequencer>(), ct);
-    }
-
-    private async UniTask RunFlowAsync(BuyPeltsSequencer instance, CancellationToken ct)
-    {
-        await UniTask.Delay(300, cancellationToken: ct);
-        int teeth = RunState.Run.currency;
-        int cheapest = instance.PeltPrices[0]; // at most 4 and always cheaper than the others wares
-        if (teeth < cheapest)
+        await UniTask.Delay(500, cancellationToken: ct);
+        BuyPeltsSequencer instance = target.GetThis<BuyPeltsSequencer>();
+        await foreach (TrapperWareData trapperWare in Neuro.Shop.BuyPelts(instance, ct))
         {
-            Plugin.Logger.LogMessage($"Can't buy anything with {teeth} teeth (pelt costs {cheapest}), leaving");
-            await NeuroMouse.MoveToAsync(instance.purchasedPile, 200, ct);
-            await NeuroMouse.ClickAsync(ct);
-            return;
-        }
-
-        LoadoutState state = LoadoutState.Calculate();
-        Context context = new(teeth, instance.peltsForSale, instance.PeltPrices, !RunState.Run.trapperKnifeBought && RunState.Run.consumables.Count < RunState.Run.MaxConsumables, instance.purchaseKnifeInteractable, 7, state);
-        state.SetContext(context);
-
-        ChooseAction<TrapperWareData> buyAction = new(context.ItemsForSale, ActionStrings.BuyTrapperItem);
-        LeaveAction leaveAction = new();
-
-        Decision decision = new(DecisionStrings.BuyTrapperItems.Format(teeth), state);
-        decision.AddAction(buyAction);
-        decision.AddAction(leaveAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (action.Match(buyAction, out TrapperWareData? trapperWare))
-        {
-            if (trapperWare.IsKnife)
+            if (ViewManager.Instance.CurrentView != trapperWare.TargetView)
             {
-                if (ViewManager.Instance.CurrentView != View.Default)
-                {
-                    ViewManager.Instance.SwitchToView(View.Default);
-                    await UniTask.Delay(500, cancellationToken: ct);
-                }
-
-                await NeuroMouse.MoveToAsync(trapperWare.Interactable, 200, ct);
-                await NeuroMouse.ClickAsync(ct);
-            }
-            else
-            {
-                if (ViewManager.Instance.CurrentView != View.TradingTopDown)
-                {
-                    ViewManager.Instance.SwitchToView(View.TradingTopDown);
-                    await UniTask.Delay(500, cancellationToken: ct);
-                }
-
-                await NeuroMouse.MoveToAsync(trapperWare.Interactable, 200, ct);
-                await NeuroMouse.ClickAsync(ct);
+                ViewManager.Instance.SwitchToView(trapperWare.TargetView);
+                await UniTask.Delay(500, cancellationToken: ct);
             }
 
-            await RunFlowAsync(instance, ct);
-        }
-        else if (action.Match(leaveAction))
-        {
-            await NeuroMouse.MoveToAsync(instance.purchasedPile, 200, ct);
+            await NeuroMouse.MoveToAsync(trapperWare.Interactable, 200, ct);
             await NeuroMouse.ClickAsync(ct);
         }
-        else
-        {
-            action.ThrowInvalid();
-        }
+        await NeuroMouse.MoveToAsync(instance.purchasedPile, 200, ct);
+        await NeuroMouse.ClickAsync(ct);
     }
 }
