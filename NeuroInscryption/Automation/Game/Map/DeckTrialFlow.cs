@@ -44,9 +44,10 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
 
         await UniTask.Delay(500, cancellationToken: ct);
 
-        await Neuro.Cards.UnflipCards(instance);
+        List<SelectableCard> cards = instance.selectableCards;
+        await Neuro.Cards.UnflipCards(cards);
 
-        Context context = new(instance.trialChoices, instance.selectableCards);
+        Context context = new(instance.trialChoices, cards);
         LoadoutState state = LoadoutState.Calculate();
         state.SetContext(context);
 

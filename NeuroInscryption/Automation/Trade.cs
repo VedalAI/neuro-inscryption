@@ -30,7 +30,7 @@ internal class Trade
     }
 
     // no IAsyncEnumerable grrrrrr
-    public UniTaskCancelableAsyncEnumerable<TrapperWareData> BuyPelts(BuyPeltsSequencer instance, CancellationToken ct = default)
+    public UniTaskCancelableAsyncEnumerable<TrapperWareData> BuyFromTrapper(BuyPeltsSequencer instance, CancellationToken ct = default)
     {
         return UniTaskAsyncEnumerable.Create<TrapperWareData>(async (writer, token) =>
         {

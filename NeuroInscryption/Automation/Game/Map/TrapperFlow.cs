@@ -25,7 +25,7 @@ public sealed class TrapperFlow : HarmonyAutomationFlow<IEnumerator>
     {
         await UniTask.Delay(500, cancellationToken: ct);
         BuyPeltsSequencer instance = target.GetThis<BuyPeltsSequencer>();
-        await foreach (TrapperWareData trapperWare in Neuro.Shop.BuyPelts(instance, ct))
+        await foreach (TrapperWareData trapperWare in Neuro.Trade.BuyFromTrapper(instance, ct))
         {
             if (ViewManager.Instance.CurrentView != trapperWare.TargetView)
             {

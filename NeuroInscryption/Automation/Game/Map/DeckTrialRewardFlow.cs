@@ -26,7 +26,7 @@ public sealed class DeckTrialRewardFlow : HarmonyAutomationFlow<IEnumerator>
 
         await UniTask.Delay(500, cancellationToken: ct);
 
-        SelectableCard cardData = await Neuro.Cards.ChooseCard(instance, ct: ct);
+        SelectableCard cardData = await Neuro.Cards.ChooseAddToDeck(instance, ct);
 
         await NeuroMouse.MoveToAsync(cardData, 200, ct);
         await NeuroMouse.ClickAsync(ct);

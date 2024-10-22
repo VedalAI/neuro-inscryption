@@ -19,7 +19,7 @@ namespace NeuroInscryption.Automation;
 internal class Cards
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class ChooseCardContext(IEnumerable<SelectableCard> cards, IGameState state) : ILoadoutContext
+    private sealed class LoadoutContext(IEnumerable<SelectableCard> cards, IGameState state) : ILoadoutContext
     {
         public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
 
@@ -27,13 +27,14 @@ internal class Cards
         IEnumerable<TraitData> ILoadoutContext.RelevantTraits => CardOptions.SelectMany(c => c.Card!.Traits);
     }
 
-    public async UniTask<SelectableCard> ChooseCard(CardChoicesSequencer choicer, CancellationToken ct = default)
+    public async UniTask<SelectableCard> ChooseAddToDeck(CardChoicesSequencer choicer, CancellationToken ct = default)
     {
-        await UnflipCards(choicer);
+        List<SelectableCard> cards = choicer.selectableCards;
 
-        var cards = choicer.selectableCards;
+        await UnflipCards(cards);
+
         LoadoutState state = LoadoutState.Calculate();
-        ChooseCardContext context = new(cards, state);
+        LoadoutContext context = new(cards, state);
         state.SetContext(context);
 
         CardSingleChoicesSequencer rerollable = (choicer as CardSingleChoicesSequencer)!; // day 999 of hating the way unity works with nulls
@@ -60,21 +61,40 @@ internal class Cards
             //await UniTask.Delay(100, cancellationToken: ct);
             // choicer sets this back to false when ready for input again
             await UniTask.WaitUntil(() => !rerollable.choicesRerolled, cancellationToken: ct);
-            return await ChooseCard(choicer, ct);
+            return await ChooseAddToDeck(choicer, ct);
         }
 
         action.ThrowInvalid();
-        throw new System.InvalidOperationException($"Unreachable in {nameof(ChooseCard)} after ThrowInvalid");
+        throw new System.InvalidOperationException($"Unreachable in {nameof(ChooseAddToDeck)} after ThrowInvalid");
     }
 
-    public async UniTask UnflipCards(CardChoicesSequencer choicer, CancellationToken ct = default)
+    public async UniTask UnflipCards(IEnumerable<SelectableCard> cards, CancellationToken ct = default)
     {
         await InputHelpers.WaitUntilViewUnlocked(ct);
-        foreach (SelectableCard card in choicer.selectableCards.Where(c => c.Flipped))
+        foreach (SelectableCard card in cards.Where(c => c.Flipped))
         {
             await NeuroMouse.MoveToAsync(card, 200, ct);
             await NeuroMouse.ClickAsync(ct);
         }
         await UniTask.Delay(200, cancellationToken: ct);
+    }
+
+    public async UniTask<SelectableCard> ChooseCardLoadout(IEnumerable<SelectableCard> cards, Description description, CancellationToken ct = default)
+    {
+        await UnflipCards(cards);
+
+        LoadoutState state = LoadoutState.Calculate();
+        LoadoutContext context = new(cards, state);
+        state.SetContext(context);
+
+        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
+        Decision decision = new(description, state);
+        decision.AddAction(chooseCardAction);
+
+        Action action = await decision.SendAsync(ct);
+
+        if (!action.Match(chooseCardAction, out SelectableCardData? selected)) action.ThrowInvalid();
+
+        return selected.TargetCard;
     }
 }

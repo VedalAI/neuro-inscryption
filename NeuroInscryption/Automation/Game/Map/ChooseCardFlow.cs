@@ -31,7 +31,7 @@ public sealed class ChooseCardFlow : HarmonyAutomationFlow<IEnumerator>
 
         await UniTask.Delay(500, cancellationToken: ct);
 
-        SelectableCard card = await Neuro.Cards.ChooseCard(instance, ct);
+        SelectableCard card = await Neuro.Cards.ChooseAddToDeck(instance, ct);
 
         await NeuroMouse.MoveToAsync(card, 200, ct);
         AllowManualInterruption = false;

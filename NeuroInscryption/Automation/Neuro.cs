@@ -5,5 +5,5 @@ internal static class Neuro
 {
     public static Cards Cards = new();
     public static Map Map = new();
-    public static Trade Shop = new();
+    public static Trade Trade = new();
 }
