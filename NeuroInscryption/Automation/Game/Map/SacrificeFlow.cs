@@ -37,6 +37,8 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
         SelectableCard sacrifice = await PickSacrifice(instance, ct);
         Debug.Assert(sacrifice is { }, "did not pick sacrifice");
 
+        await UniTask.Delay(300, cancellationToken: ct);
+
         SelectableCard host = await PickHost(instance, ct);
         Debug.Assert(host is { }, "did not pick host");
 
@@ -46,8 +48,12 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
 
     private async UniTask<SelectableCard> PickSacrifice(CardMergeSequencer instance, CancellationToken ct)
     {
-        if (instance.sacrificeSlot.Card is { } alreadySelected)
+        SelectableCard alreadySelected = instance.sacrificeSlot.Card;
+        if (alreadySelected)
+        {
+            Plugin.Logger.LogMessage($"Already selected sacrifice {alreadySelected}");
             return alreadySelected;
+        }
 
         await NeuroMouse.MoveToAsync(instance.sacrificeSlot, 200, ct);
         await NeuroMouse.ClickAsync(400, ct);
@@ -67,10 +73,14 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
 
     private async UniTask<SelectableCard> PickHost(CardMergeSequencer instance, CancellationToken ct)
     {
-        if (instance.hostSlot.Card is { } alreadySelected)
+        SelectableCard alreadySelected = instance.hostSlot.Card;
+        if (alreadySelected)
+        {
+            Plugin.Logger.LogMessage($"Already selected host {alreadySelected}");
             return alreadySelected;
+        }
 
-        SelectableCard sac = instance.sacrificeSlot.cardSelector.selectedCard;
+        SelectableCard sac = instance.sacrificeSlot.Card;
         Debug.Assert((bool)sac, "Should have picked a sacrifice by this point");
         // alternatively,
         //if (!sac) sac = await PickSacrifice(instance, ct);
