@@ -16,7 +16,7 @@ using System.Threading;
 
 namespace NeuroInscryption.Automation;
 
-internal sealed class Cards
+internal class Cards
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class ChooseCardContext(IEnumerable<SelectableCard> cards, IGameState state) : ILoadoutContext

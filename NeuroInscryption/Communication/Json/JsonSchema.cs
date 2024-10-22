@@ -6,16 +6,20 @@ namespace NeuroInscryption.Communication.Json;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public sealed class JsonSchema
 {
-    public static JsonSchema NewResponseSchema() => new()
+    private static readonly Dictionary<string, JsonSchema> DefaultProps = new()
     {
-        Type = JsonSchemaType.Object,
-        Required = ["action", "data"],
-        Properties = new Dictionary<string, JsonSchema>
-        {
-            ["action"] = QJS.Type(JsonSchemaType.String),
-            ["data"] = QJS.Type(JsonSchemaType.Object),
-        }
+        ["action"] = QJS.Type(JsonSchemaType.String),
+        ["data"] = QJS.Type(JsonSchemaType.Object),
     };
+    public static JsonSchema NewResponseSchema()
+    {
+        return new()
+        {
+            Type = JsonSchemaType.Object,
+            Required = ["action", "data"],
+            Properties = DefaultProps
+        };
+    }
 
     [JsonIgnore]
     public Dictionary<string, JsonSchema> Defs
@@ -206,5 +210,15 @@ public sealed class JsonSchema
     public void Add(Dictionary<string, JsonSchema> properties)
     {
         Add(new JsonSchema() { Properties = properties });
+    }
+
+    public void Prepare()
+    {
+        if (_oneOf is [JsonSchema { _properties: { } } single]
+            && _properties == DefaultProps)
+        {
+            _properties = single._properties;
+            _oneOf = null;
+        }
     }
 }

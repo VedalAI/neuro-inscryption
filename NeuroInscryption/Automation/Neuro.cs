@@ -3,7 +3,7 @@
 // move this thing wherever you think is appropriate
 internal static class Neuro
 {
-    public static readonly Cards Cards = new();
-    public static readonly Map Map = new();
-    public static readonly Trade Shop = new();
+    public static Cards Cards = new();
+    public static Map Map = new();
+    public static Trade Shop = new();
 }

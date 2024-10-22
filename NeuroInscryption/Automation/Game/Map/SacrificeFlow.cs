@@ -43,6 +43,8 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
     {
         CardMergeSequencer instance = enumerator.GetThis<CardMergeSequencer>();
 
+        // TODO: this should not be split across two flows
+        // check instance.hostSlot/instance.sacrificeSlot to figure out where to restart the flow from
         await UniTask.Delay(500, cancellationToken: ct);
 
         await NeuroMouse.MoveToAsync(instance.sacrificeSlot, 200, ct);
