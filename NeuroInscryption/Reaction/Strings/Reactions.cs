@@ -29,6 +29,7 @@ public static class Reactions
 
     public static readonly ReactionTracker G0llyFriendsStart = new("G0lly took your friends list and turned them into cards! G0lly seems to receive a signal from steam and your friends are now her cards!", Priority.Context, true);
 
+    // TODO: filter friends list
     public static readonly ReactionTracker G0llyFriendSpawned = new("{0} was just turned into a card and has appeared on the board!", Priority.Context);
 
     public static readonly ReactionTracker G0llyCreateCard = new("G0lly asked Vedal to make a card and send it on the internet to another player. It would be funny if the card was purposefully made to be terrible and unusable.", Priority.Force, true);
