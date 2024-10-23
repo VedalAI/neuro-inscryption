@@ -94,13 +94,9 @@ public static class Videos
         (4, "A video dated ERROR started. You can briefly see Luke sat at his table, laughing while playing with a set of scales visually identical to the ones used in the game.")
     ];
 
+    public static readonly ReactionTracker OldDataUnpacked = new("While Luke is unpacking OLD_DATA, some files briefly appear on screen, a location, an ID, a picture of someone, some text and many others that are hard to see. The screen was quickly blocked out by black bars and red text saying REDACTED. Heavy breathing is heard, the video becomes more and more glitchy until only static can be seen, The Lucky Carder can be heard yelling \"NO NO NO\".", Priority.Context, true);
 
-    public static readonly VideoTracker FinalVideo =
-    [
+    public static readonly ReactionTracker FloppyDiskDestroyed = new("The glitches fade away, Luke is standing at his desk holding a hammer. He repeatedly hits the Inscryption floppy disk with it.", Priority.Context, true);
 
-        // todo: break to unmute neuro after he destroyes that
-
-        // todo: break to unmute neuro after she does that
-
-    ];
+    public static readonly ReactionTracker LukeDied = new("Someone is at Luke's door. He opens it and the woman from GameFuna is there, before he can say much she shoots him in the head. Luke and the camera drop to the floor, the woman enters the house, stepping over Luke's dead body.", Priority.Force, true);
 }

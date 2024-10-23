@@ -14,7 +14,7 @@ internal static class VideoEvents
     [HarmonyPrefix]
     private static void HandleContext(FootageController __instance)
     {
-        if (__instance.subsData == null) return;
+        if (__instance.player.clip.name == "hammer_smash") Videos.FloppyDiskDestroyed.Send();
 
         VideoTracker? video = __instance.player.clip.name switch
         {
@@ -42,8 +42,26 @@ internal static class VideoEvents
     [HarmonyPostfix]
     private static void OnVideoStart(FootageController __instance)
     {
+        if (__instance.player.clip.name == "hammer_smash") Videos.OldDataUnpacked.Send();
+
         if (__instance.subsData == null) return;
 
         new RequestMute(true).Send();
+    }
+
+    private static bool _didTheThing;
+
+    [HarmonyPatch(typeof(FootageController), nameof(FootageController.ManagedUpdate))]
+    [HarmonyPrefix]
+    private static void OnVideoUpdate(FootageController __instance)
+    {
+        if (_didTheThing) return;
+
+        if (__instance.player.clip.name == "luke_murdered" && __instance.player.time is > 54 and < 55)
+        {
+            _didTheThing = true;
+            Videos.LukeDied.Send();
+            new RequestMute(false).Send();
+        }
     }
 }
