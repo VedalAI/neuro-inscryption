@@ -56,10 +56,10 @@ public sealed class VideoTracker(List<VideoTracker.VideoEvent> events) : IEnumer
         if (continuing)
         {
             // if continuing, it's not obvious who "he" is
-            int luckyCarder = message.IndexOf("The Lucky Carder", StringComparison.OrdinalIgnoreCase);
+            int luke = message.IndexOf("Luke", StringComparison.OrdinalIgnoreCase);
             int firstHe = message.IndexOf("He", StringComparison.OrdinalIgnoreCase);
-            if (firstHe >= 0 && (luckyCarder < 0 || firstHe < luckyCarder))
-                message = message.Remove(firstHe, 2).Insert(firstHe, "The Lucky Carder");
+            if (firstHe >= 0 && (luke < 0 || firstHe < luke))
+                message = message.Remove(firstHe, 2).Insert(firstHe, "Luke");
         }
 
         new Event(message, Priority.Context).Send();
