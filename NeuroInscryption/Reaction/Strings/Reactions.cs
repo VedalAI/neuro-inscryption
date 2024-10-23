@@ -18,12 +18,6 @@ public static class Reactions
 
     public static readonly ReactionTracker MycologistsFound = new("P03's face changes into a horrifying one, then disappears. The so-called 'Mycologists' seem to have taken control over him. They appear as real human beings, not in-game characters.", Priority.Context, true);
 
-    // archivist has dialogue before the request, vedal will probably read it to neuro out loud
-    //public static readonly ReactionTracker ArchivistRequestAccess = new("In the middle of the battle against The Archivist, the boss requests access to the Vedal's actual hard drives.", Priority.Force, true);
-
-    // p03 literally says "here come your actual files, i hope noone's watching", vedal will probably read it out
-    //public static readonly ReactionTracker ArchivistOpenMenu = new("A file explorer menu opens, all of Vedal's files are exposed for anyone to see!", Priority.Force, true);
-
     public static readonly ReactionTracker ArchivistPickFile = new("Vedal has given The Archivist access to the following file: {0}", Priority.Context, true);
 
     // ReSharper disable InconsistentNaming
@@ -31,8 +25,6 @@ public static class Reactions
 
     public static readonly ReactionTracker G0llyFriendsStart = new("G0lly has accessed Vedal's friends list on Steam and is creating cards with the friends' names and avatars!", Priority.Context, true);
 
-    // TODO: filter friends list
-    // todo: manual
     public static readonly ReactionTracker G0llyFriendSpawned = new("{0} was just turned into a card and has appeared on the board!", Priority.Context);
 
     public static readonly ReactionTracker G0llyCreateCard = new("G0lly asked Vedal to make a card and send it to another player on the Internet. It would be funny if the card was purposefully made to be terrible and unusable.", Priority.Force, true);
@@ -55,8 +47,4 @@ public static class Reactions
     public static readonly ReactionTracker MeetingMagnificus = new("The player now faces Magnificus, whose 3D form looks like a human-shaped bush. Magnificus pleads with the player to save the game from deletion.", Priority.Context, true);
 
     public static readonly ReactionTracker GoodbyeMagnificus = new("With the game on the brink of total deletion, Magnificus crawls towards the player trying to shake hands. He does not make it.", Priority.Context, true);
-
-    // dialogue, remove? vedal will read
-    // todo: manual
-    public static readonly ReactionTracker WoodcarverAdvice = new("In the endless white void with nothing else remaining in the game, alone stands the Wood Carver. She advises the player to not access the OLD_DATA left behind, even though she knows that her advice will not be heeded. She then gets deleted.", Priority.Context, true);
 }

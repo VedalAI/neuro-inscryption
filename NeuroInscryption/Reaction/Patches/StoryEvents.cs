@@ -3,7 +3,6 @@ using System.IO;
 using DiskCardGame;
 using GBC;
 using HarmonyLib;
-using NeuroInscryption.Reaction.API;
 using NeuroInscryption.Reaction.Strings;
 using NeuroInscryption.Utilities.Enumerators;
 
@@ -45,18 +44,17 @@ internal static class StoryEvents
 
     #region Act 3
 
-    [HarmonyPatch(typeof(FileAccessUI), nameof(FileAccessUI.Initialize))]
+    [HarmonyPatch(typeof(Opponent), nameof(Opponent.QueueCard), MethodType.Enumerator)]
     [HarmonyPostfix]
-    private static void ArchivistRequestAccess()
+    private static void OnCardPlayed(IEnumerator __instance)
     {
-        //Reactions.ArchivistRequestAccess.Send();
-    }
+        EnumeratorWrapper<Opponent> enumerator = new(__instance);
+        if (enumerator.State != 1) return;
 
-    [HarmonyPatch(typeof(FileBrowseUtil), nameof(FileBrowseUtil.BrowseForFile))]
-    [HarmonyPostfix]
-    private static void FileBrowserOpened()
-    {
-        //Reactions.ArchivistOpenMenu.Send();
+        CardInfo cardInfo = enumerator.GetFieldValue<CardInfo>("cardInfo");
+        if (cardInfo.name != "!FRIENDCARD_BASE") return;
+
+        Reactions.G0llyFriendSpawned.Send(cardInfo.DisplayedNameEnglish);
     }
 
     [HarmonyPatch(typeof(ArchivistBossOpponent), nameof(ArchivistBossOpponent.FindFileSequence), MethodType.Enumerator)]
