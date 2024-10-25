@@ -10,6 +10,7 @@ using NeuroInscryption.Input.Helpers;
 using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 using UnityEngine;
+using Debug = System.Diagnostics.Debug;
 
 namespace NeuroInscryption.Automation.Game.Map;
 

@@ -16,7 +16,7 @@ internal sealed class DevCheats : Singlyboi<DevCheats>
 
     private void Update()
     {
-        // Ctrl(+Shift)+Q ("quick win")
+        // Ctrl+Q ("quick win"); spam or hold Shift to also skip all boss phases
         if (UInput.GetKey(KeyCode.LeftControl) && UInput.GetKeyDown(KeyCode.Q))
         {
             StartCoroutine(Win(UInput.GetKey(KeyCode.LeftShift)));
@@ -35,15 +35,15 @@ internal sealed class DevCheats : Singlyboi<DevCheats>
     /// </summary>
     public IEnumerator Win(bool winHarder = false)
     {
-        if (TurnManager.Instance is not { Opponent: { } opponent }) yield break;
+        if (!TurnManager.Instance.Opponent) yield break;
 
         if (_lastWon + 1 > Time.time)
             winHarder = true;
         _lastWon = Time.time;
 
-        if (winHarder) opponent.NumLives = 1;
+        if (winHarder) TurnManager.Instance.Opponent.NumLives = 1;
 
-        // to-do: find funny prefab to throw on the scales
-        yield return LifeManager.Instance.ShowDamageSequence(LifeManager.Instance.DamageUntilPlayerWin, 1, false);
+        yield return LifeManager.Instance.ShowDamageSequence(LifeManager.Instance.DamageUntilPlayerWin, 1, false,
+            alternateWeightPrefab: ResourceBank.Get<GameObject>("Prefabs/Environment/ScaleWeights/Weight_DataFile_GB"));
     }
 }

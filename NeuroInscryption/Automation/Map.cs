@@ -51,10 +51,10 @@ internal class Map
         return node;
     }
 
-    private const int MAX_DEPTH = 5;
+    private const int MaxDepth = 5;
     private static List<List<MapNodeData>> GetPaths(MapNode node, int depth = 0)
     {
-        if (node.connectedNodes.Count == 0 || depth == MAX_DEPTH)
+        if (node.connectedNodes.Count == 0 || depth == MaxDepth)
         {
             return [[MapNodeData.Create(node)]];
         }
@@ -64,16 +64,14 @@ internal class Map
         foreach (MapNode childNode in node.connectedNodes)
         {
             List<List<MapNodeData>> paths = GetPaths(childNode, depth + 1);
-
-            if (depth != 0)
-            {
-                foreach (List<MapNodeData> t in paths)
-                {
-                    t.Insert(0, MapNodeData.Create(node));
-                }
-            }
-
             result.AddRange(paths);
+
+            if (depth == 0) continue;
+            
+            foreach (List<MapNodeData> t in paths)
+            {
+                t.Insert(0, MapNodeData.Create(node));
+            }
         }
 
         return result;

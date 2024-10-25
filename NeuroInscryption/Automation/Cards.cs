@@ -19,7 +19,7 @@ namespace NeuroInscryption.Automation;
 internal class Cards
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class LoadoutContext(IEnumerable<SelectableCard> cards, IGameState state) : ILoadoutContext
+    private sealed class LoadoutContext(IEnumerable<SelectableCard> cards, LoadoutState state) : ILoadoutContext
     {
         public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
 
@@ -27,11 +27,19 @@ internal class Cards
         IEnumerable<TraitData> ILoadoutContext.RelevantTraits => CardOptions.SelectMany(c => c.Card!.Traits);
     }
 
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+    private sealed class CombatContext(IEnumerable<SelectableCard> cards, CombatState state) : ICombatContext
+    {
+        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
+
+        public bool IncludeDeck => true;
+    }
+
     public async UniTask<SelectableCard> ChooseAddToDeck(CardChoicesSequencer choicer, CancellationToken ct = default)
     {
         List<SelectableCard> cards = choicer.selectableCards;
 
-        await UnflipCards(cards);
+        await UnflipCards(cards, ct);
 
         LoadoutState state = LoadoutState.Calculate();
         LoadoutContext context = new(cards, state);
@@ -79,13 +87,30 @@ internal class Cards
         await UniTask.Delay(200, cancellationToken: ct);
     }
 
-    public async UniTask<SelectableCard> ChooseCardLoadout(IEnumerable<SelectableCard> cards, Description description, CancellationToken ct = default)
+    public async UniTask<SelectableCard> ChooseCardLoadout(ICollection<SelectableCard> cards, Description description, CancellationToken ct = default)
     {
-        await UnflipCards(cards);
+        await UnflipCards(cards, ct);
 
         LoadoutState state = LoadoutState.Calculate();
         LoadoutContext context = new(cards, state);
         state.SetContext(context);
+
+        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
+        Decision decision = new(description, state);
+        decision.AddAction(chooseCardAction);
+
+        Action action = await decision.SendAsync(ct);
+
+        if (!action.Match(chooseCardAction, out SelectableCardData? selected)) action.ThrowInvalid();
+
+        return selected.TargetCard;
+    }
+
+    public async UniTask<SelectableCard> ChooseCardCombat(ICollection<SelectableCard> cards, Description description, CancellationToken ct = default)
+    {
+        // excellent
+        CombatState state = CombatState.Calculate();
+        CombatContext context = new(cards, state);
 
         ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
         Decision decision = new(description, state);

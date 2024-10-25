@@ -30,13 +30,13 @@ public sealed class SelectableCardData : IIdentifiable
     [JsonIgnore]
     public SelectableCard TargetCard { get; private set; }
 
-    private SelectableCardData(SelectableCard card, int index, IGameState state)
+    private SelectableCardData(SelectableCard card, int index, IGameState state) // todo remove state, only used for ijiraq
     {
         TargetCard = card;
 
         if (card.Info != null)
         {
-            Card = CardData.Create(card.Info, state);
+            Card = CardData.Create(card.Info);
             CardIdentifier = Card.DisplayName;
             if (index != -1) CardIdentifier += StringFormatter.Format(CardStrings.GenericDiscriminator, index);
 
@@ -44,7 +44,7 @@ public sealed class SelectableCardData : IIdentifiable
         }
         else if (card.ChoiceInfo.CardInfo != null)
         {
-            Card = CardData.Create(card.ChoiceInfo.CardInfo, state);
+            Card = CardData.Create(card.ChoiceInfo.CardInfo);
             CardIdentifier = Card.DisplayName;
             if (index != -1) CardIdentifier += StringFormatter.Format(CardStrings.GenericDiscriminator, index);
 
