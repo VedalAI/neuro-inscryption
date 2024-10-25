@@ -14,7 +14,6 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -22,9 +21,9 @@ namespace NeuroInscryption.Automation.Game.Map;
 public sealed class GoobertFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(IEnumerable<SelectableCard> cards, IGameState state) : ILoadoutContext
+    private sealed class Context(IEnumerable<SelectableCard> cards) : ILoadoutContext
     {
-        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i)).ToList();
+        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select(SelectableCardData.Create).ToList();
 
         IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
         IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
@@ -49,7 +48,7 @@ public sealed class GoobertFlow : HarmonyAutomationFlow<IEnumerator>
         await NeuroMouse.ClickAsync(400, ct);
 
         LoadoutState state = LoadoutState.Calculate();
-        Context context = new(instance.selectionSlot.cardSelector.displayedCards, state);
+        Context context = new(instance.selectionSlot.cardSelector.displayedCards);
         state.SetContext(context);
 
         ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);

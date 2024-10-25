@@ -2,7 +2,6 @@
 using DiskCardGame;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Strings;
 using Newtonsoft.Json;
 
@@ -30,13 +29,13 @@ public sealed class SelectableCardData : IIdentifiable
     [JsonIgnore]
     public Card TargetCard { get; private set; }
 
-    private SelectableCardData(Card card, int index = -1)
+    private SelectableCardData(Card card, int index = -1, IGameState? state = null)
     {
         TargetCard = card;
 
         if (card.Info != null)
         {
-            Card = CardData.Create(card.Info);
+            Card = CardData.Create(card.Info, state);
             CardIdentifier = Card.DisplayName;
             if (index != -1) CardIdentifier += StringFormatter.Format(CardStrings.GenericDiscriminator, index);
 
@@ -71,5 +70,6 @@ public sealed class SelectableCardData : IIdentifiable
         }
     }
 
-    public static SelectableCardData Create(Card card, int index = -1) => new(card, index);
+    public static SelectableCardData Create(Card card, int index = -1) => Create(card, index, null);
+    public static SelectableCardData Create(Card card, int index, IGameState? state) => new(card, index, state);
 }

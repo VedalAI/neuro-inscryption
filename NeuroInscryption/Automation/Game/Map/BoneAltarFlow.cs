@@ -13,7 +13,6 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -40,7 +39,7 @@ public sealed class BoneAltarFlow : HarmonyAutomationFlow<IEnumerator>
 
         LoadoutState state = LoadoutState.Calculate();
 
-        IEnumerable<SelectableCardData> cards = instance.sacrificeSlot.cardSelector.displayedCards.Select((c, i) => SelectableCardData.Create(c, i)).ToList();
+        IEnumerable<SelectableCardData> cards = instance.sacrificeSlot.cardSelector.displayedCards.Select(SelectableCardData.Create).ToList();
 
         ChooseAction<SelectableCardData> chooseCardAction = new(cards);
 

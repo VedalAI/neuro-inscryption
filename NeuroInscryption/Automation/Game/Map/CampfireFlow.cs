@@ -13,7 +13,6 @@ using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
@@ -22,17 +21,17 @@ namespace NeuroInscryption.Automation.Game.Map;
 public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context1(IEnumerable<SelectableCard> cards, IGameState state, bool isAttack) : ILoadoutContext
+    private sealed class ChooseCardContext(IEnumerable<SelectableCard> cards, bool isAttack) : ILoadoutContext
     {
         public readonly string BoostType = isAttack ? DecisionStrings.CampfireAttackBoost : DecisionStrings.CampfireHealthBoost;
-        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i)).ToList();
+        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select(SelectableCardData.Create).ToList();
 
         IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
         IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context2(CardData card, bool isAttack) : ILoadoutContext
+    private sealed class UpgradeTwiceContext(CardData card, bool isAttack) : ILoadoutContext
     {
         public readonly string BoostType = isAttack ? DecisionStrings.CampfireAttackBoost : DecisionStrings.CampfireHealthBoost;
         public readonly CardData ChosenCardToUpgrade = card;
@@ -62,7 +61,7 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
         await NeuroMouse.ClickAsync(400, ct);
 
         LoadoutState state = LoadoutState.Calculate();
-        Context1 context = new(instance.selectionSlot.cardSelector.displayedCards, state, isAttack);
+        ChooseCardContext context = new(instance.selectionSlot.cardSelector.displayedCards, isAttack);
         state.SetContext(context);
 
         ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
@@ -86,10 +85,11 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
 
     private async UniTask HandleSecondUpgradeAsync(CardStatBoostSequencer instance, bool isAttack, LoadoutState state, CardData oldCardData, CancellationToken ct)
     {
-        Context2 context = new(CardData.Create(oldCardData.TargetCardInfo, state), isAttack);
+        UpgradeTwiceContext context = new(CardData.Create(oldCardData.TargetCardInfo, state), isAttack);
         state.SetContext(context);
 
         // todo: just ask for a bool instead
+        // todo: always upgrade if risk-free?
         CampfireSecondUpgradeAction campfireSecondUpgradeAction = new();
         LeaveAction leaveAction = new();
 

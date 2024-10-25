@@ -13,7 +13,6 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Combat;
@@ -23,7 +22,7 @@ public sealed class MagpieDrawFlow : HarmonyAutomationFlow<IEnumerator>
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(IEnumerable<SelectableCard> cards, IGameState state) : ICombatContext
     {
-        public readonly IReadOnlyList<SelectableCardData> RemainingDeckToDrawFrom = cards.Select((c, i) => SelectableCardData.Create(c, i)).ToList();
+        public readonly IReadOnlyList<SelectableCardData> RemainingDeckToDrawFrom = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
 
         bool ICombatContext.IncludeDeck => false;
     }

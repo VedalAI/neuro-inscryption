@@ -19,9 +19,9 @@ namespace NeuroInscryption.Automation;
 internal class Cards
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class LoadoutContext(IEnumerable<SelectableCard> cards, LoadoutState state) : ILoadoutContext
+    private sealed class LoadoutContext(IEnumerable<SelectableCard> cards) : ILoadoutContext
     {
-        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i)).ToList();
+        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select(SelectableCardData.Create).ToList();
 
         IEnumerable<SigilData> ILoadoutContext.RelevantSigils => CardOptions.SelectMany(c => c.Card!.RelevantSigils);
         IEnumerable<TraitData> ILoadoutContext.RelevantTraits => CardOptions.SelectMany(c => c.Card!.Traits);
@@ -34,7 +34,7 @@ internal class Cards
         await UnflipCards(cards, ct);
 
         LoadoutState state = LoadoutState.Calculate();
-        LoadoutContext context = new(cards, state);
+        LoadoutContext context = new(cards);
         state.SetContext(context);
 
         CardSingleChoicesSequencer rerollable = (choicer as CardSingleChoicesSequencer)!; // day 999 of hating the way unity works with nulls
@@ -84,7 +84,7 @@ internal class Cards
         await UnflipCards(cards, ct);
 
         LoadoutState state = LoadoutState.Calculate();
-        LoadoutContext context = new(cards, state);
+        LoadoutContext context = new(cards);
         state.SetContext(context);
 
         ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using DiskCardGame;
 using NeuroInscryption.Communication.Strings;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Strings;
 
 namespace NeuroInscryption.Communication.Data.Describable;

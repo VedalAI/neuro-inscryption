@@ -14,7 +14,6 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -22,9 +21,9 @@ namespace NeuroInscryption.Automation.Game.Map;
 public sealed class TraderFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(List<SelectableCard> cards, int amount, IGameState state) : ILoadoutContext
+    private sealed class Context(List<SelectableCard> cards, int amount) : ILoadoutContext
     {
-        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i)).ToList();
+        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select(SelectableCardData.Create).ToList();
         public readonly int NumberOfCardsToBuy = amount;
 
         IEnumerable<SigilData> ILoadoutContext.RelevantSigils => CardOptions.SelectMany(c => c.Card!.RelevantSigils);
@@ -47,7 +46,7 @@ public sealed class TraderFlow : HarmonyAutomationFlow<IEnumerator>
         await UniTask.Delay(500, cancellationToken: ct);
 
         LoadoutState state = LoadoutState.Calculate();
-        Context context = new(instance.tradeCards, instance.peltCards.Count, state);
+        Context context = new(instance.tradeCards, instance.peltCards.Count);
         state.SetContext(context);
 
         ChooseMultipleAction<SelectableCardData> chooseAction = new(context.CardOptions, context.NumberOfCardsToBuy);

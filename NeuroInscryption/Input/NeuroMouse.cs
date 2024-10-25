@@ -96,7 +96,7 @@ public static class NeuroMouse
 
         foreach (Vector3 position in worldPositions)
         {
-            if (IsPointOnScreen(position) && isOk(position, out Vector2 result)) return result;
+            if (IsPointOnScreen(position) && IsOk(position, out Vector2 result)) return result;
         }
 
         Transform topLeft = interactable.transform.Find("TopLeftMarker");
@@ -105,23 +105,23 @@ public static class NeuroMouse
         if (topLeft && topRight)
         {
             Vector3 averagePosition = (topLeft.position + topRight.position) / 2;
-            if (isOk(averagePosition, out Vector2 result)) return result;
+            if (IsOk(averagePosition, out Vector2 result)) return result;
         }
 
         if (topLeft)
         {
-            if (isOk(topLeft.position, out Vector2 result)) return result;
+            if (IsOk(topLeft.position, out Vector2 result)) return result;
         }
 
         if (topRight)
         {
-            if (isOk(topRight.position, out Vector2 result)) return result;
+            if (IsOk(topRight.position, out Vector2 result)) return result;
         }
 
         Plugin.Logger.LogWarning($"Cannot find a suitable cursor position for interactable {interactable}! Gonna move to the center, even if the raycast there hits {InteractionCursor.Instance.CastForInteractableAtWorldPosition(interactable.transform.position)}");
         return GetCursorPointForWorldPoint(interactable.transform.position);
 
-        bool isOk(Vector3 worldPosition, out Vector2 cursorPoint)
+        bool IsOk(Vector3 worldPosition, out Vector2 cursorPoint)
         {
             if (CursorReachedTarget(interactable, InteractionCursor.Instance.CastForInteractableAtWorldPosition(worldPosition)))
             {

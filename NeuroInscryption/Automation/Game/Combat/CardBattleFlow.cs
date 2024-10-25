@@ -13,7 +13,6 @@ using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Input.Helpers;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;

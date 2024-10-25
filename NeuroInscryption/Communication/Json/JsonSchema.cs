@@ -6,7 +6,7 @@ namespace NeuroInscryption.Communication.Json;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public sealed class JsonSchema
 {
-    private static readonly Dictionary<string, JsonSchema> DefaultProps = new()
+    private static readonly Dictionary<string, JsonSchema> _defaultProps = new()
     {
         ["action"] = QJS.Type(JsonSchemaType.String),
         ["data"] = QJS.Type(JsonSchemaType.Object),
@@ -17,7 +17,7 @@ public sealed class JsonSchema
         {
             Type = JsonSchemaType.Object,
             Required = ["action", "data"],
-            Properties = DefaultProps
+            Properties = _defaultProps
         };
     }
 
@@ -209,13 +209,13 @@ public sealed class JsonSchema
 
     public void Add(Dictionary<string, JsonSchema> properties)
     {
-        Add(new JsonSchema() { Properties = properties });
+        Add(new JsonSchema { Properties = properties });
     }
 
     public void Prepare()
     {
-        if (_oneOf is [JsonSchema { _properties: { } } single]
-            && _properties == DefaultProps)
+        if (_oneOf is [{ _properties: { } } single]
+            && _properties == _defaultProps)
         {
             _properties = single._properties;
             _oneOf = null;
