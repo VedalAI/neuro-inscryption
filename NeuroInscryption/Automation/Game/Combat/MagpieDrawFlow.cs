@@ -23,7 +23,7 @@ public sealed class MagpieDrawFlow : HarmonyAutomationFlow<IEnumerator>
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(IEnumerable<SelectableCard> cards, IGameState state) : ICombatContext
     {
-        public readonly IReadOnlyList<SelectableCardData> RemainingDeckToDrawFrom = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
+        public readonly IReadOnlyList<SelectableCardData> RemainingDeckToDrawFrom = cards.Select((c, i) => SelectableCardData.Create(c, i)).ToList();
 
         bool ICombatContext.IncludeDeck => false;
     }

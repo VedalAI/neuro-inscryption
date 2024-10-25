@@ -25,7 +25,7 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
     private sealed class Context1(IEnumerable<SelectableCard> cards, IGameState state, bool isAttack) : ILoadoutContext
     {
         public readonly string BoostType = isAttack ? DecisionStrings.CampfireAttackBoost : DecisionStrings.CampfireHealthBoost;
-        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
+        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i)).ToList();
 
         IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
         IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];

@@ -28,5 +28,6 @@ public static class DecisionStrings
     public static readonly Description ChooseDeckTrial = ("deck_trial_choice", "Choose a deck trial. Afterwards, 3 random cards will be selected from your deck to check if they meet the requirements of the trial. If you pass, you will get to choose one of three cards with 2 additional sigils each. If you fail, you will not get anything.");
     public static readonly Description ChooseItem = ("item_choice", "Choose an item to add to your pack.");
     public static readonly DescriptionFormat ChooseTraderCards = ("trade_card_choice", "Choose {0} {0:card|cards} to buy from the Trader and add to your deck");
+    public static readonly DescriptionFormat ChooseTraderCardsBattle = ("trade_card_choice", "Choose {0} {0:card|cards} to buy from the Trader and add to your hand. The rest of the cards will fight on the Trader's side.");
     public static readonly DescriptionFormat BuyTrapperItems = ("trapper_buy_choice", "You have {0} {0:tooth|teeth} to spend. Choose what items to buy from the Trapper. You can also leave if you do not want to buy anything.");
 }

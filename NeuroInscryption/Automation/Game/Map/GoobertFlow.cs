@@ -24,7 +24,7 @@ public sealed class GoobertFlow : HarmonyAutomationFlow<IEnumerator>
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(IEnumerable<SelectableCard> cards, IGameState state) : ILoadoutContext
     {
-        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
+        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i)).ToList();
 
         IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
         IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];

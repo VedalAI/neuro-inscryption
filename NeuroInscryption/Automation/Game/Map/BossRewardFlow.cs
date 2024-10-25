@@ -13,7 +13,7 @@ public class BossRewardFlow : HarmonyAutomationFlow<IEnumerator>
 {
     public override FlowHook[] Hooks =>
     [
-        new FlowHook()
+        new()
         {
             Method = AccessTools.EnumeratorMoveNext(typeof(RareCardChoicesSequencer).GetMethod(nameof(RareCardChoicesSequencer.ChooseRareCard))),
             IsValid = FlowHookHelpers.EnumeratorStateIs(8)
@@ -22,8 +22,9 @@ public class BossRewardFlow : HarmonyAutomationFlow<IEnumerator>
     
     protected override async UniTask ExecuteAsync(IEnumerator target, CancellationToken ct)
     {
-        EnumeratorWrapper<RareCardChoicesSequencer> wrapper = new(target);
-        SelectableCard? card = await Neuro.Cards.ChooseAddToDeck(wrapper.This, ct);
+        RareCardChoicesSequencer choicer = target.GetThis<RareCardChoicesSequencer>();
+        Card card = await Neuro.Cards.ChooseAddToDeck(choicer, ct);
+        System.Diagnostics.Debug.Assert(card, "did not pick boss rare");
 
         await NeuroMouse.MoveToAsync(card, 300, ct);
         await NeuroMouse.ClickAsync(ct);

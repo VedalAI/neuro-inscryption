@@ -40,7 +40,7 @@ public sealed class BoneAltarFlow : HarmonyAutomationFlow<IEnumerator>
 
         LoadoutState state = LoadoutState.Calculate();
 
-        IEnumerable<SelectableCardData> cards = instance.sacrificeSlot.cardSelector.displayedCards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
+        IEnumerable<SelectableCardData> cards = instance.sacrificeSlot.cardSelector.displayedCards.Select((c, i) => SelectableCardData.Create(c, i)).ToList();
 
         ChooseAction<SelectableCardData> chooseCardAction = new(cards);
 

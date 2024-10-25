@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NeuroInscryption.Communication.Data.Serializable;
+using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Strings;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Communication.Actions.Map;
 
-public sealed class ChooseTraderCardsAction(IEnumerable<SelectableCardData> cards, int amount) : IAction<IEnumerable<SelectableCardData>>
+public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> cards, int amount) : IAction<IEnumerable<TSelectable>>
+    where TSelectable : IIdentifiable
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
@@ -27,7 +28,7 @@ public sealed class ChooseTraderCardsAction(IEnumerable<SelectableCardData> card
 
     public string ActionName => ActionStrings.MakeChoice;
 
-    bool IAction<IEnumerable<SelectableCardData>>.Deserialize(Action action, out IEnumerable<SelectableCardData>? response)
+    bool IAction<IEnumerable<TSelectable>>.Deserialize(Action action, out IEnumerable<TSelectable>? response)
     {
         IEnumerable<string?>? cardIdentifiers = action.ActionData?.Values<string>()!;
         if (cardIdentifiers == null)

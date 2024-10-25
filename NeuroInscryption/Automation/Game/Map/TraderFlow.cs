@@ -24,7 +24,7 @@ public sealed class TraderFlow : HarmonyAutomationFlow<IEnumerator>
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(List<SelectableCard> cards, int amount, IGameState state) : ILoadoutContext
     {
-        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
+        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select((c, i) => SelectableCardData.Create(c, i)).ToList();
         public readonly int NumberOfCardsToBuy = amount;
 
         IEnumerable<SigilData> ILoadoutContext.RelevantSigils => CardOptions.SelectMany(c => c.Card!.RelevantSigils);
@@ -50,7 +50,7 @@ public sealed class TraderFlow : HarmonyAutomationFlow<IEnumerator>
         Context context = new(instance.tradeCards, instance.peltCards.Count, state);
         state.SetContext(context);
 
-        ChooseTraderCardsAction chooseAction = new(context.CardOptions, context.NumberOfCardsToBuy);
+        ChooseMultipleAction<SelectableCardData> chooseAction = new(context.CardOptions, context.NumberOfCardsToBuy);
 
         Decision decision = new(DecisionStrings.ChooseTraderCards.Format(context.NumberOfCardsToBuy), state);
         decision.AddAction(chooseAction);
@@ -59,10 +59,10 @@ public sealed class TraderFlow : HarmonyAutomationFlow<IEnumerator>
 
         if (!action.Match(chooseAction, out IEnumerable<SelectableCardData>? chosenCards)) action.ThrowInvalid();
 
+        AllowManualInterruption = false;
         foreach (SelectableCardData card in chosenCards)
         {
             await NeuroMouse.MoveToAsync(card.TargetCard, 500, ct);
-            AllowManualInterruption = false;
             await NeuroMouse.ClickAsync(250, ct);
         }
     }
