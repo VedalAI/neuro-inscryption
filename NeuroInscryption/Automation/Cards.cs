@@ -1,18 +1,19 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using DiskCardGame;
+using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Input.Helpers;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using NeuroInscryption.Communication.Actions;
-using NeuroInscryption.Communication.Actions.Map;
+using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation;
 
@@ -66,7 +67,7 @@ internal class Cards
         }
 
         action.ThrowInvalid();
-        throw new System.InvalidOperationException($"Unreachable in {nameof(ChooseAddToDeck)} after ThrowInvalid");
+        throw new InvalidOperationException($"Unreachable in {nameof(ChooseAddToDeck)} after ThrowInvalid");
     }
 
     public async UniTask UnflipCards(IEnumerable<SelectableCard> cards, CancellationToken ct = default)
