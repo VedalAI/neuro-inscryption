@@ -45,7 +45,7 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
         CampfireBoostContext context = new CampfireBoostContext(isAttack);
         List<SelectableCard> cards = instance.selectionSlot.cardSelector.displayedCards;
 
-        Card card = await Neuro.Cards.ChooseCardLoadout(cards, DecisionStrings.CampfireChooseCard, context, ct);
+        Card card = await Neuro.Cards.ChooseCardLoadout(cards, DecisionStrings.CampfireChooseCard, ct, context);
 
         await NeuroMouse.MoveToAsync(card, 200, ct);
         await NeuroMouse.ClickAsync(1000, ct);

@@ -86,9 +86,7 @@ internal class Cards
     /// Pick a card from the given <paramref name="cards"/> in the <see cref="LoadoutState">loadout context</see>.
     /// </summary>
     /// <param name="description">Description to send. This should describe what kind of choice is being made.</param>
-    /// <param name="additionalContext">
-    /// Any additional context to include in the state. This can be an anonymous object.
-    /// </param>
+    /// <param name="additionalContext">Any additional context to include in the state. This can be an anonymous object.</param>
     /// <example>
     /// <code>
     /// Card cardToGloopBlurb = await Neuro.Cards.ChooseCardLoadout(cards,
@@ -97,7 +95,7 @@ internal class Cards
     /// );
     /// </code>
     /// </example>
-    public async UniTask<Card> ChooseCardLoadout(IReadOnlyCollection<SelectableCard> cards, Description description, object? additionalContext = null, CancellationToken ct = default)
+    public async UniTask<Card> ChooseCardLoadout(IReadOnlyCollection<SelectableCard> cards, Description description, CancellationToken ct = default, object? additionalContext = null)
     {
         await UnflipCards(cards, ct);
 

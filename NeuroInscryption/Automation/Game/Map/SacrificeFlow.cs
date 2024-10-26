@@ -32,12 +32,12 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
 
         // fun exercise: random order for picking sac/host
         Card sacrifice = await PickSacrifice(instance, ct);
-        AutomationManager.Assert(sacrifice is { }, "did not pick sacrifice");
+        AutomationManager.Assert(sacrifice, "did not pick sacrifice");
 
         await UniTask.Delay(300, cancellationToken: ct);
 
         Card host = await PickHost(instance, ct);
-        AutomationManager.Assert(host is { }, "did not pick host");
+        AutomationManager.Assert(host, "did not pick host");
 
         await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);
         await NeuroMouse.ClickAsync(ct);
@@ -88,7 +88,7 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
         List<SelectableCard> hosts = instance.hostSlot.cardSelector.displayedCards;
         AutomationManager.Assert(hosts.Count > 0, "No host cards found");
 
-        Card card = await Neuro.Cards.ChooseCardLoadout(hosts, DecisionStrings.SacrificeEmpower.Format(CardData.Create(sac.Info).GetDescription()), ct);
+        Card card = await Neuro.Cards.ChooseCardLoadout(hosts, DecisionStrings.SacrificeEmpower.Format(CardData.Create(sac.Info).GetDescription()), ct: ct);
         await NeuroMouse.MoveToAsync(card, 200, ct);
         await NeuroMouse.ClickAsync(ct);
 

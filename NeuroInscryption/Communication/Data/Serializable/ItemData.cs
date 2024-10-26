@@ -1,5 +1,6 @@
 ﻿using DiskCardGame;
-using NeuroInscryption.Utilities;
+using NeuroInscryption.Communication.Data.Describable;
+using NeuroInscryption.Communication.Strings;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
@@ -25,9 +26,9 @@ public sealed class ItemData : IIdentifiable
     private ItemData(ConsumableItem item)
     {
         Item = item;
-
-        Identifier = Data.rulebookName;
-        Description = Data.rulebookDescription.ParseDescription();
+        Description desc = ItemStrings.Get(item);
+        Identifier = desc.Name;
+        Description = desc.Info;
     }
 
     public static ItemData Create(ItemSlot slot) => new((ConsumableItem)slot.Item) { Slot = slot };
