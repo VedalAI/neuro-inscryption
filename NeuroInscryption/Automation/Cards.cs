@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
+using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
@@ -57,7 +58,7 @@ internal class Cards
         }
         if (action.Match(rerollAction))
         {
-            Debug.Assert(clover, $"Ended up in reroll path on non-rerollable choicer {choicer.GetType().Name} - schema enforcement fail?");
+            AutomationManager.Assert(clover, $"Ended up in reroll path on non-rerollable choicer {choicer.GetType().Name} - schema enforcement fail?");
             await NeuroMouse.MoveToAsync(clover, 200, ct);
             await NeuroMouse.ClickAsync(ct);
             //await UniTask.Delay(100, cancellationToken: ct);

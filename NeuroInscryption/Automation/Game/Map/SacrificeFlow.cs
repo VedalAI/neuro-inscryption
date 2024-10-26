@@ -32,12 +32,12 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
 
         // fun exercise: random order for picking sac/host
         Card sacrifice = await PickSacrifice(instance, ct);
-        Debug.Assert(sacrifice is { }, "did not pick sacrifice");
+        AutomationManager.Assert(sacrifice is { }, "did not pick sacrifice");
 
         await UniTask.Delay(300, cancellationToken: ct);
 
         Card host = await PickHost(instance, ct);
-        Debug.Assert(host is { }, "did not pick host");
+        AutomationManager.Assert(host is { }, "did not pick host");
 
         await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);
         await NeuroMouse.ClickAsync(ct);
@@ -59,7 +59,7 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
             .Where(card => instance.GetValidCardsForHost(card.Info).Any())
             .ToList();
 
-        Debug.Assert(sacrificable.Count > 0, "No sacrificable cards found"); // you can't cancel the stones iirc
+        AutomationManager.Assert(sacrificable.Count > 0, "No sacrificable cards found"); // you can't cancel the stones iirc
 
         Card card = await Neuro.Cards.ChooseCardLoadout(sacrificable, DecisionStrings.Sacrifice, ct);
         await NeuroMouse.MoveToAsync(card, 200, ct);
@@ -78,7 +78,7 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
         }
 
         SelectableCard sac = instance.sacrificeSlot.Card;
-        Debug.Assert((bool)sac, "Should have picked a sacrifice by this point");
+        AutomationManager.Assert((bool)sac, "Should have picked a sacrifice by this point");
         // alternatively,
         //if (!sac) sac = await PickSacrifice(instance, ct);
 
@@ -86,7 +86,7 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
         await NeuroMouse.ClickAsync(400, ct);
 
         List<SelectableCard> hosts = instance.hostSlot.cardSelector.displayedCards;
-        Debug.Assert(hosts.Count > 0, "No host cards found");
+        AutomationManager.Assert(hosts.Count > 0, "No host cards found");
 
         Card card = await Neuro.Cards.ChooseCardLoadout(hosts, DecisionStrings.SacrificeEmpower.Format(CardData.Create(sac.Info).GetDescription()), ct);
         await NeuroMouse.MoveToAsync(card, 200, ct);

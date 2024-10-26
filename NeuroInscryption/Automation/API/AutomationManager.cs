@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using GBC;
 using HarmonyLib;
 using NeuroInscryption.Tweaks;
 using NeuroInscryption.Utilities;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace NeuroInscryption.Automation.API;
 
@@ -131,6 +135,25 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         {
             FlowRunner.StartFlow(flow, context);
         }
+    }
+
+    [Conditional("DEBUG")]
+    public static void Assert(bool condition, string? message = null,
+        [CallerFilePath] string? callerFile = null,
+        [CallerMemberName] string? callerMember = null,
+        [CallerLineNumber] int? line = null)
+    {
+        if (condition) return;
+
+        Plugin.Logger.LogWarning("Forcing manual input due to assertion failure");
+        AllowManualInput = true;
+        FlowRunner.CancelCurrentFlowForcefully();
+        throw new Exception($"""
+            Assertion failed: {message ?? "(no message)"}
+                in {callerFile?[callerFile.IndexOf("NeuroInscryption", StringComparison.Ordinal)..]}
+                at {callerMember}:{line}
+            Stack trace:
+            """);
     }
 
     #region Patch methods

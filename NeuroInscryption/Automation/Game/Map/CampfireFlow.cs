@@ -63,7 +63,7 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
                 (new CampfireSecondUpgradeAction(), instance.confirmStone),
                 (new LeaveAction(), instance.selectionSlot),
             ], ct);
-        Debug.Assert(chosenButton, "did not pick on second campfire upgrade");
+        AutomationManager.Assert(chosenButton, "did not pick on second campfire upgrade");
         await UniTask.WaitUntil(() => instance.confirmStone.Enabled, cancellationToken: ct);
         
         await NeuroMouse.MoveToAsync(chosenButton, 200, ct);

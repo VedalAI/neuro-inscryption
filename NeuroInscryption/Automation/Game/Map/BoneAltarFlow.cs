@@ -33,7 +33,7 @@ public sealed class BoneAltarFlow : HarmonyAutomationFlow<IEnumerator>
 
         List<SelectableCard> cards = instance.sacrificeSlot.cardSelector.displayedCards;
         Card card = await Neuro.Cards.ChooseCardLoadout(cards, DecisionStrings.BoneAltarChooseCard, ct: ct);
-        Debug.Assert(card, "did not pick bone altar card");
+        AutomationManager.Assert(card, "did not pick bone altar card");
 
         await NeuroMouse.MoveToAsync(card, 200, ct);
         await NeuroMouse.ClickAsync(1000, ct);

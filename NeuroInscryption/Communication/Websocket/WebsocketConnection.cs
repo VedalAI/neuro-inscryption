@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using HarmonyLib;
+using NeuroInscryption.Automation.API;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -84,7 +85,7 @@ public sealed class WebsocketConnection : Singlyboi<WebsocketConnection>
     {
         string message = wsMessage.SerializeToJson();
         // insanity check
-        Debug.Assert(!message.Contains("Enumerator") && !message.Contains("Enumerable"), "Someone called ToString on an enumerable");
+        AutomationManager.Assert(!message.Contains("Enumerator") && !message.Contains("Enumerable"), "Someone called ToString on an enumerable");
         _messageQueue.Enqueue(message);
     }
 
