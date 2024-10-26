@@ -16,7 +16,8 @@ internal sealed class DevCheats : Singlyboi<DevCheats>
 
     private void Update()
     {
-        // Ctrl+Q ("quick win"); spam or hold Shift to also skip all boss phases
+        // Ctrl+Q ("quick win")
+        // Ctrl+Shift+Q (or spam Ctrl+Q) to skip remaining phases (on bosses)
         if (UInput.GetKey(KeyCode.LeftControl) && UInput.GetKeyDown(KeyCode.Q))
         {
             StartCoroutine(Win(UInput.GetKey(KeyCode.LeftShift)));
