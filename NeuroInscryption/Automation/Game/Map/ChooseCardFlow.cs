@@ -17,8 +17,12 @@ public sealed class ChooseCardFlow : HarmonyAutomationFlow<IEnumerator>
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(CardSingleChoicesSequencer), nameof(CardSingleChoicesSequencer.CardSelectionSequence))),
             IsValid = FlowHookHelpers.EnumeratorStateIs(11), // this used to check (enumerator.This.choicesRerolled: false) but that's always false at state 11
-        }
-        // TODO: boss rares
+        },
+        new()
+        {
+            Method = AccessTools.EnumeratorMoveNext(typeof(RareCardChoicesSequencer).GetMethod(nameof(RareCardChoicesSequencer.ChooseRareCard))),
+            IsValid = FlowHookHelpers.EnumeratorStateIs(8),
+        },
     ];
 
     public override bool CanInterruptItself => false;
@@ -27,7 +31,6 @@ public sealed class ChooseCardFlow : HarmonyAutomationFlow<IEnumerator>
     {
         EnumeratorWrapper<CardSingleChoicesSequencer> wrapper = new(enumerator);
         CardSingleChoicesSequencer instance = wrapper.This;
-        CardChoicesType choiceType = wrapper.GetFieldValue<CardChoicesNodeData>("<choicesData>5__2").choicesType;
 
         await UniTask.Delay(500, cancellationToken: ct);
 
@@ -37,6 +40,9 @@ public sealed class ChooseCardFlow : HarmonyAutomationFlow<IEnumerator>
         AllowManualInterruption = false;
         await NeuroMouse.ClickAsync(ct);
 
+        if (instance is RareCardChoicesSequencer) return;
+        
+        CardChoicesType choiceType = wrapper.GetFieldValue<CardChoicesNodeData>("<choicesData>5__2").choicesType;
         if (choiceType != CardChoicesType.Random)
         {
             await UniTask.Delay(150, cancellationToken: ct);
