@@ -31,13 +31,18 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(PlayerHand), nameof(PlayerHand.SelectSlotForCard))),
-            IsValid = context => context.GetResult<bool>() == false
+            IsValid = FlowHookHelpers.EnumeratorFinished(),
         },
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(ConsumableItemSlot), nameof(ConsumableItemSlot.ConsumeItem))),
-            IsValid = context => context.GetResult<bool>() == false
-        }
+            IsValid = FlowHookHelpers.EnumeratorFinished(),
+        },
+        new()
+        {
+            Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TargetSlotItem), nameof(TargetSlotItem.ActivateSequence))),
+            IsValid = FlowHookHelpers.EnumeratorFinished(),
+        },
     ];
 
     protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
@@ -54,7 +59,7 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
         CombatState state = CombatState.Calculate();
 
         ChooseAction<PlayableCardData> playCardAction = new(state.PlayerHand.Where(c => c.IsPlayable == true), ActionStrings.PlayCard);
-        ChooseAction<ItemData> useItemAction = new(state.Items, ActionStrings.UseItem);
+        ChooseAction<ItemData> useItemAction = new(state.Items.Where(i => i.IsUsable == true), ActionStrings.UseItem);
         AcceptSurrenderAction acceptSurrenderAction = new(state.IsOpponentSurrendering);
         EndTurnAction endTurnAction = new();
 

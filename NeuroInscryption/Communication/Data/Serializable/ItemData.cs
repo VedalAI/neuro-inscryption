@@ -9,23 +9,27 @@ public sealed class ItemData : IIdentifiable
 {
     [JsonProperty("Name")]
     public string Identifier { get; }
-
     public string Description { get; }
 
-    // Ignored from json
+    public bool? IsUsable => // CanBeUsedRightNow
+        !ConsumableItem.ConsumablesCanBeActivated() ? null // omit from json
+            : Item.ExtraActivationPrerequisitesMet();
 
     [JsonIgnore]
-    public ItemSlot? Slot { get; }
+    public ItemSlot? Slot { get; init; }
+    [JsonIgnore]
+    public ConsumableItem Item { get; init; }
+    [JsonIgnore]
+    public ConsumableItemData Data => (ConsumableItemData)Item.Data;
 
-    private ItemData(ItemSlot slot)
+    private ItemData(ConsumableItem item)
     {
-        ConsumableItemData? itemData = (ConsumableItemData) slot.Item.Data;
+        Item = item;
 
-        Identifier = itemData.rulebookName;
-        Description = itemData.rulebookDescription.ParseDescription();
-
-        Slot = slot;
+        Identifier = Data.rulebookName;
+        Description = Data.rulebookDescription.ParseDescription();
     }
 
-    public static ItemData Create(ItemSlot slot) => new(slot);
+    public static ItemData Create(ItemSlot slot) => new((ConsumableItem)slot.Item) { Slot = slot };
+    public static ItemData Create(ConsumableItem item) => new(item);
 }

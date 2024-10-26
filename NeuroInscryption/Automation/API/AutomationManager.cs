@@ -106,7 +106,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         {
             if (!linked.hook.IsValid(context))
             {
-                Plugin.Logger.LogDebug($"Skipping change to flow {linked.flow.GetType().Name} since current instance is not valid.");
+                // Plugin.Logger.LogDebug($"Skipping change to flow {linked.flow.GetType().Name} since current instance is not valid.");
                 continue;
             }
 

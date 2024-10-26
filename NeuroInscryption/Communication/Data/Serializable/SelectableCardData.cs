@@ -63,6 +63,7 @@ public sealed class SelectableCardData : IIdentifiable
             Identifier = Cost = selectable.ChoiceInfo.resourceType switch
             {
                 ResourceType.Blood => StringFormatter.Format(CardStrings.BloodCost, selectable.ChoiceInfo.resourceAmount),
+                // todo: "0 bones" for choice card w/ 1 bone on it (flipped to 8 bone vulture)
                 ResourceType.Bone => StringFormatter.Format(CardStrings.BonesCost, selectable.ChoiceInfo.resourceAmount),
                 ResourceType.None => throw new InvalidOperationException("Cannot create SelectableCardData for uninitialized CardChoice"),
                 _ => throw new ArgumentOutOfRangeException()
