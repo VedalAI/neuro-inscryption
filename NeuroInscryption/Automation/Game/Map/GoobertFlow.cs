@@ -1,17 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions.Map;
-using NeuroInscryption.Communication.Data.Describable;
-using NeuroInscryption.Communication.Data.Serializable;
-using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities.Enumerators;
@@ -20,15 +12,6 @@ namespace NeuroInscryption.Automation.Game.Map;
 
 public sealed class GoobertFlow : HarmonyAutomationFlow<IEnumerator>
 {
-    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(IEnumerable<SelectableCard> cards) : ILoadoutContext
-    {
-        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select(SelectableCardData.Create).ToList();
-
-        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
-        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
-    }
-
     public override FlowHook[] Hooks =>
     [
         new()
@@ -47,20 +30,11 @@ public sealed class GoobertFlow : HarmonyAutomationFlow<IEnumerator>
         await NeuroMouse.MoveToAsync(instance.selectionSlot, 200, ct);
         await NeuroMouse.ClickAsync(400, ct);
 
-        LoadoutState state = LoadoutState.Calculate();
-        Context context = new(instance.selectionSlot.cardSelector.displayedCards);
-        state.SetContext(context);
+        Card card = await Neuro.Cards.ChooseCardLoadout(instance.selectionSlot.cardSelector.displayedCards, DecisionStrings.GoobertChooseCard, ct);
 
-        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
+        Debug.Assert(card, "did not pick goobert card");
 
-        Decision decision = new(DecisionStrings.GoobertChooseCard, state);
-        decision.AddAction(chooseCardAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(chooseCardAction, out SelectableCardData? selected)) action.ThrowInvalid();
-
-        await NeuroMouse.MoveToAsync(selected.TargetCard, 200, ct);
+        await NeuroMouse.MoveToAsync(card, 200, ct);
         await NeuroMouse.ClickAsync(1000, ct);
 
         await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);

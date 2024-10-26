@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions.Map;
+using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
@@ -45,7 +45,7 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
         await UniTask.Delay(500, cancellationToken: ct);
 
         List<SelectableCard> cards = instance.selectableCards;
-        await Neuro.Cards.UnflipCards(cards);
+        await Neuro.Cards.UnflipCards(cards, ct);
 
         Context context = new(instance.trialChoices, cards);
         LoadoutState state = LoadoutState.Calculate();

@@ -24,7 +24,7 @@ public class BossRewardFlow : HarmonyAutomationFlow<IEnumerator>
     {
         RareCardChoicesSequencer choicer = target.GetThis<RareCardChoicesSequencer>();
         Card card = await Neuro.Cards.ChooseAddToDeck(choicer, ct);
-        System.Diagnostics.Debug.Assert(card, "did not pick boss rare");
+        Debug.Assert(card, "did not pick boss rare");
 
         await NeuroMouse.MoveToAsync(card, 300, ct);
         await NeuroMouse.ClickAsync(ct);

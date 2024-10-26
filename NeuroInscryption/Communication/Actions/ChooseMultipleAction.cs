@@ -5,7 +5,7 @@ using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Strings;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
-namespace NeuroInscryption.Communication.Actions.Map;
+namespace NeuroInscryption.Communication.Actions;
 
 public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> cards, int amount) : IAction<IEnumerable<TSelectable>>
     where TSelectable : IIdentifiable

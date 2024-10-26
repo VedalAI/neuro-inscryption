@@ -6,7 +6,7 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
 using Newtonsoft.Json.Linq;
 
-namespace NeuroInscryption.Communication.Actions.Map;
+namespace NeuroInscryption.Communication.Actions;
 
 public sealed class ChooseAction<T>(IEnumerable<T> items, string actionName = ActionStrings.MakeChoice) : IAction<T>
     where T : class, IIdentifiable

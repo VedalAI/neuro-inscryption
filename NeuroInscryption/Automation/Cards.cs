@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using DiskCardGame;
-using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
@@ -10,9 +9,10 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Input.Helpers;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Actions.Map;
 
 namespace NeuroInscryption.Automation;
 
@@ -22,6 +22,7 @@ internal class Cards
     private sealed class LoadoutContext(IEnumerable<SelectableCard> cards) : ILoadoutContext
     {
         public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select(SelectableCardData.Create).ToList();
+        public object? AdditionalContext { get; init; }
 
         IEnumerable<SigilData> ILoadoutContext.RelevantSigils => CardOptions.SelectMany(c => c.Card!.RelevantSigils);
         IEnumerable<TraitData> ILoadoutContext.RelevantTraits => CardOptions.SelectMany(c => c.Card!.Traits);
@@ -79,12 +80,27 @@ internal class Cards
         await UniTask.Delay(200, cancellationToken: ct);
     }
 
-    public async UniTask<Card> ChooseCardLoadout(ICollection<SelectableCard> cards, Description description, CancellationToken ct = default)
+    /// <summary>
+    /// Pick a card from the given <paramref name="cards"/> in the <see cref="LoadoutState">loadout context</see>.
+    /// </summary>
+    /// <param name="description">Description to send. This should describe what kind of choice is being made.</param>
+    /// <param name="additionalContext">
+    /// Any additional context to include in the state. This can be an anonymous object.
+    /// </param>
+    /// <example>
+    /// <code>
+    /// Card cardToGloopBlurb = await Neuro.Cards.ChooseCardLoadout(cards,
+    ///     new Description("choice_gloop_blurb", "Choose a card to gloop blurb. The card's immediate family will be murgled."),
+    ///     new { MurgleInsensity = 5 }
+    /// );
+    /// </code>
+    /// </example>
+    public async UniTask<Card> ChooseCardLoadout(IReadOnlyCollection<SelectableCard> cards, Description description, object? additionalContext = null, CancellationToken ct = default)
     {
         await UnflipCards(cards, ct);
 
         LoadoutState state = LoadoutState.Calculate();
-        LoadoutContext context = new(cards);
+        LoadoutContext context = new(cards) { AdditionalContext = additionalContext };
         state.SetContext(context);
 
         ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);

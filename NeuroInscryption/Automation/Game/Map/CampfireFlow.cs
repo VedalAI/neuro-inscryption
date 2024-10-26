@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
@@ -8,36 +7,19 @@ using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
-using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities.Enumerators;
-using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
 public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class ChooseCardContext(IEnumerable<SelectableCard> cards, bool isAttack) : ILoadoutContext
+    private sealed class CampfireBoostContext(bool isAttack)
     {
         public readonly string BoostType = isAttack ? DecisionStrings.CampfireAttackBoost : DecisionStrings.CampfireHealthBoost;
-        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select(SelectableCardData.Create).ToList();
-
-        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
-        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
-    }
-
-    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class UpgradeTwiceContext(CardData card, bool isAttack) : ILoadoutContext
-    {
-        public readonly string BoostType = isAttack ? DecisionStrings.CampfireAttackBoost : DecisionStrings.CampfireHealthBoost;
-        public readonly CardData ChosenCardToUpgrade = card;
-
-        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
-        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
     }
 
     public override FlowHook[] Hooks =>
@@ -60,60 +42,31 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
         await NeuroMouse.MoveToAsync(instance.selectionSlot, 200, ct);
         await NeuroMouse.ClickAsync(400, ct);
 
-        LoadoutState state = LoadoutState.Calculate();
-        ChooseCardContext context = new(instance.selectionSlot.cardSelector.displayedCards, isAttack);
-        state.SetContext(context);
+        CampfireBoostContext context = new CampfireBoostContext(isAttack);
+        List<SelectableCard> cards = instance.selectionSlot.cardSelector.displayedCards;
 
-        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
+        Card card = await Neuro.Cards.ChooseCardLoadout(cards, DecisionStrings.CampfireChooseCard, context, ct);
 
-        Decision decision = new(DecisionStrings.CampfireChooseCard, state);
-        decision.AddAction(chooseCardAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(chooseCardAction, out SelectableCardData? selected)) action.ThrowInvalid();
-
-        await NeuroMouse.MoveToAsync(selected.TargetCard, 200, ct);
+        await NeuroMouse.MoveToAsync(card, 200, ct);
         await NeuroMouse.ClickAsync(1000, ct);
 
         await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);
         AllowManualInterruption = false;
         await NeuroMouse.ClickAsync(750, ct);
 
-        await HandleSecondUpgradeAsync(instance, isAttack, state, selected.Card!, ct);
-    }
-
-    private async UniTask HandleSecondUpgradeAsync(CardStatBoostSequencer instance, bool isAttack, LoadoutState state, CardData oldCardData, CancellationToken ct)
-    {
-        UpgradeTwiceContext context = new(CardData.Create(oldCardData.TargetCardInfo, state), isAttack);
-        state.SetContext(context);
-
         // todo: just ask for a bool instead
         // todo: always upgrade if risk-free?
-        CampfireSecondUpgradeAction campfireSecondUpgradeAction = new();
-        LeaveAction leaveAction = new();
 
-        Decision decision = new(!RunState.Run.survivorsDead ? DecisionStrings.CampfireRiskUpgrade : DecisionStrings.CampfireNoRiskUpgrade, state);
-        decision.AddAction(campfireSecondUpgradeAction);
-        decision.AddAction(leaveAction);
-
-        Action action = await decision.SendAsync(ct);
-
+        Description desc = !RunState.Run.survivorsDead ? DecisionStrings.CampfireRiskUpgrade : DecisionStrings.CampfireNoRiskUpgrade;
+        InteractableBase chosenButton = await Neuro.Misc.ChooseInteractable(desc, LoadoutState.Calculate(),
+            [
+                (new CampfireSecondUpgradeAction(), instance.confirmStone),
+                (new LeaveAction(), instance.selectionSlot),
+            ], ct);
+        Debug.Assert(chosenButton, "did not pick on second campfire upgrade");
         await UniTask.WaitUntil(() => instance.confirmStone.Enabled, cancellationToken: ct);
-
-        if (action.Match(campfireSecondUpgradeAction))
-        {
-            await NeuroMouse.MoveToAsync(instance.confirmStone, 100, ct);
-            await NeuroMouse.ClickAsync(ct);
-        }
-        else if (action.Match(leaveAction))
-        {
-            await NeuroMouse.MoveToAsync(instance.selectionSlot, 200, ct);
-            await NeuroMouse.ClickAsync(ct);
-        }
-        else
-        {
-            action.ThrowInvalid();
-        }
+        
+        await NeuroMouse.MoveToAsync(chosenButton, 200, ct);
+        await NeuroMouse.ClickAsync(ct);
     }
 }
