@@ -14,6 +14,8 @@ using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Input.Helpers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation;
@@ -21,10 +23,11 @@ namespace NeuroInscryption.Automation;
 internal sealed class Cards
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class LoadoutContext(IEnumerable<SelectableCard> cards) : ILoadoutContext
+    private sealed class LoadoutContext(IEnumerable<SelectableCard> cards, object? additionalContext = null) : ILoadoutContext
     {
         public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select(SelectableCardData.Create).ToList();
-        public object? AdditionalContext { get; init; }
+        [JsonExtensionData]
+        public readonly JObject? AdditionalContext = additionalContext != null ? JObject.FromObject(additionalContext) : null;
 
         IEnumerable<SigilData> ILoadoutContext.RelevantSigils => CardOptions.SelectMany(c => c.Card!.RelevantSigils);
         IEnumerable<TraitData> ILoadoutContext.RelevantTraits => CardOptions.SelectMany(c => c.Card!.Traits);
@@ -100,7 +103,7 @@ internal sealed class Cards
         await UnflipCards(cards, ct);
 
         LoadoutState state = LoadoutState.Calculate();
-        LoadoutContext context = new(cards) { AdditionalContext = additionalContext };
+        LoadoutContext context = new(cards, additionalContext);
         state.SetContext(context);
 
         ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
