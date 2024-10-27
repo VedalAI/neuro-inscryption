@@ -19,7 +19,7 @@ public static class NeuroMouse
         while (Vector2.Distance(InputHandler.SimulatedMousePosition, end) > 0.1f)
         {
             InputHandler.SimulatedMousePosition = Vector2.MoveTowards(InputHandler.SimulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 8 * Plugin.Config.MouseSpeedMultiplier.Value);
-            end = GetCursorPositionFor(interactable);
+            end = GetCursorPositionFor(interactable, false);
             await UniTask.Yield(ct);
         }
 
@@ -69,8 +69,30 @@ public static class NeuroMouse
         int delayBeforeClick = 200, int delayAfterClick = 100,
         bool alt = false)
     {
-        await MoveToAsync(target, delayBeforeClick, ct);
-        await ClickAsync(delayAfterClick, ct, alt);
+        await WaitTargetEnabled(target, ct);
+        await MoveToAsync(target, ct);
+        await UniTask.Delay(delayBeforeClick, cancellationToken: ct);
+        await ClickAsync(ct, alt);
+        await UniTask.Delay(delayAfterClick, cancellationToken: ct);
+    }
+
+    private static async UniTask WaitTargetEnabled(InteractableBase target, CancellationToken ct)
+    {
+        if (target.Enabled) return;
+
+        Plugin.Logger.LogWarning($"Interactable {target} is disabled, gonna wait for a bit but then you're on your own");
+        try
+        {
+            await UniTask.WaitUntil(() => target.Enabled, cancellationToken: ct)
+                .Timeout(TimeSpan.FromSeconds(1));
+        }
+        catch (TimeoutException)
+        {
+            if (target)
+                Plugin.Logger.LogError($"Timed out waiting for interactable {target} to become enabled");
+            else
+                Plugin.Logger.LogError($"Interactable {target} died while we were waiting for it to become enabled");
+        }
     }
 
     #region Movement shenanigans
@@ -97,7 +119,12 @@ public static class NeuroMouse
         return [];
     }
 
-    private static Vector2 GetCursorPositionFor(InteractableBase interactable)
+    /// <summary>
+    /// Searches for a suitable position for the cursor.
+    /// If no good position is found, returns the center of the <paramref name="interactable"/>.
+    /// </summary>
+    /// <param name="warn">Log a warning if there's no good position available.</param>
+    private static Vector2 GetCursorPositionFor(InteractableBase interactable, bool warn = true)
     {
         List<Vector3> worldPositions = GetPreferredWorldPositionsFor(interactable);
         worldPositions.Add(interactable.transform.position);
@@ -126,7 +153,11 @@ public static class NeuroMouse
             if (IsOk(topRight.position, out Vector2 result)) return result;
         }
 
-        Plugin.Logger.LogWarning($"Cannot find a suitable cursor position for interactable {interactable}! Gonna move to the center, even if the raycast there hits {InteractionCursor.Instance.CastForInteractableAtWorldPosition(interactable.transform.position)}");
+        MainInputInteractable? atCenter = InteractionCursor.Instance.CastForInteractableAtWorldPosition(interactable.transform.position);
+        if (atCenter && atCenter != interactable && warn)
+        {
+            Plugin.Logger.LogWarning($"Cannot find a suitable cursor position for interactable {interactable}! Gonna move to the center, even if the raycast there hits {atCenter}");
+        }
         return GetCursorPointForWorldPoint(interactable.transform.position);
 
         bool IsOk(Vector3 worldPosition, out Vector2 cursorPoint)

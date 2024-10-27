@@ -9,7 +9,17 @@ namespace NeuroInscryption.Utilities;
 [PublicAPI]
 public static class Wait
 {
-    private const int CardPileSpawnTimeMs = (int)(1000 * (CardPile.SPAWN_TIME - CardPile.SPAWN_TWEEN_LENGTH));
+    /// <summary>
+    /// The time it takes for the last card in a card pile to be created.<br/>
+    /// Does not include the time it takes for the last card to tween towards its target position.
+    /// </summary>
+    /// <remarks>After this amount of time passes, the last card may still be offscreen.</remarks>
+    public const int CardPileMinSpawnTimeMs = (int)(1000 * (CardPile.SPAWN_TIME - CardPile.SPAWN_TWEEN_LENGTH));
+    /// <summary>
+    /// The time it takes for the last card in a card pile to be created and tweened towards its target position.
+    /// </summary>
+    /// <remarks>After this amount of time passes, all cards are guaranteed to be arranged on the board.</remarks>
+    public const int CardPileFullSpawnTimeMs = (int)(1000 * CardPile.SPAWN_TIME);
 
     public static async UniTask View(View targetView, CancellationToken ct = default, bool stable = true, bool unlocked = false)
     {
@@ -31,9 +41,9 @@ public static class Wait
         return WaitUntilPossiblySync(() => CameraStabilityTracker.Instance.IsStable, ct);
     }
 
-    public static UniTask CardPileSpawned(CancellationToken ct = default)
+    public static UniTask CardPileSpawned(CancellationToken ct = default, bool full = true)
     {
-        return UniTask.Delay(CardPileSpawnTimeMs, cancellationToken: ct);
+        return UniTask.Delay(full ? CardPileFullSpawnTimeMs : CardPileMinSpawnTimeMs, cancellationToken: ct);
     }
 
     private static UniTask WaitUntilPossiblySync(Func<bool> predicate, CancellationToken ct = default)
