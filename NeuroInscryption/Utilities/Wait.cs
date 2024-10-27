@@ -11,12 +11,12 @@ public static class Wait
 {
     /// <summary>
     /// The time it takes for the last card in a card pile to be created.<br/>
-    /// Does not include the time it takes for the last card to tween towards its target position.
+    /// Does not include the time it takes for the last card to move towards its target position.
     /// </summary>
     /// <remarks>After this amount of time passes, the last card may still be offscreen.</remarks>
     public const int CardPileMinSpawnTimeMs = (int)(1000 * (CardPile.SPAWN_TIME - CardPile.SPAWN_TWEEN_LENGTH));
     /// <summary>
-    /// The time it takes for the last card in a card pile to be created and tweened towards its target position.
+    /// The time it takes for the last card in a card pile to be created and move towards its target position.
     /// </summary>
     /// <remarks>After this amount of time passes, all cards are guaranteed to be arranged on the board.</remarks>
     public const int CardPileFullSpawnTimeMs = (int)(1000 * CardPile.SPAWN_TIME);
@@ -32,9 +32,16 @@ public static class Wait
     {
         return WaitUntilPossiblySync(() => ViewManager.Instance.Is(targetLockState), ct);
     }
-    public static UniTask ViewLocked(CancellationToken ct = default) => View(ViewLockState.Locked, ct);
-    public static UniTask ViewUnlocked(CancellationToken ct = default) => View(ViewLockState.Unlocked, ct);
 
+    public static UniTask ViewLocked(CancellationToken ct = default)
+    {
+        return View(ViewLockState.Locked, ct);
+    }
+
+    public static UniTask ViewUnlocked(CancellationToken ct = default)
+    {
+        return View(ViewLockState.Unlocked, ct);
+    }
 
     public static UniTask CameraStable(CancellationToken ct = default)
     {
