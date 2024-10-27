@@ -5,6 +5,7 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -24,11 +25,10 @@ public sealed class DeckTrialRewardFlow : HarmonyAutomationFlow<IEnumerator>
     {
         DeckTrialSequencer instance = enumerator.GetThis<DeckTrialSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.SceneChanged(ct);
 
-        Card cardData = await Neuro.Cards.ChooseAddToDeck(instance, ct);
-
-        await NeuroMouse.MoveToAsync(cardData, 200, ct);
-        await NeuroMouse.ClickAsync(ct);
+        Card reward = await Neuro.Cards.ChooseAddToDeck(instance, ct);
+        AutomationManager.Assert(reward, "did not pick deck trial reward");
+        await NeuroMouse.MoveAndClick(reward, ct);
     }
 }

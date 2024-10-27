@@ -33,8 +33,7 @@ public sealed class ChoosePathFlow : HarmonyAutomationFlow<MapNodeManager>
         MapNodeData node = await Neuro.Map.ChooseNextNode(ct);
 
         await Wait.ViewUnlocked(ct);
-        await NeuroMouse.MoveToAsync(node.MapNode, 300, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(node.MapNode, ct);
     }
 
     private static bool IsActive(MapNode node)

@@ -14,6 +14,7 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -42,25 +43,13 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
     {
         DeckTrialSequencer instance = enumerator.GetThis<DeckTrialSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.SceneChanged(ct);
 
         List<SelectableCard> cards = instance.selectableCards;
         await Neuro.Cards.UnflipCards(cards, ct);
 
-        Context context = new(instance.trialChoices, cards);
-        LoadoutState state = LoadoutState.Calculate();
-        state.SetContext(context);
-
-        ChooseAction<DeckTrialData> chooseAction = new(context.TrialOptions);
-
-        Decision decision = new(DecisionStrings.ChooseDeckTrial, state);
-        decision.AddAction(chooseAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(chooseAction, out DeckTrialData? trial)) action.ThrowInvalid();
-
-        await NeuroMouse.MoveToAsync(trial.Card, 200, ct);
-        await NeuroMouse.ClickAsync(ct);
+        List<DeckTrialData> trials = instance.trialChoices.Zip(cards, DeckTrialData.Create).ToList();
+        DeckTrialData trial = await Neuro.Misc.ChooseWithLoadout(trials, DecisionStrings.ChooseDeckTrial, ct);
+        await NeuroMouse.MoveAndClick(trial.Card, ct);
     }
 }

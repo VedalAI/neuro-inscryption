@@ -5,6 +5,7 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -29,24 +30,22 @@ public sealed class ChooseCardFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        EnumeratorWrapper<CardSingleChoicesSequencer> wrapper = new(enumerator);
-        CardSingleChoicesSequencer instance = wrapper.This;
+        CardSingleChoicesSequencer instance = enumerator.GetThis<CardSingleChoicesSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.SceneChanged(ct);
 
-        Card card = await Neuro.Cards.ChooseAddToDeck(instance, ct);
-
-        await NeuroMouse.MoveToAsync(card, 200, ct);
-        AllowManualInterruption = false;
-        await NeuroMouse.ClickAsync(ct);
+        if (instance.chosenReward == null)
+        {
+            Card card = await Neuro.Cards.ChooseAddToDeck(instance, ct);
+            AutomationManager.Assert(card, "did not pick card");
+            await NeuroMouse.MoveAndClick(card, ct);
+        }
 
         if (instance is RareCardChoicesSequencer) return;
-        
-        CardChoicesType choiceType = wrapper.GetFieldValue<CardChoicesNodeData>("<choicesData>5__2").choicesType;
-        if (choiceType != CardChoicesType.Random)
-        {
-            await UniTask.Delay(150, cancellationToken: ct);
-            await NeuroMouse.ClickAsync(ct);
-        }
+        CardChoicesType choiceType = enumerator.GetFieldValue<CardChoicesNodeData>("<choicesData>5__2").choicesType;
+        if (choiceType == CardChoicesType.Random) return;
+
+        await UniTask.WaitUntil(() => instance.chosenReward != null, cancellationToken: ct);
+        await NeuroMouse.MoveAndClick(instance.chosenReward!, ct);
     }
 }

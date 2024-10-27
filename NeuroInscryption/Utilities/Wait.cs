@@ -60,4 +60,13 @@ public static class Wait
         return predicate() ? UniTask.CompletedTask
             : UniTask.WaitUntil(predicate, cancellationToken: ct);
     }
+
+    // todo: move me maybe
+    public static async UniTask SceneChanged(CancellationToken ct = default)
+    {
+        // await ViewUnlocked(ct); // some nodes intentionally lock view
+        await CameraStable(ct);
+        // todo: central source for randomized "human-like" "reaction time"
+        await UniTask.Delay(300, cancellationToken: ct);
+    }
 }

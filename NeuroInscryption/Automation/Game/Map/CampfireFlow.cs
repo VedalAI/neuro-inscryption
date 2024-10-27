@@ -40,15 +40,13 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
 
         CardInfo destroyedCard = wrapper.GetFieldValue<CardInfo>("<destroyedCard>5__2");
         bool finishedBuffing = wrapper.GetFieldValue<bool>("<finishedBuffing>5__3");
+        int numBuffsGiven = wrapper.GetFieldValue<int>("<numBuffsGiven>5__4");
 
         bool finished = finishedBuffing || destroyedCard != null;
         if (finished) return;
 
-        await Wait.CameraStable(ct);
+        await Wait.SceneChanged(ct);
 
-        int numBuffsGiven = wrapper.GetFieldValue<int>("<numBuffsGiven>5__4");
-
-        bool cardSelected = instance.selectionSlot.Card != null;
         if (!ViewManager.Instance.Is(View.StatBoostSlot))
         {
             if (ViewManager.Instance.Is(View.Default))
@@ -63,6 +61,7 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
             List<SelectableCard> cards = instance.selectionSlot.cardSelector.displayedCards;
 
             Card card = await Neuro.Cards.ChooseCardLoadout(cards, DecisionStrings.CampfireChooseCard, ct, context);
+            AutomationManager.Assert(card, "did not pick campfire card");
 
             await NeuroMouse.MoveAndClick(card, ct,
                 delayAfterClick: Wait.CardPileFullSpawnTimeMs); // card pile takes the same time to despawn

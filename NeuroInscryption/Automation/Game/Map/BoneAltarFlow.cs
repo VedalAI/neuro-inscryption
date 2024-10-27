@@ -27,8 +27,7 @@ public sealed class BoneAltarFlow : HarmonyAutomationFlow<IEnumerator>
     {
         CardRemoveSequencer instance = target.GetThis<CardRemoveSequencer>();
 
-        await Wait.CameraStable(ct);
-        await UniTask.Delay(300, cancellationToken: ct); // todo: centralised source for "human" delay
+        await Wait.SceneChanged(ct);
 
         if (!ViewManager.Instance.Is(View.CardMergeConfirm))
         {
@@ -55,9 +54,18 @@ public sealed class BoneAltarFlow : HarmonyAutomationFlow<IEnumerator>
             await UniTask.WaitUntil(() => !instance.sacrificeSlot.Card, cancellationToken: ct);
         }
 
-        // slightly cursed but the boon card isn't actually placed on the slot, it's just moved to the same position
-        List<InteractableBase> interactables = instance.gamepadGrid.Rows[0].interactables;
-        await UniTask.WaitUntil(() => interactables.Count == 2 && interactables[1].Enabled, cancellationToken: ct);
-        await NeuroMouse.MoveAndClick(interactables[1], ct);
+        SelectableCard? boonCard = null;
+        // used to click the slot but the boon card isn't actually placed on the slot, it's just moved to the same position
+        await UniTask.WaitUntil(CheckBoonCard, cancellationToken: ct);
+        await NeuroMouse.MoveAndClick(boonCard!, ct);
+
+        return;
+
+        bool CheckBoonCard()
+        {
+            boonCard = target.GetFieldValue<SelectableCard>("<boonCard>5__6");
+            return boonCard != null;
+        }
     }
+
 }

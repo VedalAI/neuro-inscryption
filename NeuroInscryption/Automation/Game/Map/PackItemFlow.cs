@@ -13,6 +13,7 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
@@ -42,22 +43,13 @@ public sealed class PackItemFlow : HarmonyAutomationFlow<IEnumerator>
     {
         GainConsumablesSequencer instance = enumerator.GetThis<GainConsumablesSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.SceneChanged(ct);
 
-        Context context = new(instance.slots);
-        LoadoutState state = LoadoutState.Calculate();
-        state.SetContext(context);
+        List<ItemData> items = instance.slots.Select(ItemData.Create).ToList();
+        ItemData item = await Neuro.Misc.ChooseWithLoadout(items, DecisionStrings.ChooseItem, ct);
+        AutomationManager.Assert(item is {}, "did not pick item");
+        AutomationManager.Assert(item.Slot != null, "picked item has no slot");
 
-        ChooseAction<ItemData> chooseAction = new(context.ItemOptions);
-
-        Decision decision = new(DecisionStrings.ChooseItem, state);
-        decision.AddAction(chooseAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(chooseAction, out ItemData? item)) action.ThrowInvalid();
-
-        await NeuroMouse.MoveToAsync(item.Slot!, 300, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(item.Slot, ct);
     }
 }

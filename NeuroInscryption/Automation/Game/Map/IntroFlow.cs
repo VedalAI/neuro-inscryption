@@ -43,6 +43,7 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
         await Wait.ViewUnlocked(ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 1000, ct);
         await UniTask.WaitUntil(() => ViewManager.Instance.Is(View.FirstPerson), cancellationToken: ct);
+        await Wait.CameraStable(ct);
 
         // Move to painting
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);
@@ -56,6 +57,7 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
 
         // Return to table
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 250, ct);
+        await Wait.CameraStable(ct);
         AutomationManager.Assert(ViewManager.Instance.Is(ViewLockState.Unlocked));
         AutomationManager.Assert(ViewManager.Instance.Is(View.FirstPerson));
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);

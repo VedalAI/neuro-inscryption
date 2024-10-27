@@ -6,6 +6,7 @@ using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -25,19 +26,26 @@ public sealed class GoobertFlow : HarmonyAutomationFlow<IEnumerator>
     {
         CopyCardSequencer instance = enumerator.GetThis<CopyCardSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.SceneChanged(ct);
 
-        await NeuroMouse.MoveToAsync(instance.selectionSlot, 200, ct);
-        await NeuroMouse.ClickAsync(400, ct);
+        if (!ViewManager.Instance.Is(View.CardMergeConfirm))
+        {
+            if (ViewManager.Instance.Is(View.Default))
+            {
+                await NeuroMouse.MoveAndClick(instance.selectionSlot, ct,
+                    delayAfterClick: Wait.CardPileFullSpawnTimeMs);
+            }
 
-        Card card = await Neuro.Cards.ChooseCardLoadout(instance.selectionSlot.cardSelector.displayedCards, DecisionStrings.GoobertChooseCard, ct);
+            await Wait.View(View.DeckSelection, ct);
 
-        AutomationManager.Assert(card, "did not pick goobert card");
+            Card card = await Neuro.Cards.ChooseCardLoadout(instance.selectionSlot.cardSelector.displayedCards, DecisionStrings.GoobertChooseCard, ct);
+            AutomationManager.Assert(card, "did not pick goobert card");
+            await NeuroMouse.MoveAndClick(card, ct,
+                delayAfterClick: Wait.CardPileFullSpawnTimeMs);
+        }
 
-        await NeuroMouse.MoveToAsync(card, 200, ct);
-        await NeuroMouse.ClickAsync(1000, ct);
+        await Wait.View(View.CardMergeConfirm, ct);
 
-        await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(instance.confirmStone, ct);
     }
 }
