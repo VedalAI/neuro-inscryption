@@ -83,12 +83,15 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
     {
         if (UnityEngine.Input.GetKeyDown(KeyCode.U))
         {
-            bool allowInterrupt = AllowManualInput || FlowRunner.AllowManualInterruption;
-            bool forceInterrupt = !allowInterrupt && UnityEngine.Input.GetKey(KeyCode.LeftControl) && UnityEngine.Input.GetKey(KeyCode.LeftShift);
-            if (allowInterrupt || forceInterrupt)
+            bool allowToggle = AllowManualInput || FlowRunner.AllowManualInterruption;
+#if DEBUG
+            allowToggle |= UnityEngine.Input.GetKey(KeyCode.LeftControl) && UnityEngine.Input.GetKey(KeyCode.LeftShift);
+#endif
+
+            if (allowToggle)
             {
                 AllowManualInput = !AllowManualInput;
-                Plugin.Logger.LogWarning($"Manual input {(AllowManualInput ? "enabled" : "disabled")}" + (forceInterrupt ? " (forced)" : ""));
+                Plugin.Logger.LogWarning($"Manual input {(AllowManualInput ? "enabled" : "disabled")}");
             }
         }
 

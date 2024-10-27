@@ -11,15 +11,13 @@ public sealed class JsonSchema
         ["action"] = QJS.Type(JsonSchemaType.String),
         ["data"] = QJS.Type(JsonSchemaType.Object),
     };
-    public static JsonSchema NewResponseSchema()
+
+    public static JsonSchema NewResponseSchema() => new()
     {
-        return new()
-        {
-            Type = JsonSchemaType.Object,
-            Required = ["action", "data"],
-            Properties = _defaultProps
-        };
-    }
+        Type = JsonSchemaType.Object,
+        Required = ["action", "data"],
+        Properties = _defaultProps
+    };
 
     [JsonIgnore]
     public Dictionary<string, JsonSchema> Defs
@@ -202,19 +200,19 @@ public sealed class JsonSchema
         Apply(new T());
     }
 
-    public void Add(JsonSchema option)
+    public void OneOfAdd(JsonSchema option)
     {
         OneOf.Add(option);
     }
 
-    public void Add(Dictionary<string, JsonSchema> properties)
+    public void OneOfAdd(Dictionary<string, JsonSchema> properties)
     {
-        Add(new JsonSchema { Properties = properties });
+        OneOfAdd(new JsonSchema { Properties = properties });
     }
 
-    public void Prepare()
+    public void FlattenOneOfIfPossible()
     {
-        if (_oneOf is [{ _properties: { } } single]
+        if (_oneOf is [{ _properties.Count: > 0 } single]
             && _properties == _defaultProps)
         {
             _properties = single._properties;

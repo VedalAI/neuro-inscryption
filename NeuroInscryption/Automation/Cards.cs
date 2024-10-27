@@ -15,18 +15,21 @@ using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation;
 
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
-internal class Cards
+internal sealed class Cards
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class LoadoutContext(IEnumerable<SelectableCard> cards) : ILoadoutContext
+    private sealed class LoadoutContext(IEnumerable<SelectableCard> cards, object? additionalContext = null) : ILoadoutContext
     {
         public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select(SelectableCardData.Create).ToList();
-        public object? AdditionalContext { get; init; }
+        [JsonExtensionData]
+        public readonly JObject? AdditionalContext = additionalContext != null ? JObject.FromObject(additionalContext) : null;
 
         IEnumerable<SigilData> ILoadoutContext.RelevantSigils => CardOptions.SelectMany(c => c.Card!.RelevantSigils);
         IEnumerable<TraitData> ILoadoutContext.RelevantTraits => CardOptions.SelectMany(c => c.Card!.Traits);
@@ -42,8 +45,8 @@ internal class Cards
         LoadoutContext context = new(cards);
         state.SetContext(context);
 
-        CardSingleChoicesSequencer rerollable = (choicer as CardSingleChoicesSequencer)!; // day 999 of hating the way unity works with nulls
-        MainInputInteractable clover = rerollable ? rerollable.rerollInteractable : null!;
+        CardSingleChoicesSequencer? rerollable = choicer as CardSingleChoicesSequencer;
+        MainInputInteractable clover = rerollable != null ? rerollable.rerollInteractable : null!;
         RerollAction rerollAction = new(clover);
         ChooseAction<SelectableCardData> chooseAction = new(context.CardOptions);
 
@@ -65,7 +68,7 @@ internal class Cards
             await NeuroMouse.ClickAsync(ct);
             //await UniTask.Delay(100, cancellationToken: ct);
             // choicer sets this back to false when ready for input again
-            await UniTask.WaitUntil(() => !rerollable.choicesRerolled, cancellationToken: ct);
+            await UniTask.WaitUntil(() => !rerollable!.choicesRerolled, cancellationToken: ct);
             return await ChooseAddToDeck(choicer, ct);
         }
 
@@ -106,7 +109,7 @@ internal class Cards
         if (cards.Count == 1) return cards.First();
 
         LoadoutState state = LoadoutState.Calculate();
-        LoadoutContext context = new(cards) { AdditionalContext = additionalContext };
+        LoadoutContext context = new(cards, additionalContext);
         state.SetContext(context);
 
         ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);

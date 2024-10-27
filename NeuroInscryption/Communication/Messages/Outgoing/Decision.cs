@@ -34,8 +34,8 @@ public sealed class Decision(string id, IGameState state, string query) : Outgoi
 
     protected override WsMessage GetMessage()
     {
-        _responseSchema.Prepare();
-        return new("decision", this);
+        _responseSchema.FlattenOneOfIfPossible();
+        return new WsMessage("decision", this);
     }
 
     protected override string ResponseCommand => "action";

@@ -15,7 +15,7 @@ using NeuroInscryption.Utilities;
 namespace NeuroInscryption.Automation;
 
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
-internal class Map
+internal sealed class Map
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class MapNodeContext(List<List<MapNodeData>> paths) : ILoadoutContext

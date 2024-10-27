@@ -3,8 +3,8 @@
 // todo: move to appropriate folder/namespace
 internal static class Neuro
 {
-    public static Cards Cards = new();
-    public static Map Map = new();
-    public static Trade Trade = new();
-    public static Misc Misc = new();
+    public static readonly Cards Cards = new();
+    public static readonly Map Map = new();
+    public static readonly Trade Trade = new();
+    public static readonly Misc Misc = new();
 }

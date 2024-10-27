@@ -16,7 +16,7 @@ using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 namespace NeuroInscryption.Automation;
 
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
-internal class Misc
+internal sealed class Misc
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class LoadoutContext<TData>(IEnumerable<TData> items) : ILoadoutContext

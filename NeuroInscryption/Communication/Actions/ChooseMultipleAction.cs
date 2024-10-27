@@ -12,7 +12,7 @@ public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> c
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
-        schema.Add(new Dictionary<string, JsonSchema>
+        schema.OneOfAdd(new Dictionary<string, JsonSchema>
         {
             ["action"] = QJS.Const(ActionName),
             ["data"] = new()

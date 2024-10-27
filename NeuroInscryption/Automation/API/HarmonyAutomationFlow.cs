@@ -16,7 +16,7 @@ public abstract class HarmonyAutomationFlow : AutomationFlow<HarmonyContext>
     protected override bool ShouldAbort(HarmonyContext context)
     {
         object? instance = context.GetInstance();
-        if (instance == null || instance is UnityEngine.Object unityObject && unityObject == null)
+        if (instance == null || (instance is UnityEngine.Object unityObject && !unityObject))
         {
             Plugin.Logger.LogWarning($"Flow {FlowName} was cancelled because the target object was destroyed.");
             return true;

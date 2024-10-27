@@ -15,7 +15,7 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
-        schema.Add(new Dictionary<string, JsonSchema>
+        schema.OneOfAdd(new Dictionary<string, JsonSchema>
         {
             ["action"] = QJS.Const(ActionName),
             ["data"] = QJS.Enum(GetSacrificeCombinations(cardToPlay.Info.BloodCost))

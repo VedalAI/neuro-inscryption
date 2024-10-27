@@ -12,7 +12,7 @@ public sealed class PlaceCardAction(IReadOnlyDictionary<string, PlayableCardData
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
-        schema.Add(new Dictionary<string, JsonSchema>
+        schema.OneOfAdd(new Dictionary<string, JsonSchema>
         {
             ["action"] = QJS.Const(ActionName),
             ["data"] = QJS.Enum(playerLanes.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key).Select(int.Parse))

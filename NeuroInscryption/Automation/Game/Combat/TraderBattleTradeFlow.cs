@@ -67,10 +67,10 @@ public class TraderBattleTradeFlow : HarmonyAutomationFlow<IEnumerator>
 
         if (!action.Match(chooseAction, out IEnumerable<SelectableCardData>? chosenCards)) action.ThrowInvalid();
 
-        AllowManualInterruption = false;
         foreach (SelectableCardData card in chosenCards)
         {
             await NeuroMouse.MoveToAsync(card.TargetCard, 500, ct);
+            AllowManualInterruption = false;
             await NeuroMouse.ClickAsync(250, ct);
         }
 
