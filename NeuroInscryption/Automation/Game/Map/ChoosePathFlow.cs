@@ -1,33 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
-using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
-using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Utilities;
+using NeuroInscryption.Input.Helpers;
+using UnityEngine;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
 public sealed class ChoosePathFlow : HarmonyAutomationFlow<MapNodeManager>
 {
-    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(List<List<MapNodeData>> paths) : ILoadoutContext
-    {
-        public readonly IReadOnlyList<string> Paths = paths.Select(path => string.Join(" -> ", path.Select(node => node.Identifier))).ToList();
-        public readonly IReadOnlyDictionary<string, string> PathDescriptions = paths.Flatten().ToDescriptionDictionary();
-
-        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
-        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
-    }
-
     public override FlowHook[] Hooks =>
     [
         new()
@@ -38,52 +23,22 @@ public sealed class ChoosePathFlow : HarmonyAutomationFlow<MapNodeManager>
 
     protected override async UniTask ExecuteAsync(MapNodeManager instance, CancellationToken ct)
     {
-        // TODO: if only one option click on it
-        await UniTask.Delay(1000, cancellationToken: ct);
+        // don't send decision after manually picking node (also fixes decision after area boss)
+        if (!instance.ActiveNode || !instance.ActiveNode.connectedNodes.Any(IsActive))
+        {
+            Plugin.Logger.LogMessage($"No active nodes, cancelling {nameof(ChoosePathFlow)}");
+            return;
+        }
 
-        List<List<MapNodeData>> paths = GetPaths(instance.ActiveNode);
-        List<MapNodeData> nextNodes = paths.Select(p => p.First()).Distinct().ToList();
+        MapNodeData node = await Neuro.Map.ChooseNextNode(ct);
 
-        LoadoutState state = LoadoutState.Calculate();
-        state.SetContext(new Context(paths));
-
-        ChooseAction<MapNodeData> choosePathAction = new(nextNodes, true);
-
-        Decision decision = new(DecisionStrings.ChoosePath, state);
-        decision.AddAction(choosePathAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(choosePathAction, out MapNodeData? node)) action.ThrowInvalid();
-
+        await InputHelpers.WaitUntilViewUnlocked(ct);
         await NeuroMouse.MoveToAsync(node.MapNode, 300, ct);
         await NeuroMouse.ClickAsync(ct);
     }
 
-    private static List<List<MapNodeData>> GetPaths(MapNode node, int depth = 0)
+    private static bool IsActive(MapNode node)
     {
-        if (node.connectedNodes.Count == 0 || depth == 5)
-        {
-            return [[MapNodeData.Create(node)]];
-        }
-
-        List<List<MapNodeData>> result = [];
-
-        foreach (MapNode childNode in node.connectedNodes)
-        {
-            List<List<MapNodeData>> paths = GetPaths(childNode, depth + 1);
-
-            if (depth != 0)
-            {
-                foreach (List<MapNodeData> t in paths)
-                {
-                    t.Insert(0, MapNodeData.Create(node));
-                }
-            }
-
-            result.AddRange(paths);
-        }
-
-        return result;
+        return node && node.isActiveAndEnabled && node.GetComponent<BoxCollider>().enabled; // yep
     }
 }

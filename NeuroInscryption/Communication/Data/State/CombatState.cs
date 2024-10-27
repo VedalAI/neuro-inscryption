@@ -79,7 +79,7 @@ public sealed class CombatState : IGameState
         OpponentQueueLanes = BoardManager.Instance.opponentSlots.Select(BoardManager.Instance.GetCardQueuedForSlot).ToIndexedDictionary(card => PlayableCardData.Create(card, this))!;
 
         PlayerHand = DiskCardGame.PlayerHand.Instance.CardsInHand.Select(c => PlayableCardData.Create(c, this)).ToList();
-        _remainingDeck = CardDrawPiles.Instance.Deck.Cards.Select((c, index) => CardData.Create(c, this, index)).ToList();
+        _remainingDeck = CardDrawPiles3D.Instance.Deck.Cards.Select((c, index) => CardData.Create(c, this, index)).ToList();
         RemainingSquirrels = CardDrawPiles3D.Instance.SideDeck.Cards.Count > 4 ? "Many" : CardDrawPiles3D.Instance.SideDeck.Cards.Count.ToString();
         Boons = RunState.Run.playerDeck.Boons.Select(BoonData.Create).ToList().NullIfEmpty();
 

@@ -1,5 +1,4 @@
-﻿using NeuroInscryption.Utilities;
-using NeuroInscryption.Utilities.Strings;
+﻿using NeuroInscryption.Utilities.Strings;
 
 namespace NeuroInscryption.Communication.Data.Describable;
 

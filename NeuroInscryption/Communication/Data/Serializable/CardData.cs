@@ -60,12 +60,9 @@ public class CardData
 
     [JsonIgnore]
     public CardInfo TargetCardInfo { get; private set; }
-
-    private readonly IGameState _state;
-
-    protected CardData(CardInfo cardInfo, IGameState state, int? deckIndex = null)
+    
+    protected CardData(CardInfo cardInfo, IGameState? state = null, int? deckIndex = null)
     {
-        _state = state;
         TargetCardInfo = cardInfo;
 
         if (TargetCardInfo.name == "!STATIC!GLITCH")
@@ -77,7 +74,7 @@ public class CardData
             return;
         }
 
-        if (deckIndex != null && _state.ShouldFakeIjiraq(deckIndex.Value))
+        if (deckIndex != null && state?.ShouldFakeIjiraq(deckIndex.Value) == true)
         {
             TargetCardInfo = CardLoader.GetCardByName("Ijiraq");
         }
@@ -95,7 +92,7 @@ public class CardData
     }
 
     [return: NotNullIfNotNull(nameof(cardInfo))]
-    public static CardData? Create(CardInfo? cardInfo, IGameState state, int? deckIndex = null) => cardInfo != null ? new CardData(cardInfo, state, deckIndex) : null;
+    public static CardData? Create(CardInfo? cardInfo, IGameState? state = null, int? deckIndex = null) => cardInfo != null ? new CardData(cardInfo, state, deckIndex) : null;
 
     public virtual string GetDescription()
     {

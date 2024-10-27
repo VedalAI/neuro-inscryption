@@ -6,14 +6,13 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions.Map;
+using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
@@ -49,7 +48,7 @@ public sealed class PackItemFlow : HarmonyAutomationFlow<IEnumerator>
         LoadoutState state = LoadoutState.Calculate();
         state.SetContext(context);
 
-        ChooseAction<ItemData> chooseAction = new(context.ItemOptions, true);
+        ChooseAction<ItemData> chooseAction = new(context.ItemOptions);
 
         Decision decision = new(DecisionStrings.ChooseItem, state);
         decision.AddAction(chooseAction);

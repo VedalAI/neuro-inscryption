@@ -21,6 +21,7 @@
         <PackageReference Include="UnityEngine.Modules" Version="2019.4.24" />
         <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
         <Reference Include="Resources/Assemblies/UniTask.dll" />
+        <Reference Include="Resources/Assemblies/UniTask.Linq.dll" />
 
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
         <PackageReference Include="BepInEx.AutoPlugin" Version="1.1.0" PrivateAssets="all" />

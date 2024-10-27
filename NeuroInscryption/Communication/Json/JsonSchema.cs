@@ -6,15 +6,17 @@ namespace NeuroInscryption.Communication.Json;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public sealed class JsonSchema
 {
+    private static readonly Dictionary<string, JsonSchema> _defaultProps = new()
+    {
+        ["action"] = QJS.Type(JsonSchemaType.String),
+        ["data"] = QJS.Type(JsonSchemaType.Object),
+    };
+
     public static JsonSchema NewResponseSchema() => new()
     {
         Type = JsonSchemaType.Object,
         Required = ["action", "data"],
-        Properties = new Dictionary<string, JsonSchema>
-        {
-            ["action"] = QJS.Type(JsonSchemaType.String),
-            ["data"] = QJS.Type(JsonSchemaType.Object),
-        }
+        Properties = _defaultProps
     };
 
     [JsonIgnore]
@@ -196,5 +198,25 @@ public sealed class JsonSchema
     public void Apply<T>() where T : ISchemaModifier, new()
     {
         Apply(new T());
+    }
+
+    public void OneOfAdd(JsonSchema option)
+    {
+        OneOf.Add(option);
+    }
+
+    public void OneOfAdd(Dictionary<string, JsonSchema> properties)
+    {
+        OneOfAdd(new JsonSchema { Properties = properties });
+    }
+
+    public void FlattenOneOfIfPossible()
+    {
+        if (_oneOf is [{ _properties.Count: > 0 } single]
+            && _properties == _defaultProps)
+        {
+            _properties = single._properties;
+            _oneOf = null;
+        }
     }
 }

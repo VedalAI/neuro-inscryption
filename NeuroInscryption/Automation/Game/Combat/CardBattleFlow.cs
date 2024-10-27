@@ -5,15 +5,14 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
+using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Actions.Combat;
-using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Input.Helpers;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
@@ -32,13 +31,18 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(PlayerHand), nameof(PlayerHand.SelectSlotForCard))),
-            IsValid = context => context.GetResult<bool>() == false
+            IsValid = FlowHookHelpers.EnumeratorFinished(),
         },
         new()
         {
             Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(ConsumableItemSlot), nameof(ConsumableItemSlot.ConsumeItem))),
-            IsValid = context => context.GetResult<bool>() == false
-        }
+            IsValid = FlowHookHelpers.EnumeratorFinished(),
+        },
+        new()
+        {
+            Method = AccessTools.EnumeratorMoveNext(AccessTools.Method(typeof(TargetSlotItem), nameof(TargetSlotItem.ActivateSequence))),
+            IsValid = FlowHookHelpers.EnumeratorFinished(),
+        },
     ];
 
     protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
@@ -54,8 +58,8 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
 
         CombatState state = CombatState.Calculate();
 
-        ChooseAction<PlayableCardData> playCardAction = new(state.PlayerHand.Where(c => c.IsPlayable == true), false, ActionStrings.PlayCard);
-        ChooseAction<ItemData> useItemAction = new(state.Items, false, ActionStrings.UseItem);
+        ChooseAction<PlayableCardData> playCardAction = new(state.PlayerHand.Where(c => c.IsPlayable == true), ActionStrings.PlayCard);
+        ChooseAction<ItemData> useItemAction = new(state.Items.Where(i => i.IsUsable == true), ActionStrings.UseItem);
         AcceptSurrenderAction acceptSurrenderAction = new(state.IsOpponentSurrendering);
         EndTurnAction endTurnAction = new();
 

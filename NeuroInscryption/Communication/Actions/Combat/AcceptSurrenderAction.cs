@@ -1,24 +1,8 @@
-﻿using System.Collections.Generic;
-using NeuroInscryption.Communication.Json;
-using NeuroInscryption.Communication.Strings;
+﻿using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Communication.Actions.Combat;
 
-public sealed class AcceptSurrenderAction(bool? isOpponentSurrendering) : IAction
+public sealed class AcceptSurrenderAction(bool? isOpponentSurrendering) : BasicAction(ActionStrings.AcceptSurrender)
 {
-    void ISchemaModifier.Apply(JsonSchema schema)
-    {
-        if (isOpponentSurrendering != true) return;
-
-        schema.OneOf.Add(new JsonSchema
-        {
-            Properties = new Dictionary<string, JsonSchema>
-            {
-                ["action"] = QJS.Const(ActionName),
-                ["data"] = QJS.ConstNull
-            }
-        });
-    }
-
-    public string ActionName => ActionStrings.AcceptSurrender;
+    protected override bool IsApplicable => isOpponentSurrendering == true;
 }

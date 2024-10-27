@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions.Map;
+using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
@@ -14,8 +14,6 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Input.Helpers;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -46,21 +44,14 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
 
         await UniTask.Delay(500, cancellationToken: ct);
 
-        foreach (SelectableCard card in instance.selectableCards.Where(c => c.Flipped))
-        {
-            await NeuroMouse.MoveToAsync(card, 100, ct);
-            await NeuroMouse.ClickAsync(ct);
+        List<SelectableCard> cards = instance.selectableCards;
+        await Neuro.Cards.UnflipCards(cards, ct);
 
-            await InputHelpers.WaitUntilViewLocked(ct);
-            await InputHelpers.WaitUntilViewUnlocked(ct);
-            await UniTask.Delay(150, cancellationToken: ct);
-        }
-
-        Context context = new(instance.trialChoices, instance.selectableCards);
+        Context context = new(instance.trialChoices, cards);
         LoadoutState state = LoadoutState.Calculate();
         state.SetContext(context);
 
-        ChooseAction<DeckTrialData> chooseAction = new(context.TrialOptions, true);
+        ChooseAction<DeckTrialData> chooseAction = new(context.TrialOptions);
 
         Decision decision = new(DecisionStrings.ChooseDeckTrial, state);
         decision.AddAction(chooseAction);

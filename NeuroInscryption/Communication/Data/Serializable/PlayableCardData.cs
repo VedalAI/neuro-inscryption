@@ -101,7 +101,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             switch (ability)
             {
                 case SpecialTriggeredAbility.Ant:
-                    return PowerStrings.Ant + StringFormatter.Format(PowerStrings.InPlaySuffix, BoardManager.Instance.playerSlots.Where(s => s.Card && s.Card.Info.traits.Contains(Trait.Ant)));
+                    return PowerStrings.Ant + StringFormatter.Format(PowerStrings.InPlaySuffix, BoardManager.Instance.playerSlots.Count(s => s.Card && s.Card.Info.traits.Contains(Trait.Ant)));
 
                 case SpecialTriggeredAbility.Lammergeier:
                     return PowerStrings.Lammergeier + StringFormatter.Format(PowerStrings.LammergeierInPlaySuffix, _state.Bones, _state.Bones / 2);
@@ -118,7 +118,8 @@ public sealed class PlayableCardData : CardData, IIdentifiable
                     return PowerStrings.BellProximity + StringFormatter.Format(PowerStrings.InPlaySuffix, TargetCard.Attack);
 
                 case SpecialTriggeredAbility.CardsInHand:
-                    return PowerStrings.CardsInHand + StringFormatter.Format(PowerStrings.InPlaySuffix, _state.PlayerHand.Count);
+                    // we can get here from inside the LINQ expression that constructs _state.PlayerHand so it's not available
+                    return PowerStrings.CardsInHand + StringFormatter.Format(PowerStrings.InPlaySuffix, PlayerHand.Instance.CardsInHand.Count);
             }
         }
 

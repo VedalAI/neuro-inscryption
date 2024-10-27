@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions.Map;
+using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
@@ -14,7 +14,6 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -47,7 +46,7 @@ public sealed class WoodcarverChooseFlow : HarmonyAutomationFlow<IEnumerator>
         LoadoutState state = LoadoutState.Calculate();
         state.SetContext(context);
 
-        ChooseAction<TotemPieceData> chooseAction = new(context.TotemPieceOptions, true);
+        ChooseAction<TotemPieceData> chooseAction = new(context.TotemPieceOptions);
 
         Decision decision = new(DecisionStrings.ChooseTotemPiece, state);
         decision.AddAction(chooseAction);

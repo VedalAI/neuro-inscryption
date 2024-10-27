@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text;
 using HarmonyLib;
 using NeuroInscryption.Tweaks;
 using NeuroInscryption.Utilities;
@@ -77,10 +80,18 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
 
     private void Update()
     {
-        if (UnityEngine.Input.GetKeyDown(KeyCode.U) && FlowRunner.AllowManualInterruption)
+        if (UnityEngine.Input.GetKeyDown(KeyCode.U))
         {
-            AllowManualInput = !AllowManualInput;
-            Plugin.Logger.LogWarning($"Manual input {(AllowManualInput ? "enabled" : "disabled")}");
+            bool allowToggle = AllowManualInput || FlowRunner.AllowManualInterruption;
+#if DEBUG
+            allowToggle |= UnityEngine.Input.GetKey(KeyCode.LeftControl) && UnityEngine.Input.GetKey(KeyCode.LeftShift);
+#endif
+
+            if (allowToggle)
+            {
+                AllowManualInput = !AllowManualInput;
+                Plugin.Logger.LogWarning($"Manual input {(AllowManualInput ? "enabled" : "disabled")}");
+            }
         }
 
         if (UnityEngine.Input.GetKeyDown(KeyCode.P) && AllowManualInput)
@@ -101,7 +112,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         {
             if (!linked.hook.IsValid(context))
             {
-                Plugin.Logger.LogDebug($"Skipping change to flow {linked.flow.GetType().Name} since current instance is not valid.");
+                // Plugin.Logger.LogDebug($"Skipping change to flow {linked.flow.GetType().Name} since current instance is not valid.");
                 continue;
             }
 
@@ -126,6 +137,34 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         {
             FlowRunner.StartFlow(flow, context);
         }
+    }
+
+    [Conditional("DEBUG")]
+    public static void Assert(bool condition, string? message = null,
+        string? details = null,
+        [CallerFilePath] string? callerFile = null,
+        [CallerMemberName] string? callerMember = null,
+        [CallerLineNumber] int? line = null)
+    {
+        if (condition) return;
+
+        Plugin.Logger.LogWarning("Forcing manual input due to assertion failure");
+        AllowManualInput = true;
+        FlowRunner.CancelCurrentFlowForcefully();
+
+        StringBuilder sb = new("Assertion failed: ");
+        sb.AppendLine(message ?? "(no message)");
+
+        int projNameIdx = Math.Max(0, callerFile!.IndexOf(nameof(NeuroInscryption), StringComparison.Ordinal));
+        sb.AppendLine($"\tin {callerFile[projNameIdx ..]}");
+        sb.AppendLine($"\tat {callerMember}:{line}");
+        if (!string.IsNullOrEmpty(details))
+        {
+            sb.Append("Details: ");
+            sb.AppendLine(details);
+        }
+        sb.AppendLine("Stack trace:");
+        throw new Exception(sb.ToString());
     }
 
     #region Patch methods

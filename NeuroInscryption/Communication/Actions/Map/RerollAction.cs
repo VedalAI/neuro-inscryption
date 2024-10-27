@@ -1,27 +1,9 @@
-﻿using System.Collections.Generic;
-using DiskCardGame;
-using NeuroInscryption.Communication.Json;
+﻿using DiskCardGame;
 using NeuroInscryption.Communication.Strings;
 
 namespace NeuroInscryption.Communication.Actions.Map;
 
-public sealed class RerollAction(MainInputInteractable clover) : IAction
+public sealed class RerollAction(MainInputInteractable clover) : BasicAction(ActionStrings.Reroll)
 {
-    public bool Applicable { get; } = clover && clover.Enabled && clover.gameObject.activeSelf;
-
-    void ISchemaModifier.Apply(JsonSchema schema)
-    {
-        if (!Applicable) return;
-
-        schema.OneOf.Add(new JsonSchema
-        {
-            Properties = new Dictionary<string, JsonSchema>
-            {
-                ["action"] = QJS.Const(ActionName),
-                ["data"] = QJS.ConstNull,
-            }
-        });
-    }
-
-    public string ActionName => ActionStrings.Reroll;
+    protected override bool IsApplicable => clover && clover.Enabled && clover.gameObject.activeSelf;
 }

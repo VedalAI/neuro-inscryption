@@ -6,14 +6,13 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions.Map;
+using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Combat;
@@ -45,7 +44,7 @@ public sealed class MagpieDrawFlow : HarmonyAutomationFlow<IEnumerator>
         Context context = new(BoardManager.Instance.CardSelector.displayedCards, state);
         state.SetContext(context);
 
-        ChooseAction<SelectableCardData> chooseCardAction = new(context.RemainingDeckToDrawFrom, true, ActionStrings.DrawCard);
+        ChooseAction<SelectableCardData> chooseCardAction = new(context.RemainingDeckToDrawFrom, ActionStrings.DrawCard);
 
         Decision decision = new(DecisionStrings.MagpieDrawCard, state);
         decision.AddAction(chooseCardAction);

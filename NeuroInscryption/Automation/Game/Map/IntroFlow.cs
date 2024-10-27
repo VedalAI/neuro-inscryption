@@ -37,13 +37,13 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
         ViewManager.Instance.SwitchToView(View.MapDefault);
         if (puzzle.state.puzzleSolved) return;
 
-        await InputHelpers.WaitUntilViewUnlocked(ct);
+        AutomationManager.Assert(ViewManager.Instance.Is(ViewLockState.Unlocked));
         await UniTask.Delay(1000, cancellationToken: ct);
         AllowManualInterruption = false;
         // Stand up
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 1000, ct);
-        await UniTask.WaitUntil(() => ViewManager.Instance.CurrentView == View.FirstPerson, cancellationToken: ct);
         await InputHelpers.WaitUntilViewUnlocked(ct);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 1000, ct);
+        await UniTask.WaitUntil(() => ViewManager.Instance.Is(View.FirstPerson), cancellationToken: ct);
 
         // Move to painting
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);
@@ -57,6 +57,8 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
 
         // Return to table
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 250, ct);
+        AutomationManager.Assert(ViewManager.Instance.Is(ViewLockState.Unlocked));
+        AutomationManager.Assert(ViewManager.Instance.Is(View.FirstPerson));
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, 250, ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, 250, ct);

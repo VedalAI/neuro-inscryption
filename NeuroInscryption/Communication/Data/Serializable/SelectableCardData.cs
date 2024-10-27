@@ -2,7 +2,6 @@
 using DiskCardGame;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
-using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Strings;
 using Newtonsoft.Json;
 
@@ -28,9 +27,9 @@ public sealed class SelectableCardData : IIdentifiable
     public string Identifier { get; private set; }
 
     [JsonIgnore]
-    public SelectableCard TargetCard { get; private set; }
+    public Card TargetCard { get; private set; }
 
-    private SelectableCardData(SelectableCard card, int index, IGameState state)
+    private SelectableCardData(Card card, int index = -1, IGameState? state = null)
     {
         TargetCard = card;
 
@@ -41,38 +40,37 @@ public sealed class SelectableCardData : IIdentifiable
             if (index != -1) CardIdentifier += StringFormatter.Format(CardStrings.GenericDiscriminator, index);
 
             Identifier = CardIdentifier;
+            return;
         }
-        else if (card.ChoiceInfo.CardInfo != null)
+
+        if (card is not SelectableCard selectable)
+            throw new InvalidOperationException("Card must either have Card.Info or be a SelectableCard");
+        
+        if (selectable.ChoiceInfo.CardInfo != null)
         {
-            Card = CardData.Create(card.ChoiceInfo.CardInfo, state);
+            Card = CardData.Create(selectable.ChoiceInfo.CardInfo);
             CardIdentifier = Card.DisplayName;
             if (index != -1) CardIdentifier += StringFormatter.Format(CardStrings.GenericDiscriminator, index);
 
             Identifier = CardIdentifier;
         }
-        else if (card.ChoiceInfo.tribe != DiskCardGame.Tribe.None)
+        else if (selectable.ChoiceInfo.tribe != DiskCardGame.Tribe.None)
         {
-            Identifier = Tribe = card.ChoiceInfo.tribe.ToString();
+            Identifier = Tribe = selectable.ChoiceInfo.tribe.ToString();
         }
         else
         {
-            switch (card.ChoiceInfo.resourceType)
+            Identifier = Cost = selectable.ChoiceInfo.resourceType switch
             {
-                case ResourceType.Blood:
-                    Identifier = Cost = StringFormatter.Format(CardStrings.BloodCost, card.ChoiceInfo.resourceAmount);
-                    break;
-                case ResourceType.Bone:
-                    Identifier = Cost = StringFormatter.Format(CardStrings.BonesCost, card.ChoiceInfo.resourceAmount);
-                    break;
-
-                case ResourceType.None:
-                    throw new InvalidOperationException("Cannot create SelectableCardData for uninitialized CardChoice");
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                ResourceType.Blood => StringFormatter.Format(CardStrings.BloodCost, selectable.ChoiceInfo.resourceAmount),
+                // todo: "0 bones" for choice card w/ 1 bone on it (flipped to 8 bone vulture)
+                ResourceType.Bone => StringFormatter.Format(CardStrings.BonesCost, selectable.ChoiceInfo.resourceAmount),
+                ResourceType.None => throw new InvalidOperationException("Cannot create SelectableCardData for uninitialized CardChoice"),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
     }
 
-    public static SelectableCardData Create(SelectableCard card, IGameState state) => new(card, -1, state);
-    public static SelectableCardData Create(SelectableCard card, int index, IGameState state) => new(card, index, state);
+    public static SelectableCardData Create(Card card, int index = -1) => Create(card, index, null);
+    public static SelectableCardData Create(Card card, int index, IGameState? state) => new(card, index, state);
 }

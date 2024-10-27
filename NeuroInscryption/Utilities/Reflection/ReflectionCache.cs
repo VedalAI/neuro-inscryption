@@ -8,7 +8,7 @@ namespace NeuroInscryption.Utilities.Reflection;
 
 public static class ReflectionCache
 {
-    private const BindingFlags ALL = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+    private const BindingFlags All = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
     private sealed class Cache<TKey, TValue>(Func<TKey, TValue> getValueFunc)
     {
@@ -23,19 +23,19 @@ public static class ReflectionCache
     }
     private static readonly Cache<string, Type> _types = new(AccessTools.TypeByName);
     private static readonly Cache<Type, List<FieldInfo>> _allFields = new(
-        type => ReflectionHelpers.WalkTypeHierarchy(type).SelectMany(t => t.GetFields(ALL)).ToList()
+        type => ReflectionHelpers.WalkTypeHierarchy(type).SelectMany(t => t.GetFields(All)).ToList()
     );
     private static readonly Cache<(Type type, string name), FieldInfo> _fieldByName = new(
         pair => AccessTools.Field(pair.type, pair.name)
     );
     private static readonly Cache<Type, List<MethodInfo>> _allMethods = new(
-        type => ReflectionHelpers.WalkTypeHierarchy(type).SelectMany(t => t.GetMethods(ALL)).ToList()
+        type => ReflectionHelpers.WalkTypeHierarchy(type).SelectMany(t => t.GetMethods(All)).ToList()
     );
     private static readonly Cache<(Type type, string name), MethodInfo> _methodByName = new(
         pair => AccessTools.Method(pair.type, pair.name)
     );
     private static readonly Cache<Type, List<PropertyInfo>> _allProperties = new(
-        type => ReflectionHelpers.WalkTypeHierarchy(type).SelectMany(t => t.GetProperties(ALL)).ToList()
+        type => ReflectionHelpers.WalkTypeHierarchy(type).SelectMany(t => t.GetProperties(All)).ToList()
     );
     private static readonly Cache<(Type type, string name), PropertyInfo> _propertyByName = new(
         pair => AccessTools.Property(pair.type, pair.name)
