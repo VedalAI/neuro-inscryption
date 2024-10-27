@@ -18,7 +18,7 @@ using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation;
 
-internal class Cards
+internal sealed class Cards
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class LoadoutContext(IEnumerable<SelectableCard> cards) : ILoadoutContext
@@ -40,8 +40,8 @@ internal class Cards
         LoadoutContext context = new(cards);
         state.SetContext(context);
 
-        CardSingleChoicesSequencer rerollable = (choicer as CardSingleChoicesSequencer)!; // day 999 of hating the way unity works with nulls
-        MainInputInteractable clover = rerollable ? rerollable.rerollInteractable : null!;
+        CardSingleChoicesSequencer? rerollable = choicer as CardSingleChoicesSequencer;
+        MainInputInteractable clover = rerollable != null ? rerollable.rerollInteractable : null!;
         RerollAction rerollAction = new(clover);
         ChooseAction<SelectableCardData> chooseAction = new(context.CardOptions);
 
@@ -63,7 +63,7 @@ internal class Cards
             await NeuroMouse.ClickAsync(ct);
             //await UniTask.Delay(100, cancellationToken: ct);
             // choicer sets this back to false when ready for input again
-            await UniTask.WaitUntil(() => !rerollable.choicesRerolled, cancellationToken: ct);
+            await UniTask.WaitUntil(() => !rerollable!.choicesRerolled, cancellationToken: ct);
             return await ChooseAddToDeck(choicer, ct);
         }
 

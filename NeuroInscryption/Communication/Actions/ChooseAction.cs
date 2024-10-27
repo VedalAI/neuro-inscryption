@@ -23,7 +23,7 @@ public sealed class ChooseAction<T>(IEnumerable<T> items, string actionName = Ac
             ["data"] = QJS.Enum(items.Select(card => card.Identifier).Distinct())
         };
 
-        schema.Add(properties);
+        schema.OneOfAdd(properties);
     }
 
     public string ActionName => actionName;

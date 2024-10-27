@@ -55,7 +55,6 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
         await NeuroMouse.ClickAsync(750, ct);
 
         // todo: just ask for a bool instead
-        // todo: always upgrade if risk-free?
 
         Description desc = !RunState.Run.survivorsDead ? DecisionStrings.CampfireRiskUpgrade : DecisionStrings.CampfireNoRiskUpgrade;
         InteractableBase chosenButton = await Neuro.Misc.ChooseInteractable(desc, LoadoutState.Calculate(),

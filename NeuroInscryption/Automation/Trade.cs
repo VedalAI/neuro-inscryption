@@ -15,7 +15,7 @@ using NeuroInscryption.Communication.Strings;
 using Sirenix.Utilities;
 
 namespace NeuroInscryption.Automation;
-internal class Trade
+internal sealed class Trade
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class TrapperShopContext(int teeth, IEnumerable<SelectableCard> pelts, IEnumerable<int> peltPrices, bool knifeAvailable, MainInputInteractable knife, int knifePrice) : ILoadoutContext
@@ -33,7 +33,9 @@ internal class Trade
     // no IAsyncEnumerable grrrrrr
     public UniTaskCancelableAsyncEnumerable<TrapperWareData> BuyFromTrapper(BuyPeltsSequencer instance, CancellationToken ct = default)
     {
-        return UniTaskAsyncEnumerable.Create<TrapperWareData>(async (writer, token) =>
+        return UniTaskAsyncEnumerable.Create<TrapperWareData>(enumerable).WithCancellation(ct);
+
+        async UniTask enumerable(IAsyncWriter<TrapperWareData> writer, CancellationToken token)
         {
             while (true)
             {
@@ -74,6 +76,6 @@ internal class Trade
                     action.ThrowInvalid();
                 }
             }
-        }).WithCancellation(ct);
+        }
     }
 }

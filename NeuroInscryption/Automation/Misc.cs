@@ -10,7 +10,7 @@ using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation;
 
-internal class Misc
+internal sealed class Misc
 {
     public record struct InteractableOption(BasicAction Action, InteractableBase Interactable)
     {

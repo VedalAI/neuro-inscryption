@@ -12,7 +12,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 
 namespace NeuroInscryption.Automation;
-internal class Map
+internal sealed class Map
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class MapNodeContext(List<List<MapNodeData>> paths) : ILoadoutContext
