@@ -101,7 +101,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             switch (ability)
             {
                 case SpecialTriggeredAbility.Ant:
-                    return PowerStrings.Ant + StringFormatter.Format(PowerStrings.InPlaySuffix, BoardManager.Instance.playerSlots.Where(s => s.Card && s.Card.Info.traits.Contains(Trait.Ant)));
+                    return PowerStrings.Ant + StringFormatter.Format(PowerStrings.InPlaySuffix, BoardManager.Instance.playerSlots.Count(s => s.Card && s.Card.Info.traits.Contains(Trait.Ant)));
 
                 case SpecialTriggeredAbility.Lammergeier:
                     return PowerStrings.Lammergeier + StringFormatter.Format(PowerStrings.LammergeierInPlaySuffix, _state.Bones, _state.Bones / 2);

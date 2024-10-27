@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using GBC;
 using HarmonyLib;
 using NeuroInscryption.Tweaks;
@@ -139,6 +140,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
 
     [Conditional("DEBUG")]
     public static void Assert(bool condition, string? message = null,
+        string? details = null,
         [CallerFilePath] string? callerFile = null,
         [CallerMemberName] string? callerMember = null,
         [CallerLineNumber] int? line = null)
@@ -148,12 +150,20 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
         Plugin.Logger.LogWarning("Forcing manual input due to assertion failure");
         AllowManualInput = true;
         FlowRunner.CancelCurrentFlowForcefully();
-        throw new Exception($"""
-            Assertion failed: {message ?? "(no message)"}
-                in {callerFile?[callerFile.IndexOf("NeuroInscryption", StringComparison.Ordinal)..]}
-                at {callerMember}:{line}
-            Stack trace:
-            """);
+
+        StringBuilder sb = new("Assertion failed: ");
+        sb.AppendLine(message ?? "(no message)");
+
+        int projNameIdx = Math.Max(0, callerFile!.IndexOf(nameof(NeuroInscryption), StringComparison.Ordinal));
+        sb.AppendLine($"\tin {callerFile[projNameIdx ..]}");
+        sb.AppendLine($"\tat {callerMember}:{line}");
+        if (!string.IsNullOrEmpty(details))
+        {
+            sb.Append("Details: ");
+            sb.AppendLine(details);
+        }
+        sb.AppendLine("Stack trace:");
+        throw new Exception(sb.ToString());
     }
 
     #region Patch methods

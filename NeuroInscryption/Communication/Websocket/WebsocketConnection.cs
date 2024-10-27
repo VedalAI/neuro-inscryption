@@ -85,7 +85,11 @@ public sealed class WebsocketConnection : Singlyboi<WebsocketConnection>
     {
         string message = wsMessage.SerializeToJson();
         // insanity check
-        AutomationManager.Assert(!message.Contains("Enumerator") && !message.Contains("Enumerable"), "Someone called ToString on an enumerable");
+        AutomationManager.Assert(
+            !message.Contains("Enumerator") && !message.Contains("Enumerable"),
+            "Someone called ToString on an enumerable",
+            message
+        );
         _messageQueue.Enqueue(message);
     }
 
