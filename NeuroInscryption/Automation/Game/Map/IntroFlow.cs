@@ -6,7 +6,6 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Input;
-using NeuroInscryption.Input.Helpers;
 using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 using UnityEngine;
@@ -41,7 +40,7 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
         await UniTask.Delay(1000, cancellationToken: ct);
         AllowManualInterruption = false;
         // Stand up
-        await InputHelpers.WaitUntilViewUnlocked(ct);
+        await Wait.ViewUnlocked(ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 1000, ct);
         await UniTask.WaitUntil(() => ViewManager.Instance.Is(View.FirstPerson), cancellationToken: ct);
 

@@ -6,7 +6,7 @@ using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Input;
-using NeuroInscryption.Input.Helpers;
+using NeuroInscryption.Utilities;
 using UnityEngine;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -32,7 +32,7 @@ public sealed class ChoosePathFlow : HarmonyAutomationFlow<MapNodeManager>
 
         MapNodeData node = await Neuro.Map.ChooseNextNode(ct);
 
-        await InputHelpers.WaitUntilViewUnlocked(ct);
+        await Wait.ViewUnlocked(ct);
         await NeuroMouse.MoveToAsync(node.MapNode, 300, ct);
         await NeuroMouse.ClickAsync(ct);
     }

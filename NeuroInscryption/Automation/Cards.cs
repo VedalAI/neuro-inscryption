@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -13,11 +14,12 @@ using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
-using NeuroInscryption.Input.Helpers;
+using NeuroInscryption.Utilities;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation;
 
+[SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
 internal class Cards
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -73,7 +75,7 @@ internal class Cards
 
     public async UniTask UnflipCards(IEnumerable<SelectableCard> cards, CancellationToken ct = default)
     {
-        await InputHelpers.WaitUntilViewUnlocked(ct);
+        await Wait.ViewUnlocked(ct);
         foreach (SelectableCard card in cards.Where(c => c.Flipped))
         {
             await NeuroMouse.MoveToAsync(card, 200, ct);
@@ -97,7 +99,11 @@ internal class Cards
     /// </example>
     public async UniTask<Card> ChooseCardLoadout(IReadOnlyCollection<SelectableCard> cards, Description description, CancellationToken ct = default, object? additionalContext = null)
     {
+        AutomationManager.Assert(cards.Count > 0, "Nothing to pick from");
+
         await UnflipCards(cards, ct);
+
+        if (cards.Count == 1) return cards.First();
 
         LoadoutState state = LoadoutState.Calculate();
         LoadoutContext context = new(cards) { AdditionalContext = additionalContext };

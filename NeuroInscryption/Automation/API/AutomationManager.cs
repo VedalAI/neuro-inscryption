@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using GBC;
 using HarmonyLib;
 using NeuroInscryption.Tweaks;
 using NeuroInscryption.Utilities;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace NeuroInscryption.Automation.API;
 
@@ -139,7 +138,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
     }
 
     [Conditional("DEBUG")]
-    public static void Assert(bool condition, string? message = null,
+    public static void Assert([DoesNotReturnIf(false)] bool condition, string? message = null,
         string? details = null,
         [CallerFilePath] string? callerFile = null,
         [CallerMemberName] string? callerMember = null,

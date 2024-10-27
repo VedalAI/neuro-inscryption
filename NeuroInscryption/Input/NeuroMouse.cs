@@ -65,6 +65,14 @@ public static class NeuroMouse
         await UniTask.Delay(msDelay, cancellationToken: ct);
     }
 
+    public static async UniTask MoveAndClick(InteractableBase target, CancellationToken ct = default,
+        int delayBeforeClick = 200, int delayAfterClick = 100,
+        bool alt = false)
+    {
+        await MoveToAsync(target, delayBeforeClick, ct);
+        await ClickAsync(delayAfterClick, ct, alt);
+    }
+
     #region Movement shenanigans
 
     private static bool CursorReachedTarget(InteractableBase target, InteractableBase? currentHit)
