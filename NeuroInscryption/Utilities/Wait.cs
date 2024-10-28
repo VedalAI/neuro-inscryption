@@ -48,25 +48,27 @@ public static class Wait
         return WaitUntilPossiblySync(() => CameraStabilityTracker.Instance.IsStable, ct);
     }
 
-    public static UniTask CardPileSpawned(CancellationToken ct = default, bool full = true)
-    {
-        return UniTask.Delay(full ? CardPileFullSpawnTimeMs : CardPileMinSpawnTimeMs, cancellationToken: ct);
-    }
-
     private static UniTask WaitUntilPossiblySync(Func<bool> predicate, CancellationToken ct = default)
     {
-        // i'm not 500% sure on this but i think UniTask waits at least 1 yield just like unity
+        // i'm not 500% sure on this but i think UniTask yields at least once just like unity
         // whereas i want the corlib task behaviour (complete synchronously if possible)
         return predicate() ? UniTask.CompletedTask
             : UniTask.WaitUntil(predicate, cancellationToken: ct);
     }
 
-    // todo: move me maybe
-    public static async UniTask SceneChanged(CancellationToken ct = default)
+    // todo: move this maybe
+    // also desperately needs a better name
+    // names already discarded:
+    //   - SceneChanged
+    //   - FlowStarted
+    //   - ReactionTime
+    // this is like a "reorienting" time, sort of like how visual acquisition after a view shift takes a little bit
+    public static async UniTask CommonFlowDelay(CancellationToken ct = default)
     {
         // await ViewUnlocked(ct); // some nodes intentionally lock view
         await CameraStable(ct);
-        // todo: central source for randomized "human-like" "reaction time"
+        // current thinking is to make a central source for randomized "human-like" "reaction time"
+        // as it is commonly known, human = normal distribution
         await UniTask.Delay(300, cancellationToken: ct);
     }
 }

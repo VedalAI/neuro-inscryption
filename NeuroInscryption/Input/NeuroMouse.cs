@@ -67,33 +67,41 @@ public static class NeuroMouse
     }
 
     public static async UniTask MoveAndClick(InteractableBase target, CancellationToken ct = default,
-        int delayBeforeClick = 200, int delayAfterClick = 100,
+        int msDelayBeforeClick = 200, int msDelayAfterClick = 100,
         bool alt = false)
     {
-        await WaitTargetEnabled(target, ct);
+        if (!await WaitTargetEnabled(target, ct))
+            return; // todo: decide how hard to crash here
         await MoveToAsync(target, ct);
-        await UniTask.Delay(delayBeforeClick, cancellationToken: ct);
+        await UniTask.Delay(msDelayBeforeClick, cancellationToken: ct);
         await ClickAsync(ct, alt);
-        await UniTask.Delay(delayAfterClick, cancellationToken: ct);
+        await UniTask.Delay(msDelayAfterClick, cancellationToken: ct);
     }
 
-    private static async UniTask WaitTargetEnabled(InteractableBase target, CancellationToken ct)
+    private static async UniTask<bool> WaitTargetEnabled(InteractableBase target, CancellationToken ct)
     {
-        if (target.Enabled) return;
+        if (!target)
+        {
+            Plugin.Logger.LogError($"Mouse target {target} is null/dead");
+            return false;
+        }
+        if (target.Enabled) return true;
 
         Plugin.Logger.LogWarning($"Interactable {target} is disabled, gonna wait for a bit but then you're on your own");
         try
         {
-            await UniTask.WaitUntil(() => target.Enabled, cancellationToken: ct)
+            await UniTask.WaitUntil(() => !target || target.Enabled, cancellationToken: ct)
                 .Timeout(TimeSpan.FromSeconds(1));
         }
         catch (TimeoutException)
         {
-            if (target)
-                Plugin.Logger.LogError($"Timed out waiting for interactable {target} to become enabled");
-            else
-                Plugin.Logger.LogError($"Interactable {target} died while we were waiting for it to become enabled");
+            Plugin.Logger.LogError($"Timed out waiting for interactable {target} to become enabled, gonna try to click it anyway");
         }
+
+        if (target) return true;
+
+        Plugin.Logger.LogError($"Interactable {target} died while we were waiting for it to become enabled");
+        return false;
     }
 
     #region Movement shenanigans

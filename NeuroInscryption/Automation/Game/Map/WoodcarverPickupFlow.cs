@@ -5,6 +5,7 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -24,9 +25,8 @@ public sealed class WoodcarverPickupFlow : HarmonyAutomationFlow<IEnumerator>
     {
         BuildTotemSequencer instance = enumerator.GetThis<BuildTotemSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.CommonFlowDelay(ct);
 
-        await NeuroMouse.MoveToAsync(instance.completeTotemSlot, 200, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(instance.completeTotemSlot, ct);
     }
 }

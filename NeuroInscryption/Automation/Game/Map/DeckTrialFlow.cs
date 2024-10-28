@@ -6,12 +6,7 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions;
-using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
-using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
@@ -21,15 +16,6 @@ namespace NeuroInscryption.Automation.Game.Map;
 
 public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
 {
-    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(IEnumerable<DeckTrialSequencer.Trial> trials, IEnumerable<SelectableCard> cards) : ILoadoutContext
-    {
-        public readonly IReadOnlyList<DeckTrialData> TrialOptions = trials.Zip(cards, DeckTrialData.Create).ToList();
-
-        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
-        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
-    }
-
     public override FlowHook[] Hooks =>
     [
         new()
@@ -41,15 +27,35 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        DeckTrialSequencer instance = enumerator.GetThis<DeckTrialSequencer>();
+        EnumeratorWrapper<DeckTrialSequencer> wrapper = new(enumerator);
+        DeckTrialSequencer instance = wrapper.This;
 
-        await Wait.SceneChanged(ct);
+        await Wait.CommonFlowDelay(ct);
 
-        List<SelectableCard> cards = instance.selectableCards;
-        await Neuro.Cards.UnflipCards(cards, ct);
+        // i'm either very smart or very very dumb
+        // either way - we'll need to tell neuro whether she passed the trial :)
+        if (wrapper.State < 27) // reward
+        {
+            if (wrapper.State < 22) // trial cards exit (first yield after trial result is available to us)
+            {
+                List<SelectableCard> cards = instance.selectableCards;
+                await Neuro.Cards.UnflipCards(cards, ct);
 
-        List<DeckTrialData> trials = instance.trialChoices.Zip(cards, DeckTrialData.Create).ToList();
-        DeckTrialData trial = await Neuro.Misc.ChooseWithLoadout(trials, DecisionStrings.ChooseDeckTrial, ct);
-        await NeuroMouse.MoveAndClick(trial.Card, ct);
+                List<DeckTrialData> trials = instance.trialChoices.Zip(cards, DeckTrialData.Create).ToList();
+                DeckTrialData trial = await Neuro.Loadout.ChooseItem(trials, DecisionStrings.ChooseDeckTrial, ct);
+                await NeuroMouse.MoveAndClick(trial.Card, ct);
+
+                await UniTask.WaitUntil(wrapper, e => e.State is 22, cancellationToken: ct);
+            }
+
+            bool passedTrial = enumerator.GetFieldValue<bool>("<trialIsPassed>5__4");
+            if (!passedTrial) return;
+
+            await UniTask.WaitUntil(wrapper, e => e.State is 27, cancellationToken: ct);
+        }
+
+        Card reward = await Neuro.Cards.ChooseAddToDeck(instance, ct);
+        AutomationManager.Assert(reward, "did not pick deck trial reward");
+        await NeuroMouse.MoveAndClick(reward, ct);
     }
 }

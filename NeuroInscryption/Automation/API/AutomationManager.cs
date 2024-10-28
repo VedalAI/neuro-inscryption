@@ -151,7 +151,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
 
         Plugin.Logger.LogWarning("Forcing manual input due to assertion failure");
         AllowManualInput = true;
-        FlowRunner.CancelCurrentFlowForcefully();
+        // FlowRunner.CancelCurrentFlowForcefully();
 
         StringBuilder sb = new("Assertion failed: ");
         sb.AppendLine(message ?? "(no message)");

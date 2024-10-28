@@ -23,12 +23,14 @@ public sealed class ChoosePathFlow : HarmonyAutomationFlow<MapNodeManager>
 
     protected override async UniTask ExecuteAsync(MapNodeManager instance, CancellationToken ct)
     {
-        // don't send decision after manually picking node (also fixes decision after area boss)
+        // don't send choice after already picked node (also fixes choice after area boss)
         if (!instance.ActiveNode || !instance.ActiveNode.connectedNodes.Any(IsActive))
         {
             Plugin.Logger.LogMessage($"No active nodes, cancelling {nameof(ChoosePathFlow)}");
             return;
         }
+
+        await Wait.CommonFlowDelay(ct);
 
         MapNodeData node = await Neuro.Map.ChooseNextNode(ct);
 

@@ -26,22 +26,12 @@ public sealed class GoobertFlow : HarmonyAutomationFlow<IEnumerator>
     {
         CopyCardSequencer instance = enumerator.GetThis<CopyCardSequencer>();
 
-        await Wait.SceneChanged(ct);
+        await Wait.CommonFlowDelay(ct);
 
         if (!ViewManager.Instance.Is(View.CardMergeConfirm))
         {
-            if (ViewManager.Instance.Is(View.Default))
-            {
-                await NeuroMouse.MoveAndClick(instance.selectionSlot, ct,
-                    delayAfterClick: Wait.CardPileFullSpawnTimeMs);
-            }
-
-            await Wait.View(View.DeckSelection, ct);
-
-            Card card = await Neuro.Cards.ChooseCardLoadout(instance.selectionSlot.cardSelector.displayedCards, DecisionStrings.GoobertChooseCard, ct);
+            Card card = await Neuro.Cards.SelectCardFromDeck(instance.selectionSlot, DecisionStrings.GoobertChooseCard, ct);
             AutomationManager.Assert(card, "did not pick goobert card");
-            await NeuroMouse.MoveAndClick(card, ct,
-                delayAfterClick: Wait.CardPileFullSpawnTimeMs);
         }
 
         await Wait.View(View.CardMergeConfirm, ct);

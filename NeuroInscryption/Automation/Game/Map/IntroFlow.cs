@@ -32,6 +32,8 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
     {
         OilPaintingPuzzle puzzle = GameObject.FindObjectOfType<OilPaintingPuzzle>();
 
+        await Wait.CommonFlowDelay(ct);
+
         // Stop inspecting deck
         ViewManager.Instance.SwitchToView(View.MapDefault);
         if (puzzle.state.puzzleSolved) return;
@@ -41,9 +43,20 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
         AllowManualInterruption = false;
         // Stand up
         await Wait.ViewUnlocked(ct);
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 1000, ct);
-        await UniTask.WaitUntil(() => ViewManager.Instance.Is(View.FirstPerson), cancellationToken: ct);
-        await Wait.CameraStable(ct);
+        // i'm so done dude
+        for (int tries = 0; tries < 3; tries++)
+        {
+            await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 500, ct);
+            await Wait.CameraStable(ct);
+            if (ViewManager.Instance.Is(View.FirstPerson)) break;
+        }
+
+        if (!ViewManager.Instance.Is(View.FirstPerson))
+        {
+            // whatever
+            Plugin.Logger.LogWarning("No painting for you today");
+            return;
+        }
 
         // Move to painting
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);
@@ -57,9 +70,7 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
 
         // Return to table
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 250, ct);
-        await Wait.CameraStable(ct);
-        AutomationManager.Assert(ViewManager.Instance.Is(ViewLockState.Unlocked));
-        AutomationManager.Assert(ViewManager.Instance.Is(View.FirstPerson));
+        await Wait.View(View.FirstPerson, ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, 250, ct);
         await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, 250, ct);

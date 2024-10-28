@@ -25,7 +25,7 @@ public sealed class PackFullFlow : HarmonyAutomationFlow<IEnumerator>
     {
         GainConsumablesSequencer instance = enumerator.GetThis<GainConsumablesSequencer>();
 
-        await Wait.SceneChanged(ct);
+        await Wait.CommonFlowDelay(ct);
 
         await NeuroMouse.MoveAndClick(instance.ratCard, ct);
     }

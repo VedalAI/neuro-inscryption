@@ -29,14 +29,14 @@ public sealed class MycologistsFlow : HarmonyAutomationFlow<IEnumerator>
     {
         DuplicateMergeSequencer instance = target.GetThis<DuplicateMergeSequencer>();
 
-        await Wait.CameraStable(ct);
+        await Wait.CommonFlowDelay(ct);
 
         if (!ViewManager.Instance.Is(View.CardMergeConfirm))
         {
             if (ViewManager.Instance.Is(View.Default))
             {
-                await NeuroMouse.MoveAndClick(instance.selectionSlot, ct: ct);
-                await Wait.CardPileSpawned(ct);
+                await NeuroMouse.MoveAndClick(instance.selectionSlot, ct,
+                    msDelayAfterClick: Wait.CardPileFullSpawnTimeMs);
             }
 
             await Wait.View(View.DeckSelection, ct);
@@ -44,7 +44,7 @@ public sealed class MycologistsFlow : HarmonyAutomationFlow<IEnumerator>
             SelectableCardPairArray selector = (SelectableCardPairArray)instance.selectionSlot.cardSelector;
             List<SelectableCardPairData> pairs = selector.pairs.Select(SelectableCardPairData.Create).ToList();
 
-            SelectableCardPairData pair = await Neuro.Misc.ChooseWithLoadout(pairs, DecisionStrings.MycologistsChoosePair, ct);
+            SelectableCardPairData pair = await Neuro.Loadout.ChooseItem(pairs, DecisionStrings.MycologistsChoosePair, ct);
             AutomationManager.Assert(pair is {} && pair.Pair, "did not pick pair for mycologists");
 
             await NeuroMouse.MoveAndClick(pair.Pair, ct);

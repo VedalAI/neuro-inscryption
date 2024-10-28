@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
@@ -7,7 +6,6 @@ using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
-using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
@@ -34,37 +32,25 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        EnumeratorWrapper<CardStatBoostSequencer> wrapper = new(enumerator);
-        CardStatBoostSequencer instance = wrapper.This;
-        bool isAttack = wrapper.GetFieldValue<object>("<>8__1").GetFieldValue<bool>("attackMod");
+        CardStatBoostSequencer instance = enumerator.GetThis<CardStatBoostSequencer>();
+        bool isAttack = enumerator.GetFieldValue<object>("<>8__1").GetFieldValue<bool>("attackMod");
 
-        CardInfo destroyedCard = wrapper.GetFieldValue<CardInfo>("<destroyedCard>5__2");
-        bool finishedBuffing = wrapper.GetFieldValue<bool>("<finishedBuffing>5__3");
-        int numBuffsGiven = wrapper.GetFieldValue<int>("<numBuffsGiven>5__4");
+        CardInfo destroyedCard = enumerator.GetFieldValue<CardInfo>("<destroyedCard>5__2");
+        bool finishedBuffing = enumerator.GetFieldValue<bool>("<finishedBuffing>5__3");
+        int numBuffsGiven = enumerator.GetFieldValue<int>("<numBuffsGiven>5__4");
 
         bool finished = finishedBuffing || destroyedCard != null;
         if (finished) return;
 
-        await Wait.SceneChanged(ct);
+        await Wait.CommonFlowDelay(ct);
 
         if (!ViewManager.Instance.Is(View.StatBoostSlot))
         {
-            if (ViewManager.Instance.Is(View.Default))
-            {
-                await NeuroMouse.MoveAndClick(instance.selectionSlot, ct,
-                    delayAfterClick: Wait.CardPileFullSpawnTimeMs);
-            }
-
-            await Wait.View(View.DeckSelection, ct);
-
             CampfireBoostContext context = new CampfireBoostContext(isAttack);
-            List<SelectableCard> cards = instance.selectionSlot.cardSelector.displayedCards;
 
-            Card card = await Neuro.Cards.ChooseCardLoadout(cards, DecisionStrings.CampfireChooseCard, ct, context);
-            AutomationManager.Assert(card, "did not pick campfire card");
-
-            await NeuroMouse.MoveAndClick(card, ct,
-                delayAfterClick: Wait.CardPileFullSpawnTimeMs); // card pile takes the same time to despawn
+            Card card = await Neuro.Cards.SelectCardFromDeck(instance.selectionSlot, DecisionStrings.CampfireChooseCard, ct,
+                additionalContext: context);
+            AutomationManager.Assert(card, $"did not pick campfire card");
         }
 
         await Wait.View(View.StatBoostSlot, ct);
@@ -72,20 +58,14 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
         if (numBuffsGiven == 0)
         {
             await NeuroMouse.MoveAndClick(instance.confirmStone, ct,
-                delayAfterClick: 300); // there's a WaitForSeconds(0.25f) before stats are actually applied
+                msDelayAfterClick: 300); // there's a WaitForSeconds(0.25f) before stats are actually applied
         }
 
-        // todo: just ask for a bool instead
         Description desc = !RunState.Run.survivorsDead ? DecisionStrings.CampfireRiskUpgrade : DecisionStrings.CampfireNoRiskUpgrade;
-        InteractableBase chosenButton = await Neuro.Misc.ChooseInteractable(desc, LoadoutState.Calculate(),
-        [
-            (new CampfireSecondUpgradeAction(), instance.confirmStone),
-            (new LeaveAction(), instance.selectionSlot.Card!),
-        ], ct);
-        AutomationManager.Assert(chosenButton, "did not pick on second campfire upgrade");
+        bool doSecondUpgrade = await Neuro.Loadout.Choose(new CampfireSecondUpgradeAction(), desc, ct);
+        InteractableBase chosenButton = doSecondUpgrade ? instance.confirmStone : instance.selectionSlot;
 
         await UniTask.WaitUntil(() => instance.confirmStone.Enabled, cancellationToken: ct);
-
         await NeuroMouse.MoveAndClick(chosenButton, ct);
     }
 }

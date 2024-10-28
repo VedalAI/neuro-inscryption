@@ -86,7 +86,7 @@ internal sealed class DevCheats : Singlyboi<DevCheats>
     {
         _doAutoWin = overrideValue ?? !_doAutoWin;
         Plugin.Logger.LogInfo($"autowin {(_doAutoWin ? "on" : "off")}");
-        Win(true);
+        if (_doAutoWin) Win(true);
     }
 
     private static bool _doAutoWin;

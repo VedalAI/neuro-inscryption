@@ -15,8 +15,7 @@ using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using UnityEngine;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation;
@@ -25,14 +24,11 @@ namespace NeuroInscryption.Automation;
 internal sealed class Cards
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class LoadoutContext(IEnumerable<SelectableCard> cards, object? additionalContext = null) : ILoadoutContext
+    private sealed class LoadoutContext(IEnumerable<SelectableCard> cards, object? additionalContext = null)
+        : Loadout.ItemsContext<SelectableCardData>(cards.Select(SelectableCardData.Create), additionalContext)
     {
-        public readonly IReadOnlyList<SelectableCardData> CardOptions = cards.Select(SelectableCardData.Create).ToList();
-        [JsonExtensionData]
-        public readonly JObject? AdditionalContext = additionalContext != null ? JObject.FromObject(additionalContext) : null;
-
-        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => CardOptions.SelectMany(c => c.Card!.RelevantSigils);
-        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => CardOptions.SelectMany(c => c.Card!.Traits);
+        protected override IEnumerable<SigilData> RelevantSigils => Options.SelectMany(c => c.Card!.RelevantSigils);
+        protected override IEnumerable<TraitData> RelevantTraits => Options.SelectMany(c => c.Card!.Traits);
     }
 
     public async UniTask<Card> ChooseAddToDeck(CardChoicesSequencer choicer, CancellationToken ct = default)
@@ -48,7 +44,7 @@ internal sealed class Cards
         CardSingleChoicesSequencer? rerollable = choicer as CardSingleChoicesSequencer;
         MainInputInteractable clover = rerollable != null ? rerollable.rerollInteractable : null!;
         RerollAction rerollAction = new(clover);
-        ChooseAction<SelectableCardData> chooseAction = new(context.CardOptions);
+        ChooseAction<SelectableCardData> chooseAction = new(context.Options);
 
         Decision decision = new(DecisionStrings.ChooseCard, state);
         decision.AddAction(chooseAction);
@@ -64,9 +60,7 @@ internal sealed class Cards
         if (action.Match(rerollAction))
         {
             AutomationManager.Assert(clover, $"Ended up in reroll path on non-rerollable choicer {choicer.GetType().Name} - schema enforcement fail?");
-            await NeuroMouse.MoveToAsync(clover, 200, ct);
-            await NeuroMouse.ClickAsync(ct);
-            //await UniTask.Delay(100, cancellationToken: ct);
+            await NeuroMouse.MoveAndClick(clover, ct);
             // choicer sets this back to false when ready for input again
             await UniTask.WaitUntil(() => !rerollable!.choicesRerolled, cancellationToken: ct);
             return await ChooseAddToDeck(choicer, ct);
@@ -81,8 +75,7 @@ internal sealed class Cards
         await Wait.ViewUnlocked(ct);
         foreach (SelectableCard card in cards.Where(c => c.Flipped))
         {
-            await NeuroMouse.MoveToAsync(card, 200, ct);
-            await NeuroMouse.ClickAsync(ct);
+            await NeuroMouse.MoveAndClick(card, ct);
         }
         await UniTask.Delay(200, cancellationToken: ct);
     }
@@ -108,18 +101,33 @@ internal sealed class Cards
 
         if (cards.Count == 1) return cards.First();
 
-        LoadoutState state = LoadoutState.Calculate();
-        LoadoutContext context = new(cards, additionalContext);
-        state.SetContext(context);
-
-        ChooseAction<SelectableCardData> chooseCardAction = new(context.CardOptions);
-        Decision decision = new(description, state);
-        decision.AddAction(chooseCardAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(chooseCardAction, out SelectableCardData? selected)) action.ThrowInvalid();
-
+        List<SelectableCardData> data = cards.Select(SelectableCardData.Create).ToList();
+        SelectableCardData selected = await Neuro.Loadout.ChooseItem(data, description, ct, additionalContext);
         return selected.TargetCard;
+    }
+
+    public async UniTask<Card> SelectCardFromDeck(SelectCardFromDeckSlot slot, Description description, CancellationToken ct = default,
+        Func<SelectableCard, bool>? filter = null, object? additionalContext = null,
+        float cardPileSpawnTimeMultiplier = 1f, float cardPileDespawnTimeMultiplier = 0.5f)
+    {
+        await Wait.CameraStable(ct);
+
+        if (!ViewManager.Instance.Is(View.DeckSelection))
+        {
+            await NeuroMouse.MoveAndClick(slot, ct,
+                msDelayAfterClick: Mathf.CeilToInt(Wait.CardPileFullSpawnTimeMs * cardPileSpawnTimeMultiplier));
+            await Wait.View(View.DeckSelection, ct);
+        }
+
+        List<SelectableCard> cards = slot.cardSelector.displayedCards;
+        if (filter is { }) cards = cards.Where(filter).ToList();
+
+        AutomationManager.Assert(cards.Count > 0, "No selectable cards found" + (filter is { } ? ", check filter" : ""));
+
+        Card card = await Neuro.Cards.ChooseCardLoadout(cards, description, ct, additionalContext);
+        await NeuroMouse.MoveAndClick(card, ct,
+            msDelayAfterClick: Mathf.CeilToInt(Wait.CardPileFullSpawnTimeMs * cardPileDespawnTimeMultiplier));
+
+        return card ? card : slot.Card; // behaviour varies
     }
 }

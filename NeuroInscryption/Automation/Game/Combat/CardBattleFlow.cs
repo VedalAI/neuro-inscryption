@@ -52,7 +52,8 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
             await UniTask.Delay(500, cancellationToken: ct); // time it takes for the card to go back in the hand
         }
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.CommonFlowDelay(ct);
+        await Wait.ViewUnlocked(ct);
 
         ViewManager.Instance.SwitchToView(BoardManager.Instance.DefaultView);
 
@@ -71,30 +72,25 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
 
         Action action = await decision.SendAsync(ct);
 
+        InteractableBase? target = null;
         if (action.Match(playCardAction, out PlayableCardData? cardData))
         {
-            await NeuroMouse.MoveToAsync(cardData.TargetCard, 500, ct);
-            await NeuroMouse.ClickAsync(ct);
+            target = cardData.TargetCard;
         }
         else if (action.Match(useItemAction, out ItemData? itemData))
         {
-            await NeuroMouse.MoveToAsync(itemData.Slot!, 500, ct);
-            await NeuroMouse.ClickAsync(ct);
-            await Wait.ViewUnlocked(ct);
+            target = itemData.Slot!;
         }
         else if (action.Match(acceptSurrenderAction))
         {
-            await NeuroMouse.MoveToAsync(LeshyAnimationController.Instance.oliveBranchInteractable, 500, ct);
-            await NeuroMouse.ClickAsync(ct);
+            await UniTask.Delay(500, cancellationToken: ct); // branch takes time to extend, so the mouse aim gets thrown off
+            target = LeshyAnimationController.Instance.oliveBranchInteractable;
         }
         else if (action.Match(endTurnAction))
         {
-            await NeuroMouse.MoveToAsync(((BoardManager3D) BoardManager.Instance).Bell, 500, ct);
-            await NeuroMouse.ClickAsync(ct);
+            target = ((BoardManager3D)BoardManager.Instance).Bell;
         }
-        else
-        {
-            action.ThrowInvalid();
-        }
+        if (target == null) action.ThrowInvalid();
+        await NeuroMouse.MoveAndClick(target, ct, msDelayBeforeClick: 500);
     }
 }

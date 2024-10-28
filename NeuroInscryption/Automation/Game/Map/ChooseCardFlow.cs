@@ -32,7 +32,7 @@ public sealed class ChooseCardFlow : HarmonyAutomationFlow<IEnumerator>
     {
         CardSingleChoicesSequencer instance = enumerator.GetThis<CardSingleChoicesSequencer>();
 
-        await Wait.SceneChanged(ct);
+        await Wait.CommonFlowDelay(ct);
 
         if (instance.chosenReward == null)
         {

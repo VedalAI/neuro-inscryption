@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
@@ -27,23 +26,12 @@ public sealed class BoneAltarFlow : HarmonyAutomationFlow<IEnumerator>
     {
         CardRemoveSequencer instance = target.GetThis<CardRemoveSequencer>();
 
-        await Wait.SceneChanged(ct);
+        await Wait.CommonFlowDelay(ct);
 
         if (!ViewManager.Instance.Is(View.CardMergeConfirm))
         {
-            if (ViewManager.Instance.Is(View.CardMergeSlots))
-            {
-                await NeuroMouse.MoveAndClick(instance.sacrificeSlot, ct,
-                    delayAfterClick: Wait.CardPileFullSpawnTimeMs);
-            }
-
-            await Wait.View(View.DeckSelection, ct);
-
-            List<SelectableCard> cards = instance.sacrificeSlot.cardSelector.displayedCards;
-            Card card = await Neuro.Cards.ChooseCardLoadout(cards, DecisionStrings.BoneAltarChooseCard, ct);
+            Card card = await Neuro.Cards.SelectCardFromDeck(instance.sacrificeSlot, DecisionStrings.BoneAltarChooseCard, ct);
             AutomationManager.Assert(card, "did not pick bone altar card");
-
-            await NeuroMouse.MoveAndClick(card, ct);
 
             await Wait.View(View.CardMergeConfirm, ct);
         }
@@ -56,12 +44,12 @@ public sealed class BoneAltarFlow : HarmonyAutomationFlow<IEnumerator>
 
         SelectableCard? boonCard = null;
         // used to click the slot but the boon card isn't actually placed on the slot, it's just moved to the same position
-        await UniTask.WaitUntil(CheckBoonCard, cancellationToken: ct);
+        await UniTask.WaitUntil(checkBoonCard, cancellationToken: ct);
         await NeuroMouse.MoveAndClick(boonCard!, ct);
 
         return;
 
-        bool CheckBoonCard()
+        bool checkBoonCard()
         {
             boonCard = target.GetFieldValue<SelectableCard>("<boonCard>5__6");
             return boonCard != null;

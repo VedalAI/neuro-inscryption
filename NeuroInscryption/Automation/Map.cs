@@ -4,11 +4,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
-using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.Describable;
-using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 
@@ -17,41 +13,30 @@ namespace NeuroInscryption.Automation;
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
 internal sealed class Map
 {
-    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class MapNodeContext(List<List<MapNodeData>> paths) : ILoadoutContext
-    {
-        public readonly IReadOnlyList<string> Paths = paths.ConvertAll(path => string.Join(" -> ", path.Select(node => node.Identifier)));
-        public readonly IReadOnlyDictionary<string, string> PathDescriptions = paths.Flatten().ToDescriptionDictionary();
-
-        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
-        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
-    }
-
     public async UniTask<MapNodeData> ChooseNextNode(CancellationToken ct)
     {
         MapNodeManager instance = MapNodeManager.Instance;
+
+        List<MapNode> directNext = instance.ActiveNode.connectedNodes;
+        if (directNext.Count == 1)
+        {
+            Plugin.Logger.LogDebug($"Only one path ({directNext[0]}), not gonna bother asking");
+            return MapNodeData.Create(directNext[0]);
+        }
+
         List<List<MapNodeData>> paths = GetPaths(instance.ActiveNode);
         List<MapNodeData> nextNodes = paths.Select(p => p[0]).Distinct().ToList();
 
-        if (nextNodes.Count == 1)
+        var additionalContext = new
         {
-            Plugin.Logger.LogDebug($"Only one path ({nextNodes[0].MapNode}), not gonna bother asking");
-            return nextNodes[0];
-        }
+            Paths = paths.ConvertAll(path => string.Join(" -> ", path.Select(node => node.Identifier))),
+            PathDescriptions = paths.Flatten().ToDescriptionDictionary(),
+        };
 
-        LoadoutState state = LoadoutState.Calculate();
-        state.SetContext(new MapNodeContext(paths));
+        MapNodeData nextNode = await Neuro.Loadout.ChooseItem(nextNodes, DecisionStrings.ChoosePath, ct,
+            additionalContext);
 
-        ChooseAction<MapNodeData> choosePathAction = new(nextNodes);
-
-        Decision decision = new(DecisionStrings.ChoosePath, state);
-        decision.AddAction(choosePathAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(choosePathAction, out MapNodeData? node)) action.ThrowInvalid();
-
-        return node;
+        return nextNode;
     }
 
     private const int MaxDepth = 5;
