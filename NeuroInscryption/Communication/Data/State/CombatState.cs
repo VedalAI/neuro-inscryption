@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using DiskCardGame;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
@@ -39,7 +40,7 @@ public sealed class CombatState : IGameState
 
     public readonly int? OpponentLives;
     public readonly TotemData? OpponentTotem;
-    public readonly string? BossAbilityDescription; // TODO
+    public readonly string? BossDescription; // TODO
     public readonly bool? IsOpponentSurrendering;
 
     // TODO: Oil painting puzzle
@@ -100,6 +101,78 @@ public sealed class CombatState : IGameState
         if (Totem != null) relevantSigils = relevantSigils.Append(SigilData.Create(Totem.Sigil));
         SigilDescriptions = relevantSigils.ToDescriptionDictionary().NullIfEmpty();
         TraitDescriptions = allCardsInPlay.SelectMany(c => c.Traits).Distinct().ToDescriptionDictionary().NullIfEmpty();
+
+        BossDescription = GetBossDescription(opponent);
+    }
+
+    private string? GetBossDescription(Opponent opponent)
+    {
+        if (opponent is not Part1BossOpponent) return null;
+
+        BoardManager boardManager = BoardManager.Instance;
+        bool isLastPhase = opponent.NumLives == 1;
+        StringBuilder sb = new();
+        switch (opponent)
+        {
+            case ProspectorBossOpponent:
+            {
+                sb.Append(BossStrings.Prospector);
+                if (boardManager.opponentSlots.Select(s => s.Card).Concat(opponent.Queue).Any(card => card.Info.name == "Mule"))
+                    sb.Append($" {BossStrings.ProspectorMule}");
+                if (isLastPhase) break;
+
+                sb.Append($" {BossStrings.ProspectorPhase1Transition}");
+                break;
+            }
+            case AnglerBossOpponent:
+            {
+                sb.Append(BossStrings.Angler);
+                sb.Append($" {BossStrings.AnglerPhase1Ability}");
+                if (isLastPhase) break;
+
+                int difficulty = TurnManager.Instance.BattleNodeData.difficulty + RunState.Run.DifficultyModifier;
+                sb.Append(difficulty < 15 // magic number from game
+                    ? $" {BossStrings.AnglerPhase1TransitionEasy}"
+                    : $" {BossStrings.AnglerPhase1TransitionHard}"
+                );
+                break;
+            }
+            case TrapperTraderBossOpponent:
+            {
+                sb.Append(isLastPhase ? BossStrings.Trapper : BossStrings.Trader);
+                if (isLastPhase) break;
+
+                sb.Append($" {BossStrings.TrapperAndTraderPhase1Transition}");
+                break;
+            }
+            case LeshyBossOpponent:
+            {
+                sb.Append(BossStrings.Leshy);
+                if (isLastPhase) break;
+
+                sb.Append($" {BossStrings.LeshyPhases1And2Ability}");
+                sb.Append(opponent.NumLives == 3 // first phase
+                    ? $" {BossStrings.LeshyPhase1Transition}"
+                    : $" {BossStrings.LeshyPhase2Transition}"
+                );
+                break;
+            }
+            case RoyalBossOpponent:
+            {
+                sb.Append(BossStrings.Royal);
+                if (isLastPhase) break;
+
+                sb.Append($" {BossStrings.RoyalPhase1And2Ability}");
+                sb.Append(opponent.NumLives == 3
+                    ? $" {BossStrings.RoyalPhase1Transition}"
+                    : $" {BossStrings.RoyalPhase2Transition}"
+                );
+                break;
+            }
+            default: return null;
+        }
+
+        return sb.ToString();
     }
 
     public void SetContext(ICombatContext decisionContext)
