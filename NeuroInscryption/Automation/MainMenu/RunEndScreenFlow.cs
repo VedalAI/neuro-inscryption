@@ -34,7 +34,7 @@ public sealed class RunEndScreenFlow : HarmonyAutomationFlow<AscensionRunEndScre
 
         AscensionMenuScreenTransition screen = target.GetComponent<AscensionMenuScreenTransition>();
 
-        await NeuroMouse.MoveToAsync(screen.screenInteractables.Find(i => i.name == "BackButton"), 500, ct);
-        await NeuroMouse.ClickAsync(ct);
+        MainInputInteractable backButton = screen.screenInteractables.Find(i => i.name == "BackButton");
+        await NeuroMouse.MoveAndClick(backButton, ct, 500);
     }
 }

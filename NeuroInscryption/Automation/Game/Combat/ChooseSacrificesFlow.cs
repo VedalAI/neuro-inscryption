@@ -48,9 +48,7 @@ public sealed class ChooseSacrificesFlow : HarmonyAutomationFlow<IEnumerator>
 
         foreach (PlayableCardData sacrifice in sacrifices)
         {
-            await NeuroMouse.MoveToAsync(sacrifice.TargetCard, 500, ct);
-            AllowManualInterruption = false;
-            await NeuroMouse.ClickAsync(250, ct);
+            await NeuroMouse.MoveAndClick(sacrifice.TargetCard, ct, msDelayBeforeClick: 500, msDelayAfterClick: 250);
         }
     }
 }

@@ -56,7 +56,7 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
         AutomationManager.Assert(sacrifice, "did not pick sacrifice");
         return sacrifice;
 
-        bool validSacrificeFilter(SelectableCard c) => instance.GetValidCardsForSacrifice(c.Info).Any();
+        bool validSacrificeFilter(SelectableCard c) => instance.GetValidCardsForHost(c.Info).Any();
     }
 
     private static async UniTask<Card> PickHost(CardMergeSequencer instance, CancellationToken ct)

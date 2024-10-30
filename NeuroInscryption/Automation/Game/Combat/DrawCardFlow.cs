@@ -10,6 +10,7 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Combat;
@@ -27,11 +28,32 @@ public sealed class DrawCardFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator _, CancellationToken ct)
     {
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.CommonFlowDelay(ct);
 
+        bool drawFromSideDeck = await DoWeDrawFromSideDeck(ct);
+
+        CardPile target = !drawFromSideDeck ? CardDrawPiles3D.Instance.Pile : CardDrawPiles3D.Instance.SidePile;
+        await NeuroMouse.MoveAndClick(target, ct, msDelayBeforeClick: 500);
+    }
+
+    private static async UniTask<bool> DoWeDrawFromSideDeck(CancellationToken ct = default)
+    {
         CombatState state = CombatState.Calculate();
 
-        DrawCardAction drawCardAction = new();
+        bool mainDeckEmpty = state.RemainingDeck?.Count == 0;
+        bool sideDeckEmpty = state.RemainingSquirrels == "0";
+
+        if (mainDeckEmpty)
+        {
+            Plugin.Logger.LogMessage($"Main deck empty, force draw from side");
+            return true;
+        }
+        if (sideDeckEmpty)
+        {
+            Plugin.Logger.LogMessage($"Side deck empty, force draw from main");
+            return false;
+        }
+        DrawCardAction drawCardAction = new(mainDeckEmpty, sideDeckEmpty);
 
         Decision decision = new(DecisionStrings.DrawCard, state);
         decision.AddAction(drawCardAction);
@@ -40,8 +62,6 @@ public sealed class DrawCardFlow : HarmonyAutomationFlow<IEnumerator>
 
         if (!action.Match(drawCardAction, out bool drawFromSideDeck)) action.ThrowInvalid();
 
-        CardPile target = !drawFromSideDeck ? CardDrawPiles3D.Instance.Pile : CardDrawPiles3D.Instance.SidePile;
-        await NeuroMouse.MoveToAsync(target, 500, ct);
-        await NeuroMouse.ClickAsync(ct);
+        return drawFromSideDeck;
     }
 }

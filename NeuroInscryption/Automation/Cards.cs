@@ -128,6 +128,9 @@ internal sealed class Cards
         await NeuroMouse.MoveAndClick(card, ct,
             msDelayAfterClick: Mathf.CeilToInt(Wait.CardPileFullSpawnTimeMs * cardPileDespawnTimeMultiplier));
 
+        await UniTask.WaitUntil(() => !ViewManager.Instance.Is(View.DeckSelection), cancellationToken: ct);
+        await Wait.CameraStable(ct);
+
         return card ? card : slot.Card; // behaviour varies
     }
 }

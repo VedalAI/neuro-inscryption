@@ -61,9 +61,7 @@ public sealed class TraderFlow : HarmonyAutomationFlow<IEnumerator>
 
         foreach (SelectableCardData card in chosenCards)
         {
-            await NeuroMouse.MoveToAsync(card.TargetCard, 500, ct);
-            AllowManualInterruption = false;
-            await NeuroMouse.ClickAsync(250, ct);
+            await NeuroMouse.MoveAndClick(card.TargetCard, ct);
         }
     }
 }

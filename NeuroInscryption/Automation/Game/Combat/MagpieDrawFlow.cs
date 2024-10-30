@@ -13,6 +13,7 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Combat;
@@ -38,7 +39,7 @@ public sealed class MagpieDrawFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator _, CancellationToken ct)
     {
-        await UniTask.Delay(1000, cancellationToken: ct);
+        await Wait.CommonFlowDelay(ct);
 
         CombatState state = CombatState.Calculate();
         Context context = new(BoardManager.Instance.CardSelector.displayedCards, state);
@@ -53,7 +54,6 @@ public sealed class MagpieDrawFlow : HarmonyAutomationFlow<IEnumerator>
 
         if (!action.Match(chooseCardAction, out SelectableCardData? selected)) action.ThrowInvalid();
 
-        await NeuroMouse.MoveToAsync(selected.TargetCard, 200, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(selected.TargetCard, ct);
     }
 }

@@ -6,14 +6,17 @@ using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Combat;
 
-public sealed class DrawCardAction : IAction<bool>
+public sealed class DrawCardAction(bool mainDeckEmpty, bool sideDeckEmpty) : IAction<bool>
 {
     void ISchemaModifier.Apply(JsonSchema schema)
     {
+        List<string> values = [];
+        if (!mainDeckEmpty) values.Add("Random");
+        if (!sideDeckEmpty) values.Add("Squirrel");
         schema.OneOfAdd(new Dictionary<string, JsonSchema>
         {
             ["action"] = QJS.Const(ActionName),
-            ["data"] = QJS.Enum(["Random", "Squirrel"])
+            ["data"] = QJS.Enum(values)
         });
     }
 
@@ -26,11 +29,11 @@ public sealed class DrawCardAction : IAction<bool>
         switch (strResponse)
         {
             case "Random":
-                drawFromSideDeck = false;
+                drawFromSideDeck = mainDeckEmpty;
                 return true;
 
             case "Squirrel":
-                drawFromSideDeck = true;
+                drawFromSideDeck = !sideDeckEmpty;
                 return true;
 
             default:

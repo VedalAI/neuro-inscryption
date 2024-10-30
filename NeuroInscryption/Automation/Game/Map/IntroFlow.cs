@@ -65,8 +65,8 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, ct);
 
         // Inspect painting
-        await NeuroMouse.MoveToAsync(puzzle.zoomInteractable, ct, mouseSpeedMultiplier: 10);
-        await NeuroMouse.ClickAsync(2500, ct);
+        await NeuroMouse.MoveAndClick(puzzle.zoomInteractable, ct, mouseSpeedMultiplier: 10);
+        await UniTask.Delay(2500, cancellationToken: ct); // explicit "looking" wait
 
         // Return to table
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, ct);

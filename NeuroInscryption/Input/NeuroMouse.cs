@@ -13,7 +13,7 @@ namespace NeuroInscryption.Input;
 
 public static class NeuroMouse
 {
-    private const float MouseSpeed = 5.0f; // magic number, idk and icba what weird coordinate system the game uses
+    private const float MouseSpeed = 4.0f; // magic number, idk and icba what weird coordinate system the game uses
 
     private static InteractableBase? _current;
 
@@ -41,9 +41,18 @@ public static class NeuroMouse
         {
             Vector2 end = GetCursorPositionFor(interactable);
             bool complete = false;
-            ValueVector2 tween = (ValueVector2)Tween.Value(InputHandler.SimulatedMousePosition, end,
-                valueUpdatedCallback: curr => InputHandler.SimulatedMousePosition = curr,
-                duration: Vector2.Distance(InputHandler.SimulatedMousePosition, end) / (mouseSpeedMultiplier * MouseSpeed),
+            ValueVector2 tween = default!;
+            float distance = Vector2.Distance(InputHandler.SimulatedMousePosition, end);
+            float duration = Mathf.Sqrt(distance) / (mouseSpeedMultiplier * MouseSpeed);
+            // Plugin.Logger.LogWarning($"Move {distance} at {mouseSpeedMultiplier}x{MouseSpeed}, should take {duration}");
+            tween = (ValueVector2)Tween.Value(InputHandler.SimulatedMousePosition, end,
+                valueUpdatedCallback: curr =>
+                {
+                    InputHandler.SimulatedMousePosition = curr;
+                    // ReSharper disable once AccessToModifiedClosure
+                    if (ct.IsCancellationRequested) tween.Stop();
+                },
+                duration: duration,
                 easeCurve: Tween.EaseOut,
                 delay: 0,
                 completeCallback: () => complete = true
@@ -96,14 +105,15 @@ public static class NeuroMouse
 
     public static async UniTask MoveAndClick(InteractableBase target, CancellationToken ct = default,
         int msDelayBeforeClick = 200, int msDelayAfterClick = 100,
+        float mouseSpeedMultiplier = 1f, bool waitTargetEnabled = true,
         bool alt = false)
     {
-        if (!await WaitTargetEnabled(target, ct))
-            return; // todo: decide how hard to crash here
-        await MoveToAsync(target, ct);
-        await UniTask.Delay(msDelayBeforeClick, cancellationToken: ct);
+        if (waitTargetEnabled && !await WaitTargetEnabled(target, ct)) return; // todo: decide how hard to crash here
+
+        await MoveToAsync(target, ct, mouseSpeedMultiplier);
+        if (msDelayBeforeClick > 0) await UniTask.Delay(msDelayBeforeClick, cancellationToken: ct);
         await ClickAsync(ct, alt);
-        await UniTask.Delay(msDelayAfterClick, cancellationToken: ct);
+        if (msDelayAfterClick > 0) await UniTask.Delay(msDelayAfterClick, cancellationToken: ct);
     }
 
     private static async UniTask<bool> WaitTargetEnabled(InteractableBase target, CancellationToken ct)
