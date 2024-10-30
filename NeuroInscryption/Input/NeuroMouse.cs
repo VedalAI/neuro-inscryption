@@ -103,12 +103,19 @@ public static class NeuroMouse
         await UniTask.Delay(msDelay, cancellationToken: ct);
     }
 
+    /// <summary>
+    /// Move the mouse to an <see cref="InteractableBase">interactable</see> <paramref name="target"/> and click it.
+    /// </summary>
+    /// <param name="target">If the interactable is not enabled, this function will wait up to <paramref name="waitTargetEnabledMsTimeout"/> and then try to click anyway.</param>
+    /// <param name="msDelayBeforeClick">Delay between moving the mouse and clicking.</param>
+    /// <param name="waitTargetEnabledMsTimeout">If non-zero and the target is not enabled, this function will wait up to this timeout (in milliseconds) and then try to click anyway.</param>
+    /// <param name="alt">No idea what this does but the previous code had this</param>
     public static async UniTask MoveAndClick(InteractableBase target, CancellationToken ct = default,
         int msDelayBeforeClick = 200, int msDelayAfterClick = 100,
-        float mouseSpeedMultiplier = 1f, bool waitTargetEnabled = true,
+        float mouseSpeedMultiplier = 1f, int waitTargetEnabledMsTimeout = 1000,
         bool alt = false)
     {
-        if (waitTargetEnabled && !await WaitTargetEnabled(target, ct)) return; // todo: decide how hard to crash here
+        if (!await WaitTargetEnabled(target, ct, waitTargetEnabledMsTimeout)) return; // todo: decide how hard to crash here
 
         await MoveToAsync(target, ct, mouseSpeedMultiplier);
         if (msDelayBeforeClick > 0) await UniTask.Delay(msDelayBeforeClick, cancellationToken: ct);
@@ -116,7 +123,7 @@ public static class NeuroMouse
         if (msDelayAfterClick > 0) await UniTask.Delay(msDelayAfterClick, cancellationToken: ct);
     }
 
-    private static async UniTask<bool> WaitTargetEnabled(InteractableBase target, CancellationToken ct)
+    private static async UniTask<bool> WaitTargetEnabled(InteractableBase target, CancellationToken ct, int msTimeout = 1000)
     {
         if (!target)
         {
@@ -124,17 +131,19 @@ public static class NeuroMouse
             return false;
         }
         if (target.Enabled) return true;
+        if (msTimeout <= 0) return false;
 
         Plugin.Logger.LogWarning($"Interactable {target} is disabled, gonna wait for a bit but then you're on your own");
-        try
+        CancellationTokenSource timeoutCts = new(msTimeout);
+        using (CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, ct))
         {
-            await UniTask.WaitUntil(() => !target || target.Enabled, cancellationToken: ct)
-                .Timeout(TimeSpan.FromSeconds(1));
+            await UniTask.WaitUntil(() => !target || target.Enabled, cancellationToken: linkedCts.Token)
+                .SuppressCancellationThrow();
         }
-        catch (TimeoutException)
-        {
+        ct.ThrowIfCancellationRequested(); // only suppress our inner timeout
+
+        if (timeoutCts.IsCancellationRequested)
             Plugin.Logger.LogError($"Timed out waiting for interactable {target} to become enabled, gonna try to click it anyway");
-        }
 
         if (target) return true;
 
