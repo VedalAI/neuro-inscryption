@@ -22,6 +22,7 @@ public sealed class CombatState : IGameState
     public readonly int Bones;
     public readonly int PlayerLives;
 
+    // todo: properties with backing lists/arrays
     public readonly IReadOnlyDictionary<string, PlayableCardData?> PlayerLanes;
     public readonly IReadOnlyDictionary<string, PlayableCardData?> OpponentLanes;
     public readonly IReadOnlyDictionary<string, PlayableCardData?> OpponentQueueLanes;
@@ -41,7 +42,6 @@ public sealed class CombatState : IGameState
     public readonly string? BossAbilityDescription; // TODO
     public readonly bool? IsOpponentSurrendering;
 
-    // TODO: Follow up nodes
     // TODO: Oil painting puzzle
 
     [JsonProperty("Note")]

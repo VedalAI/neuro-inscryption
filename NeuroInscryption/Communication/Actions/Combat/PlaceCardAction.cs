@@ -15,7 +15,8 @@ public sealed class PlaceCardAction(IReadOnlyDictionary<string, PlayableCardData
         schema.OneOfAdd(new Dictionary<string, JsonSchema>
         {
             ["action"] = QJS.Const(ActionName),
-            ["data"] = QJS.Enum(playerLanes.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key).Select(int.Parse))
+            ["data"] = QJS.Enum(playerLanes.Where(kvp => kvp.Value == null)
+                .Select(kvp => 1 + int.Parse(kvp.Key))) // 1-indexed
         });
     }
 
@@ -23,7 +24,8 @@ public sealed class PlaceCardAction(IReadOnlyDictionary<string, PlayableCardData
 
     bool IAction<int>.Deserialize(Action action, out int response)
     {
-        response = action.ActionData?.Value<int>() ?? -1;
-        return response != -1;
+        int? result = action.ActionData?.Value<int>();
+        response = result.HasValue ? result.Value - 1 : default;
+        return result.HasValue;
     }
 }

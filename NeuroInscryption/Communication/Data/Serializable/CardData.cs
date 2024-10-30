@@ -60,7 +60,7 @@ public class CardData
 
     [JsonIgnore]
     public CardInfo TargetCardInfo { get; private set; }
-    
+
     protected CardData(CardInfo cardInfo, IGameState? state = null, int? deckIndex = null)
     {
         TargetCardInfo = cardInfo;
@@ -137,8 +137,8 @@ public class CardData
 
     private string GetCost()
     {
-        if (TargetCardInfo.BonesCost > 0) return StringFormatter.Format(CardStrings.BonesCost, TargetCardInfo.BonesCost);
-        if (TargetCardInfo.BloodCost > 0) return StringFormatter.Format(CardStrings.BloodCost, TargetCardInfo.BloodCost);
+        if (TargetCardInfo.BloodCost > 0) return CardStrings.CostPrefix + StringFormatter.Format(CardStrings.BloodCost, TargetCardInfo.BloodCost);
+        if (TargetCardInfo.BonesCost > 0) return CardStrings.CostPrefix + StringFormatter.Format(CardStrings.BonesCost, TargetCardInfo.BonesCost);
         return CardStrings.FreeCost;
     }
 

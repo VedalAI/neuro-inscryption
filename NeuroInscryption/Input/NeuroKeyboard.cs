@@ -23,15 +23,10 @@ public static class NeuroKeyboard
         AltMenu = 16,
     }
 
-    public static void Press(Button button)
+    public static UniTask Press(Button button, CancellationToken ct = default, int msDelayAfterPress = 250)
     {
         InputHandler.EnqueueInput((global::Button) button, true);
         InputHandler.EnqueueInput((global::Button) button, false);
-    }
-
-    public static async UniTask Press(Button button, int msDelay, CancellationToken ct = default)
-    {
-        Press(button);
-        await UniTask.Delay(msDelay, cancellationToken: ct);
+        return UniTask.Delay(msDelayAfterPress, cancellationToken: ct);
     }
 }

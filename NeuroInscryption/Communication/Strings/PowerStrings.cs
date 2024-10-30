@@ -6,8 +6,7 @@ public static class PowerStrings
     public const string Lammergeier = "Equal to half the number of bones you have";
     public const string SacrificesThisTurn = "Equal to the number of cards you've sacrificed this turn";
     public const string Mirror = "Equal to the power of the card opposite this one";
-    // todo: lane mentioned
-    public const string BellProximity = "Power ranges from 1 to 4 based on proximity to the bell, which is left of lane 0. Additionally, gains 1 power for every adjacent Chime.";
+    public const string BellProximity = "Grows from 1 to 4 the closer this card is to the bell (which is left of lane 1). Additionally, gains 1 power for every adjacent Chime.";
     public const string CardsInHand = "Equal to the number of cards in your hand";
 
     public const string InPlaySuffix = " (currently {0})";

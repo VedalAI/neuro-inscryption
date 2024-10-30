@@ -46,7 +46,7 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
         // i'm so done dude
         for (int tries = 0; tries < 3; tries++)
         {
-            await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 500, ct);
+            await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, ct, 500);
             await Wait.CameraStable(ct);
             if (ViewManager.Instance.Is(View.FirstPerson)) break;
         }
@@ -59,22 +59,24 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
         }
 
         // Move to painting
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, 250, ct);
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, 250, ct);
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, ct);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, ct);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, ct);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, ct);
 
         // Inspect painting
         await NeuroMouse.MoveToAsync(puzzle.zoomInteractable, ct, mouseSpeedMultiplier: 10);
         await NeuroMouse.ClickAsync(2500, ct);
 
         // Return to table
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 250, ct);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, ct);
         await Wait.View(View.FirstPerson, ct);
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, 250, ct);
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, 250, ct);
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, 250, ct);
-        NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, ct);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, ct);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, ct);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookRight, ct);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.DirUp, ct);
+
+        await Wait.CameraStable(ct); // just in case
     }
 }

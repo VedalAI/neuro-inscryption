@@ -34,6 +34,7 @@ public sealed class PlaceCardFlow : HarmonyAutomationFlow<IEnumerator>
         CombatState state = CombatState.Calculate();
         PlayableCard card = PlayerHand.Instance.ChoosingSlotCard;
 
+        // todo: this is an IAction<int>, replace with Neuro.Combat.Choose (like Neuro.Loadout.Choose)
         PlaceCardAction placeCardAction = new(state.PlayerLanes);
 
         Description decisionString = DecisionStrings.PlaceCard.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
@@ -45,7 +46,6 @@ public sealed class PlaceCardFlow : HarmonyAutomationFlow<IEnumerator>
         if (!action.Match(placeCardAction, out int lane)) action.ThrowInvalid();
 
         CardSlot slot = BoardManager.Instance.playerSlots[lane];
-        await NeuroMouse.MoveToAsync(slot, 500, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(slot, ct, msDelayBeforeClick: 500);
     }
 }

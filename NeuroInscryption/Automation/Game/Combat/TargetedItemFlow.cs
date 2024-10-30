@@ -14,6 +14,7 @@ using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities.Enumerators;
+using Newtonsoft.Json;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
 namespace NeuroInscryption.Automation.Game.Combat;
@@ -21,8 +22,9 @@ namespace NeuroInscryption.Automation.Game.Combat;
 public class TargetedItemFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class NoSpamDeck : ICombatContext
+    private sealed class DecklessContext : ICombatContext
     {
+        [JsonIgnore]
         public bool IncludeDeck => false;
     }
     public override FlowHook[] Hooks =>
@@ -45,15 +47,15 @@ public class TargetedItemFlow : HarmonyAutomationFlow<IEnumerator>
         if (validSlots.Count == 0)
         {
             Plugin.Logger.LogWarning($"No valid targets for {itemData.Identifier} (somehow), attempting to back out of using item");
-            await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 500, ct);
+            await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, ct, 500);
             // CardBattleFlow will interrupt
             return;
         }
 
         List<SelectableCardData> validTargetCards = validSlots.Select(slot => SelectableCardData.Create(slot.Card, slot.Index)).ToList();
-        
+
         CombatState state = CombatState.Calculate();
-        state.SetContext(new NoSpamDeck());
+        state.SetContext(new DecklessContext());
 
         ChooseAction<SelectableCardData> action = new(validTargetCards);
 
@@ -63,8 +65,7 @@ public class TargetedItemFlow : HarmonyAutomationFlow<IEnumerator>
         Action chosenAction = await decision.SendAsync(ct);
 
         if (!chosenAction.Match(action, out SelectableCardData? card)) chosenAction.ThrowInvalid();
-        
-        await NeuroMouse.MoveToAsync(card.TargetCard, 100, ct);
-        await NeuroMouse.ClickAsync(ct);
+
+        await NeuroMouse.MoveAndClick(card.TargetCard, ct);
     }
 }
