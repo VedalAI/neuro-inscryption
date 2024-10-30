@@ -35,7 +35,7 @@ public sealed class ProspectorFlow : HarmonyAutomationFlow<IEnumerator>
         if (selection is <1 or >3)
         {
             Plugin.Logger.LogError($"Boulder out of range - selected {selection}, should be between 1 and 3");
-            selection = Random.RandomRangeInt(1, 3);
+            selection = UnityEngine.Random.RandomRangeInt(1, 3);
         }
 #endif
 

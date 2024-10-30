@@ -55,7 +55,7 @@ internal sealed class Map
             result.AddRange(paths);
 
             if (depth == 0) continue;
-            
+
             foreach (List<MapNodeData> t in paths)
             {
                 t.Insert(0, MapNodeData.Create(node));
