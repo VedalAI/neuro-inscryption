@@ -1,41 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using NeuroInscryption.Input.Helpers;
+using Pixelplacement;
+using Pixelplacement.TweenSystem;
 using UnityEngine;
 
 namespace NeuroInscryption.Input;
 
 public static class NeuroMouse
 {
+    private const float MouseSpeed = 5.0f; // magic number, idk and icba what weird coordinate system the game uses
+
+    private static InteractableBase? _current;
+
     public static async UniTask MoveToAsync(InteractableBase interactable, CancellationToken ct = default, float mouseSpeedMultiplier = 1, int tries = 10)
     {
         if (!interactable) throw new ArgumentNullException(nameof(interactable));
-
-        Vector2 end = GetCursorPositionFor(interactable);
-
-        while (Vector2.Distance(InputHandler.SimulatedMousePosition, end) > 0.1f)
+        if (_current != null && _current != interactable)
         {
-            // todo: ✧*.⋆｡⋆☂˚｡⋆｡˚☽˚｡⋆.:・ﾟ✧ bezier curves ✧・ﾟ:.⋆｡˚☽˚｡⋆｡˚☂⋆｡⋆.*✧
-            InputHandler.SimulatedMousePosition = Vector2.MoveTowards(InputHandler.SimulatedMousePosition, end, mouseSpeedMultiplier * Time.deltaTime * 8 * Plugin.Config.MouseSpeedMultiplier.Value);
-            end = GetCursorPositionFor(interactable, false);
-            await UniTask.Yield(ct);
+            Plugin.Logger.LogWarning($"Tried to move mouse to {interactable} while something else is already moving it to {_current}");
+            return;
         }
 
-        InputHandler.SimulatedMousePosition = end;
-        await UniTask.Yield(ct);
-
-        if (tries <= 0) return;
-
-        InteractionCursor cursor = InteractionCursor.Instance;
-        int layerMask = ~LayerMask.GetMask(cursor.excludedLayers.ToArray());
-        InteractableBase? raycastHit = cursor.RaycastForInteractable<InteractableBase>(layerMask, cursor.transform.position);
-        if (!CursorReachedTarget(interactable, raycastHit))
+        _current = interactable;
+        try
         {
-            Plugin.Logger.LogError($"Failed to move mouse to interactable {interactable} (instead found {raycastHit}), retrying...");
-            await MoveToAsync(interactable, ct, mouseSpeedMultiplier * 2, tries - 1);
+            await inner();
+        }
+        finally
+        {
+            _current = null;
+        }
+        return;
+
+        async Task inner()
+        {
+            Vector2 end = GetCursorPositionFor(interactable);
+            bool complete = false;
+            ValueVector2 tween = (ValueVector2)Tween.Value(InputHandler.SimulatedMousePosition, end,
+                valueUpdatedCallback: curr => InputHandler.SimulatedMousePosition = curr,
+                duration: Vector2.Distance(InputHandler.SimulatedMousePosition, end) / (mouseSpeedMultiplier * MouseSpeed),
+                easeCurve: Tween.EaseOut,
+                delay: 0,
+                completeCallback: () => complete = true
+            );
+
+            while (!complete)
+            {
+                tween.EndValue = GetCursorPositionFor(interactable, false);
+                await UniTask.Yield(ct);
+            }
+            if (tries <= 0) return;
+
+            InteractionCursor cursor = InteractionCursor.Instance;
+            int layerMask = ~LayerMask.GetMask(cursor.excludedLayers.ToArray());
+            InteractableBase? raycastHit = cursor.RaycastForInteractable<InteractableBase>(layerMask, cursor.transform.position);
+            if (!CursorReachedTarget(interactable, raycastHit))
+            {
+                Plugin.Logger.LogError($"Failed to move mouse to interactable {interactable} (instead found {raycastHit}), retrying...");
+                await MoveToAsync(interactable, ct, mouseSpeedMultiplier * 2, tries - 1);
+            }
         }
     }
 
