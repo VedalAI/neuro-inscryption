@@ -9,8 +9,6 @@ using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
@@ -21,7 +19,7 @@ namespace NeuroInscryption.Automation.Game.Combat;
 public sealed class MagpieDrawFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(IEnumerable<SelectableCard> cards, IGameState state) : ICombatContext
+    private sealed class MagpieDrawContext(IEnumerable<SelectableCard> cards, IGameState state) : ICombatContext
     {
         public readonly IReadOnlyList<SelectableCardData> RemainingDeckToDrawFrom = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
 
@@ -42,17 +40,11 @@ public sealed class MagpieDrawFlow : HarmonyAutomationFlow<IEnumerator>
         await Wait.CommonFlowDelay(ct);
 
         CombatState state = CombatState.Calculate();
-        Context context = new(BoardManager.Instance.CardSelector.displayedCards, state);
-        state.SetContext(context);
+        MagpieDrawContext context = new(BoardManager.Instance.CardSelector.displayedCards, state);
 
         ChooseAction<SelectableCardData> chooseCardAction = new(context.RemainingDeckToDrawFrom, ActionStrings.DrawCard);
 
-        Decision decision = new(DecisionStrings.MagpieDrawCard, state);
-        decision.AddAction(chooseCardAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(chooseCardAction, out SelectableCardData? selected)) action.ThrowInvalid();
+        SelectableCardData selected = await Neuro.Common.Choose(chooseCardAction, DecisionStrings.MagpieDrawCard, state, ct, context);
 
         await NeuroMouse.MoveAndClick(selected.TargetCard, ct);
     }

@@ -14,11 +14,6 @@ internal sealed class PluralFormatProvider : IFormatProvider, ICustomFormatter
         }
 
         string[] formats = format.Split('|');
-        if (arg is int count)
-        {
-            return count == 1 ? formats[0] : formats[1];
-        }
-
-        return arg.ToString();
+        return arg is 1 ? formats[0] : formats[1];
     }
 }

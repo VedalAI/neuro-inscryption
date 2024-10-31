@@ -14,7 +14,7 @@ namespace NeuroInscryption.Automation;
 internal sealed class Map
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class MapContext(List<List<MapNodeData>> paths) : Loadout.ContextBase
+    private sealed class MapContext(List<List<MapNodeData>> paths) : Common.ContextBase
     {
         public readonly IReadOnlyList<string> Paths = paths.ConvertAll(path => string.Join(" -> ", path.Select(node => node.Identifier)));
         public readonly IDictionary<string, string> Descriptions = paths.Flatten().ToDescriptionDictionary();

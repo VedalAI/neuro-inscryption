@@ -6,27 +6,17 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
-using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities.Enumerators;
-using Newtonsoft.Json;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
 public class TargetedItemFlow : HarmonyAutomationFlow<IEnumerator>
 {
-    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class DecklessContext : ICombatContext
-    {
-        [JsonIgnore]
-        public bool IncludeDeck => false;
-    }
     public override FlowHook[] Hooks =>
     [
         new()
@@ -53,18 +43,9 @@ public class TargetedItemFlow : HarmonyAutomationFlow<IEnumerator>
         }
 
         List<SelectableCardData> validTargetCards = validSlots.Select(slot => SelectableCardData.Create(slot.Card, slot.Index)).ToList();
+        Description description = DecisionStrings.ChooseItemTarget.Format(itemData.Identifier);
 
-        CombatState state = CombatState.Calculate();
-        state.SetContext(new DecklessContext());
-
-        ChooseAction<SelectableCardData> action = new(validTargetCards);
-
-        Decision decision = new(DecisionStrings.ChooseItemTarget.Format(itemData.Identifier), state);
-        decision.AddAction(action);
-
-        Action chosenAction = await decision.SendAsync(ct);
-
-        if (!chosenAction.Match(action, out SelectableCardData? card)) chosenAction.ThrowInvalid();
+        SelectableCardData card = await Neuro.Combat.ChooseItem(validTargetCards, description, ct, includeDeck: false);
 
         await NeuroMouse.MoveAndClick(card.TargetCard, ct);
     }

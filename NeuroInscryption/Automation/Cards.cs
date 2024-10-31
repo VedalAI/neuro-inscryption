@@ -25,7 +25,7 @@ internal sealed class Cards
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class LoadoutContext(IEnumerable<SelectableCard> cards, object? additionalContext = null)
-        : Loadout.ItemsContext<SelectableCardData>(cards.Select(SelectableCardData.Create), additionalContext)
+        : Common.ItemsContext<SelectableCardData>(cards.Select(SelectableCardData.Create), additionalContext)
     {
         protected override IEnumerable<SigilData> RelevantSigils => Items.SelectMany(c => c.Card!.RelevantSigils);
         protected override IEnumerable<TraitData> RelevantTraits => Items.SelectMany(c => c.Card!.Traits);
@@ -88,8 +88,8 @@ internal sealed class Cards
     /// <example>
     /// <code>
     /// Card cardToGloopBlurb = await Neuro.Cards.ChooseCardLoadout(cards,
-    ///     new Description("choice_gloop_blurb", "Choose a card to gloop blurb. The card's immediate family will be murgled."),
-    ///     new { MurgleInsensity = 5 }
+    ///     description: new Description("choice_gloop_blurb", "Choose a card to gloop blurb. The card's immediate family will be murgled."),
+    ///     additionalContext: new { MurgleInsensity = 5 }
     /// );
     /// </code>
     /// </example>

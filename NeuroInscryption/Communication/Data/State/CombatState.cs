@@ -111,14 +111,16 @@ public sealed class CombatState : IGameState
         if (opponent is not Part1BossOpponent) return null;
 
         BoardManager boardManager = BoardManager.Instance;
-        bool isLastPhase = opponent.NumLives == 1;
+        bool isLastPhase = opponent.NumLives <= 1;
         StringBuilder sb = new();
         switch (opponent)
         {
             case ProspectorBossOpponent:
             {
                 sb.Append(BossStrings.Prospector);
-                if (boardManager.opponentSlots.Select(s => s.Card).Concat(opponent.Queue).Any(card => card.Info.name == "Mule"))
+                IEnumerable<PlayableCard> playedCards = boardManager.opponentSlots.Select(s => s.Card);
+                IEnumerable<PlayableCard> queuedCards = boardManager.opponentSlots.Select(boardManager.GetCardQueuedForSlot);
+                if (playedCards.Concat(queuedCards).WhereNotNull().Any(card => card.Info && card.Info.name == "Mule"))
                     sb.Append($" {BossStrings.ProspectorPhase1Ability}");
                 if (isLastPhase) break;
 

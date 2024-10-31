@@ -63,7 +63,7 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
 
         Description desc = !RunState.Run.survivorsDead ? DecisionStrings.CampfireRiskUpgrade : DecisionStrings.CampfireNoRiskUpgrade;
         bool doSecondUpgrade = await Neuro.Loadout.Choose(new CampfireSecondUpgradeAction(), desc, ct);
-        InteractableBase chosenButton = doSecondUpgrade ? instance.confirmStone : instance.selectionSlot;
+        InteractableBase chosenButton = doSecondUpgrade ? instance.confirmStone : instance.retrieveCardInteractable;
 
         await UniTask.WaitUntil(() => instance.confirmStone.Enabled, cancellationToken: ct);
         await NeuroMouse.MoveAndClick(chosenButton, ct);

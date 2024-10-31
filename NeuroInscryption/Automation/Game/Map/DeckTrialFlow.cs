@@ -36,7 +36,8 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
         // either way - we'll need to tell neuro whether she passed the trial :)
         if (wrapper.State < 27) // reward
         {
-            if (wrapper.State < 22) // trial cards exit (first yield after trial result is available to us)
+            SelectableCard selectedTrial = enumerator.GetFieldValue<object>("<>8__1").GetFieldValue<SelectableCard>("selectedTrialCard");
+            if (!selectedTrial)
             {
                 List<SelectableCard> cards = instance.selectableCards;
                 await Neuro.Cards.UnflipCards(cards, ct);
@@ -44,9 +45,9 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
                 List<DeckTrialData> trials = instance.trialChoices.Zip(cards, DeckTrialData.Create).ToList();
                 DeckTrialData trial = await Neuro.Loadout.ChooseItem(trials, DecisionStrings.ChooseDeckTrial, ct);
                 await NeuroMouse.MoveAndClick(trial.Card, ct);
-
-                await UniTask.WaitUntil(wrapper, e => e.State is 22, cancellationToken: ct);
             }
+            // state 22 is trial cards exit (first yield after trial result is available to us)
+            await UniTask.WaitUntil(wrapper, e => e.State is 22, cancellationToken: ct);
 
             bool passedTrial = enumerator.GetFieldValue<bool>("<trialIsPassed>5__4");
             if (!passedTrial) return;

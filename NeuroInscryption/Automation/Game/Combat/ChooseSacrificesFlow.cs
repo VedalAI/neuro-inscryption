@@ -10,11 +10,9 @@ using NeuroInscryption.Communication.Actions.Combat;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities.Enumerators;
-using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
@@ -41,12 +39,7 @@ public sealed class ChooseSacrificesFlow : HarmonyAutomationFlow<IEnumerator>
             SacrificeAction sacrificeAction = new(card, state.PlayerLanes);
 
             Description decisionString = DecisionStrings.ChooseSacrifices.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
-            Decision decision = new(decisionString, state);
-            decision.AddAction(sacrificeAction);
-
-            Action action = await decision.SendAsync(ct);
-
-            if (!action.Match(sacrificeAction, out IEnumerable<PlayableCardData>? sacrifices)) action.ThrowInvalid();
+            IEnumerable<PlayableCardData> sacrifices = await Neuro.Combat.Choose(sacrificeAction, decisionString, ct);
 
             foreach (PlayableCardData sacrifice in sacrifices)
             {
@@ -55,7 +48,7 @@ public sealed class ChooseSacrificesFlow : HarmonyAutomationFlow<IEnumerator>
         }
         catch
         {
-            // it's "better" to actually keep the already-sacrificed cards but not worth the work
+            // keeping/handling state mid-sacrifice (e.g. picked 1 of 2 blood) is really not worth the work
             BoardManager.Instance.cancelledPlacementWithInput = true;
             throw;
         }
