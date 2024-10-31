@@ -20,7 +20,7 @@ public sealed class ChooseAction<T>(IEnumerable<T> items, string actionName = Ac
         Dictionary<string, JsonSchema> properties = new()
         {
             ["action"] = QJS.Const(ActionName),
-            ["data"] = QJS.Enum(items.Select(card => card.Identifier).Distinct())
+            ["data"] = QJS.Enum(items.Select(item => item.Identifier).Distinct())
         };
 
         schema.OneOfAdd(properties);

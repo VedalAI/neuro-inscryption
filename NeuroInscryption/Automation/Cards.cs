@@ -27,8 +27,8 @@ internal sealed class Cards
     private sealed class LoadoutContext(IEnumerable<SelectableCard> cards, object? additionalContext = null)
         : Loadout.ItemsContext<SelectableCardData>(cards.Select(SelectableCardData.Create), additionalContext)
     {
-        protected override IEnumerable<SigilData> RelevantSigils => Options.SelectMany(c => c.Card!.RelevantSigils);
-        protected override IEnumerable<TraitData> RelevantTraits => Options.SelectMany(c => c.Card!.Traits);
+        protected override IEnumerable<SigilData> RelevantSigils => Items.SelectMany(c => c.Card!.RelevantSigils);
+        protected override IEnumerable<TraitData> RelevantTraits => Items.SelectMany(c => c.Card!.Traits);
     }
 
     public async UniTask<Card> ChooseAddToDeck(CardChoicesSequencer choicer, CancellationToken ct = default)
@@ -44,7 +44,7 @@ internal sealed class Cards
         CardSingleChoicesSequencer? rerollable = choicer as CardSingleChoicesSequencer;
         MainInputInteractable clover = rerollable != null ? rerollable.rerollInteractable : null!;
         RerollAction rerollAction = new(clover);
-        ChooseAction<SelectableCardData> chooseAction = new(context.Options);
+        ChooseAction<SelectableCardData> chooseAction = new(context.Items);
 
         Decision decision = new(DecisionStrings.ChooseCard, state);
         decision.AddAction(chooseAction);

@@ -91,7 +91,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             Health,
             SigilNames != null ? CardStrings.InfoSeparator + string.Join(CardStrings.InfoSeparator, SigilNames) : "",
             _maybeIjiraq ? CardStrings.InfoSeparator + CardStrings.IjiraqNarrowedDownShortDescription : "",
-            Cost
+            DescCost
         );
     }
 

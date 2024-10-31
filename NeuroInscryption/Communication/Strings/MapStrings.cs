@@ -39,7 +39,7 @@ public static class MapStrings
     private static readonly Description _pack = ("Gain Consumables", "Choose between three random items until you have reached a maximum of 3. If you already have 3 items, you will instead receive a Pack Rat card [2 power, 2 attack, cost of 2 blood, Trinket Bearer (gives you an item when played)].");
 
     [Describes(typeof(BuildTotemNodeData))]
-    private static readonly Description _buildTotem = ("The Woodcarver", "Obtain a random totem piece and optionally rebuild your totem. If you already have 7 totem pieces, you will instead receive an Amalgam card [3 power, 3 attack, no cost, belongs to all tribes].");
+    private static readonly Description _buildTotem = ("The Woodcarver", "Obtain a random totem piece and optionally rebuild your totem. If you already have 7 totem pieces, you will instead receive an Amalgam card [3 power, 3 attack, cost of 2 blood, belongs to all tribes].");
 
     [Describes(typeof(BuyPeltsNodeData))]
     private static readonly Description _buyPelts = ("The Trapper", "Spend teeth in exchange for pelts. You can also buy a Skinning Knife, an item that allows you to destroy an opponent's card.");

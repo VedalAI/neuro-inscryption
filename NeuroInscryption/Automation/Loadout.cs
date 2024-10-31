@@ -11,6 +11,7 @@ using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Messages.Outgoing;
+using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
@@ -20,10 +21,17 @@ namespace NeuroInscryption.Automation;
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
 internal sealed class Loadout
 {
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     internal class ItemsContext<TData>(IEnumerable<TData> items, object? additionalContext = null) : ContextBase(additionalContext)
         where TData : class, IIdentifiable
     {
-        public readonly IReadOnlyList<TData> Options = items.ToList();
+        // ReSharper disable PossibleMultipleEnumeration
+        [JsonIgnore]
+        internal readonly IReadOnlyList<TData> Items = items.ToList();
+
+        public readonly IReadOnlyList<string> Options = items.Select(i => i.Identifier).ToList();
+        public readonly IDictionary<string, string>? Descriptions = items.OfType<IDescribable>().ToDescriptionDictionary().NullIfEmpty();
+        // ReSharper restore PossibleMultipleEnumeration
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -79,10 +87,11 @@ internal sealed class Loadout
         AutomationManager.Assert(items.Count > 0, "Nothing to pick from");
         if (items.Count == 1) return items.First();
 
-        ItemsContext<T> context = new(items, additionalContext);
-        ChooseAction<T> chooseAction = new(context.Options);
+        ChooseAction<T> chooseAction = new(items);
 
-        return await Choose(chooseAction, description, ct);
+        ILoadoutContext context = additionalContext as ILoadoutContext ?? new ItemsContext<T>(items, additionalContext);
+
+        return await Choose(chooseAction, description, ct, context);
     }
 
     /// <summary>
@@ -110,7 +119,7 @@ internal sealed class Loadout
 
         if (!chosenAction.Match(action, out T? result)) chosenAction.ThrowInvalid();
 
-        Plugin.Logger.LogDebug($"Picked {result}");
+        Plugin.Logger.LogDebug($"Picked {(result is IIdentifiable id ? id.Identifier : result.ToString())}");
         return result;
     }
 }

@@ -2,7 +2,7 @@
 
 public static class CardStrings
 {
-    public const string FreeCost = "no cost";
+    public const string FreeCost = "free";
     public const string CostPrefix = "cost of ";
     public const string BonesCost = "{0} bones";
     public const string BloodCost = "{0} blood";

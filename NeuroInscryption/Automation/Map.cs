@@ -13,6 +13,12 @@ namespace NeuroInscryption.Automation;
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
 internal sealed class Map
 {
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+    private sealed class MapContext(List<List<MapNodeData>> paths) : Loadout.ContextBase
+    {
+        public readonly IReadOnlyList<string> Paths = paths.ConvertAll(path => string.Join(" -> ", path.Select(node => node.Identifier)));
+        public readonly IDictionary<string, string> Descriptions = paths.Flatten().ToDescriptionDictionary();
+    }
     public async UniTask<MapNodeData> ChooseNextNode(CancellationToken ct)
     {
         MapNodeManager instance = MapNodeManager.Instance;
@@ -27,14 +33,7 @@ internal sealed class Map
         List<List<MapNodeData>> paths = GetPaths(instance.ActiveNode);
         List<MapNodeData> nextNodes = paths.Select(p => p[0]).Distinct().ToList();
 
-        var additionalContext = new
-        {
-            Paths = paths.ConvertAll(path => string.Join(" -> ", path.Select(node => node.Identifier))),
-            PathDescriptions = paths.Flatten().ToDescriptionDictionary(),
-        };
-
-        MapNodeData nextNode = await Neuro.Loadout.ChooseItem(nextNodes, DecisionStrings.ChoosePath, ct,
-            additionalContext);
+        MapNodeData nextNode = await Neuro.Loadout.ChooseItem(nextNodes, DecisionStrings.ChoosePath, ct, new MapContext(paths));
 
         return nextNode;
     }
