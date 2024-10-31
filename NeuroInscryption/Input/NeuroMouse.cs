@@ -106,10 +106,10 @@ public static class NeuroMouse
     /// <summary>
     /// Move the mouse to an <see cref="InteractableBase">interactable</see> <paramref name="target"/> and click it.
     /// </summary>
-    /// <param name="target">If the interactable is not enabled, this function will wait up to <paramref name="waitTargetEnabledMsTimeout"/> and then try to click anyway.</param>
+    /// <param name="target">If the interactable is not <see cref="InteractableBase.Enabled">enabled</see>, this function will wait up to <paramref name="waitTargetEnabledMsTimeout"/> milliseconds before trying to click anyway.</param>
     /// <param name="msDelayBeforeClick">Delay between moving the mouse and clicking.</param>
-    /// <param name="waitTargetEnabledMsTimeout">If non-zero and the target is not enabled, this function will wait up to this timeout (in milliseconds) and then try to click anyway.</param>
-    /// <param name="alt">No idea what this does but the previous code had this</param>
+    /// <param name="waitTargetEnabledMsTimeout">If above zero and the target is not <see cref="InteractableBase.Enabled">enabled</see>, this function will wait up to this timeout (in milliseconds) before trying to click anyway.</param>
+    /// <param name="alt">Right click instead of left clicking.</param>
     public static async UniTask MoveAndClick(InteractableBase target, CancellationToken ct = default,
         int msDelayBeforeClick = 200, int msDelayAfterClick = 100,
         float mouseSpeedMultiplier = 1f, int waitTargetEnabledMsTimeout = 1000,
@@ -130,8 +130,8 @@ public static class NeuroMouse
             Plugin.Logger.LogError($"Mouse target {target} is null/dead");
             return false;
         }
-        if (target.Enabled) return true;
-        if (msTimeout <= 0) return false;
+        if (msTimeout <= 0 || target.Enabled)
+            return true;
 
         Plugin.Logger.LogWarning($"Interactable {target} is disabled, gonna wait for a bit but then you're on your own");
         CancellationTokenSource timeoutCts = new(msTimeout);

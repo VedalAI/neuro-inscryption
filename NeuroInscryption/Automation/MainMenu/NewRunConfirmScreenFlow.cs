@@ -22,6 +22,6 @@ public sealed class NewRunConfirmScreenFlow : HarmonyAutomationFlow<AscensionMen
     protected override async UniTask ExecuteAsync(AscensionMenuScreenTransition target, CancellationToken ct)
     {
         MainInputInteractable continueButton = target.screenInteractables.First(i => i.name == "ContinueButton");
-        await NeuroMouse.MoveAndClick(continueButton, ct, msDelayBeforeClick: 500);
+        await NeuroMouse.MoveAndClick(continueButton, ct, 500);
     }
 }
