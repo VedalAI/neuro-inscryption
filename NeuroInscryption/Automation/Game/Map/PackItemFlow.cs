@@ -34,8 +34,7 @@ public sealed class PackItemFlow : HarmonyAutomationFlow<IEnumerator>
         List<ItemData> items = instance.slots.Select(ItemData.Create).ToList();
         ItemData item = await Neuro.Loadout.ChooseItem(items, DecisionStrings.ChooseItem, ct);
         AutomationManager.Assert(item is {}, "did not pick item");
-        AutomationManager.Assert(item.Slot != null, "picked item has no slot");
 
-        await NeuroMouse.MoveAndClick(item.Slot, ct);
+        await NeuroMouse.MoveAndClick(item.Slot!, ct);
     }
 }

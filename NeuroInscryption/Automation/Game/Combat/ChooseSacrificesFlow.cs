@@ -33,22 +33,31 @@ public sealed class ChooseSacrificesFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator _, CancellationToken ct)
     {
-        CombatState state = CombatState.Calculate();
-        PlayableCard card = BoardManager.Instance.CurrentSacrificeDemandingCard;
-
-        SacrificeAction sacrificeAction = new(card, state.PlayerLanes);
-
-        Description decisionString = DecisionStrings.ChooseSacrifices.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
-        Decision decision = new(decisionString, state);
-        decision.AddAction(sacrificeAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(sacrificeAction, out IEnumerable<PlayableCardData>? sacrifices)) action.ThrowInvalid();
-
-        foreach (PlayableCardData sacrifice in sacrifices)
+        try
         {
-            await NeuroMouse.MoveAndClick(sacrifice.TargetCard, ct, msDelayBeforeClick: 500, msDelayAfterClick: 250);
+            CombatState state = CombatState.Calculate();
+            PlayableCard card = BoardManager.Instance.CurrentSacrificeDemandingCard;
+
+            SacrificeAction sacrificeAction = new(card, state.PlayerLanes);
+
+            Description decisionString = DecisionStrings.ChooseSacrifices.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
+            Decision decision = new(decisionString, state);
+            decision.AddAction(sacrificeAction);
+
+            Action action = await decision.SendAsync(ct);
+
+            if (!action.Match(sacrificeAction, out IEnumerable<PlayableCardData>? sacrifices)) action.ThrowInvalid();
+
+            foreach (PlayableCardData sacrifice in sacrifices)
+            {
+                await NeuroMouse.MoveAndClick(sacrifice.TargetCard, ct, msDelayBeforeClick: 500, msDelayAfterClick: 250);
+            }
+        }
+        catch
+        {
+            // it's "better" to actually keep the already-sacrificed cards but not worth the work
+            BoardManager.Instance.cancelledPlacementWithInput = true;
+            throw;
         }
     }
 }

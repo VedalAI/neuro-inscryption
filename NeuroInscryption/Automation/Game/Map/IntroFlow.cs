@@ -66,6 +66,7 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
 
         // Inspect painting
         await NeuroMouse.MoveAndClick(puzzle.zoomInteractable, ct, mouseSpeedMultiplier: 10);
+        // todo: send context here
         await UniTask.Delay(2500, cancellationToken: ct); // explicit "looking" wait
 
         // Return to table

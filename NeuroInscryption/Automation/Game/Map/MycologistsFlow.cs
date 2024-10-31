@@ -37,9 +37,9 @@ public sealed class MycologistsFlow : HarmonyAutomationFlow<IEnumerator>
             {
                 await NeuroMouse.MoveAndClick(instance.selectionSlot, ct,
                     msDelayAfterClick: Wait.CardPileFullSpawnTimeMs);
-            }
 
-            await Wait.View(View.DeckSelection, ct);
+                await Wait.View(View.DeckSelection, ct);
+            }
 
             SelectableCardPairArray selector = (SelectableCardPairArray)instance.selectionSlot.cardSelector;
             List<SelectableCardPairData> pairs = selector.pairs.Select(SelectableCardPairData.Create).ToList();

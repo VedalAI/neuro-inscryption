@@ -32,9 +32,9 @@ public sealed class GoobertFlow : HarmonyAutomationFlow<IEnumerator>
         {
             Card card = await Neuro.Cards.SelectCardFromDeck(instance.selectionSlot, DecisionStrings.GoobertChooseCard, ct);
             AutomationManager.Assert(card, "did not pick goobert card");
-        }
 
-        await Wait.View(View.CardMergeConfirm, ct);
+            await Wait.View(View.CardMergeConfirm, ct);
+        }
 
         await NeuroMouse.MoveAndClick(instance.confirmStone, ct);
     }

@@ -107,10 +107,7 @@ internal sealed class Loadout
         object? additionalContext = null)
     {
         LoadoutState state = LoadoutState.Calculate();
-        if (additionalContext is ILoadoutContext implements)
-            state.SetContext(implements);
-        else
-            state.SetContext(new ContextBase(additionalContext));
+        state.SetContext(additionalContext as ILoadoutContext ?? new ContextBase(additionalContext));
 
         Decision decision = new(description, state);
         decision.AddAction(action);

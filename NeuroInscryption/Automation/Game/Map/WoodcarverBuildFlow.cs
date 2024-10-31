@@ -37,7 +37,7 @@ public sealed class WoodcarverBuildFlow : HarmonyAutomationFlow<IEnumerator>
             new { WoodcarverTotemTracker.LastTotem }
         );
 
-        // edge case: with a bottom piece previously selected, the bottom choice is effectively discarded
+        // edge case: with a bottom piece previously selected, clicking top piece completes the totem and discards bottom choice
         if (instance.selectedTop != response.Top.Slot)
             await NeuroMouse.MoveAndClick(response.Top.Slot!, ct);
         if (instance.selectedBottom != response.Bottom.Slot)

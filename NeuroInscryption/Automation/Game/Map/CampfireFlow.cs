@@ -50,10 +50,10 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
 
             Card card = await Neuro.Cards.SelectCardFromDeck(instance.selectionSlot, DecisionStrings.CampfireChooseCard, ct,
                 additionalContext: context);
-            AutomationManager.Assert(card, $"did not pick campfire card");
-        }
+            AutomationManager.Assert(card, "did not pick campfire card");
 
-        await Wait.View(View.StatBoostSlot, ct);
+            await Wait.View(View.StatBoostSlot, ct);
+        }
 
         if (numBuffsGiven == 0)
         {
