@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NeuroInscryption.Communication.Data.Serializable;
+using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
@@ -16,7 +17,7 @@ public sealed class PlaceCardAction(IReadOnlyDictionary<string, PlayableCardData
         {
             ["action"] = QJS.Const(ActionName),
             ["data"] = QJS.Enum(playerLanes.Where(kvp => kvp.Value == null)
-                .Select(kvp => 1 + int.Parse(kvp.Key))) // 1-indexed
+                .Select(kvp => CombatState.LaneIndexBase + int.Parse(kvp.Key)))
         });
     }
 
@@ -25,7 +26,7 @@ public sealed class PlaceCardAction(IReadOnlyDictionary<string, PlayableCardData
     bool IAction<int>.Deserialize(Action action, out int response)
     {
         int? result = action.ActionData?.Value<int>();
-        response = result.HasValue ? result.Value - 1 : default;
+        response = result.HasValue ? result.Value - CombatState.LaneIndexBase : default;
         return result.HasValue;
     }
 }

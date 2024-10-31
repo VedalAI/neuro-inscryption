@@ -139,8 +139,8 @@ public class CardData
 
     private string GetCost()
     {
-        if (TargetCardInfo.BloodCost > 0) return StringFormatter.Format(CardStrings.BloodCost, TargetCardInfo.BloodCost);
         if (TargetCardInfo.BonesCost > 0) return StringFormatter.Format(CardStrings.BonesCost, TargetCardInfo.BonesCost);
+        if (TargetCardInfo.BloodCost > 0) return StringFormatter.Format(CardStrings.BloodCost, TargetCardInfo.BloodCost);
         return CardStrings.FreeCost;
     }
 

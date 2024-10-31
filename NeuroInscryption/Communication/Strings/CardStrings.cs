@@ -4,7 +4,7 @@ public static class CardStrings
 {
     public const string FreeCost = "free";
     public const string CostPrefix = "cost of ";
-    public const string BonesCost = "{0} bones";
+    public const string BonesCost = "{0} {0:bone|bones}";
     public const string BloodCost = "{0} blood";
     public const string IjiraqBonesCostSuffix = " (but won't consume {0:it|them} when played)";
     public const string InfoSeparator = ", ";

@@ -13,11 +13,11 @@ namespace NeuroInscryption.Input;
 
 public static class NeuroMouse
 {
-    private const float MouseSpeed = 4.0f; // magic number, idk and icba what weird coordinate system the game uses
+    private const float MouseSpeed = 4.0f; // magic number, works well with the cursor's weird coordinate scale
 
     private static InteractableBase? _current;
 
-    public static async UniTask MoveToAsync(InteractableBase interactable, CancellationToken ct = default, float mouseSpeedMultiplier = 1, int tries = 10)
+    public static async UniTask MoveTo(InteractableBase interactable, CancellationToken ct = default, float mouseSpeedMultiplier = 1, int tries = 10)
     {
         if (!interactable) throw new ArgumentNullException(nameof(interactable));
         if (_current != null && _current != interactable)
@@ -40,11 +40,12 @@ public static class NeuroMouse
         async Task inner()
         {
             Vector2 end = GetCursorPositionFor(interactable);
-            bool complete = false;
-            ValueVector2 tween = default!;
             float distance = Vector2.Distance(InputHandler.SimulatedMousePosition, end);
             float duration = Mathf.Sqrt(distance) / (mouseSpeedMultiplier * MouseSpeed);
             // Plugin.Logger.LogWarning($"Move {distance} at {mouseSpeedMultiplier}x{MouseSpeed}, should take {duration}");
+
+            bool complete = false;
+            ValueVector2 tween = default!;
             tween = (ValueVector2)Tween.Value(InputHandler.SimulatedMousePosition, end,
                 valueUpdatedCallback: curr =>
                 {
@@ -71,18 +72,18 @@ public static class NeuroMouse
             if (!CursorReachedTarget(interactable, raycastHit))
             {
                 Plugin.Logger.LogError($"Failed to move mouse to interactable {interactable} (instead found {raycastHit}), retrying...");
-                await MoveToAsync(interactable, ct, mouseSpeedMultiplier * 2, tries - 1);
+                await MoveTo(interactable, ct, mouseSpeedMultiplier * 2, tries - 1);
             }
         }
     }
 
-    public static async UniTask MoveToAsync(InteractableBase interactable, int msDelay, CancellationToken ct = default, float mouseSpeedMultiplier = 1, int tries = 10)
+    public static async UniTask MoveTo(InteractableBase interactable, int msDelay, CancellationToken ct = default, float mouseSpeedMultiplier = 1, int tries = 10)
     {
-        await MoveToAsync(interactable, ct, mouseSpeedMultiplier, tries);
+        await MoveTo(interactable, ct, mouseSpeedMultiplier, tries);
         await UniTask.Delay(msDelay, cancellationToken: ct);
     }
 
-    public static async UniTask ClickAsync(CancellationToken ct = default, bool alt = false)
+    public static async UniTask Click(CancellationToken ct = default, bool alt = false)
     {
         Button button = !alt ? Button.Select : Button.AltSelect;
         InputHandler.EnqueueInput(button, true);
@@ -97,9 +98,9 @@ public static class NeuroMouse
         }
     }
 
-    public static async UniTask ClickAsync(int msDelay, CancellationToken ct = default, bool alt = false)
+    public static async UniTask Click(int msDelay, CancellationToken ct = default, bool alt = false)
     {
-        await ClickAsync(ct, alt);
+        await Click(ct, alt);
         await UniTask.Delay(msDelay, cancellationToken: ct);
     }
 
@@ -117,9 +118,9 @@ public static class NeuroMouse
     {
         if (!await WaitTargetEnabled(target, ct, waitTargetEnabledMsTimeout)) return; // todo: decide how hard to crash here
 
-        await MoveToAsync(target, ct, mouseSpeedMultiplier);
+        await MoveTo(target, ct, mouseSpeedMultiplier);
         if (msDelayBeforeClick > 0) await UniTask.Delay(msDelayBeforeClick, cancellationToken: ct);
-        await ClickAsync(ct, alt);
+        await Click(ct, alt);
         if (msDelayAfterClick > 0) await UniTask.Delay(msDelayAfterClick, cancellationToken: ct);
     }
 

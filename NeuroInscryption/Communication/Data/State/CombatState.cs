@@ -23,7 +23,6 @@ public sealed class CombatState : IGameState
     public readonly int Bones;
     public readonly int PlayerLives;
 
-    // todo: properties with backing lists/arrays
     public readonly IReadOnlyDictionary<string, PlayableCardData?> PlayerLanes;
     public readonly IReadOnlyDictionary<string, PlayableCardData?> OpponentLanes;
     public readonly IReadOnlyDictionary<string, PlayableCardData?> OpponentQueueLanes;
@@ -67,6 +66,8 @@ public sealed class CombatState : IGameState
 
     bool IGameState.ShouldFakeIjiraq(int deckIndex) => Ijiraq.FakeIjiraqsInDeck.Contains(deckIndex);
 
+    public const int LaneIndexBase = 1;
+
     private CombatState()
     {
         Ijiraq = new IjiraqState();
@@ -75,9 +76,9 @@ public sealed class CombatState : IGameState
         Bones = ResourcesManager.Instance.PlayerBones;
         PlayerLives = RunState.Run.playerLives;
 
-        PlayerLanes = BoardManager.Instance.playerSlots.ToIndexedDictionary(slot => PlayableCardData.Create(slot.Card, this))!;
-        OpponentLanes = BoardManager.Instance.opponentSlots.ToIndexedDictionary(slot => PlayableCardData.Create(slot.Card, this))!;
-        OpponentQueueLanes = BoardManager.Instance.opponentSlots.Select(BoardManager.Instance.GetCardQueuedForSlot).ToIndexedDictionary(card => PlayableCardData.Create(card, this))!;
+        PlayerLanes = BoardManager.Instance.playerSlots.ToIndexedDictionary(slot => PlayableCardData.Create(slot.Card, this), LaneIndexBase)!;
+        OpponentLanes = BoardManager.Instance.opponentSlots.ToIndexedDictionary(slot => PlayableCardData.Create(slot.Card, this), LaneIndexBase)!;
+        OpponentQueueLanes = BoardManager.Instance.opponentSlots.Select(BoardManager.Instance.GetCardQueuedForSlot).ToIndexedDictionary(card => PlayableCardData.Create(card, this), LaneIndexBase)!;
 
         PlayerHand = DiskCardGame.PlayerHand.Instance.CardsInHand.Select(c => PlayableCardData.Create(c, this)).ToList();
         _remainingDeck = CardDrawPiles3D.Instance.Deck.Cards.Select((c, index) => CardData.Create(c, this, index)).ToList();
@@ -118,7 +119,7 @@ public sealed class CombatState : IGameState
             {
                 sb.Append(BossStrings.Prospector);
                 if (boardManager.opponentSlots.Select(s => s.Card).Concat(opponent.Queue).Any(card => card.Info.name == "Mule"))
-                    sb.Append($" {BossStrings.ProspectorMule}");
+                    sb.Append($" {BossStrings.ProspectorPhase1Ability}");
                 if (isLastPhase) break;
 
                 sb.Append($" {BossStrings.ProspectorPhase1Transition}");

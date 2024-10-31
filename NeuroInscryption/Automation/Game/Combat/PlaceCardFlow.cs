@@ -34,7 +34,7 @@ public sealed class PlaceCardFlow : HarmonyAutomationFlow<IEnumerator>
         CombatState state = CombatState.Calculate();
         PlayableCard card = PlayerHand.Instance.ChoosingSlotCard;
 
-        // todo: this is an IAction<int>, replace with Neuro.Combat.Choose (like Neuro.Loadout.Choose)
+        // todo: this is an IAction<int>, replace just like Neuro.Loadout.Choose but with combat context
         PlaceCardAction placeCardAction = new(state.PlayerLanes);
 
         Description decisionString = DecisionStrings.PlaceCard.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
