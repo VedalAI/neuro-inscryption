@@ -40,7 +40,7 @@ public sealed class CombatState : IGameState
 
     public readonly int? OpponentLives;
     public readonly TotemData? OpponentTotem;
-    public readonly string? BossDescription; // TODO
+    public readonly string? BossDescription;
     public readonly bool? IsOpponentSurrendering;
 
     // TODO: Oil painting puzzle

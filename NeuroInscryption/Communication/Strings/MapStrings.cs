@@ -10,6 +10,10 @@ namespace NeuroInscryption.Communication.Strings;
 
 public static class MapStrings
 {
+    private sealed class RuntimeDescription(DescriptionFormat format, Func<DescriptionFormat, Description> doFormat)
+    {
+        public Description GetDescription() => doFormat(format);
+    }
     [Describes(typeof(CardBattleNodeData))]
     private static readonly Description _cardBattle = ("Card Battle", "A standard card battle.");
 
@@ -29,9 +33,11 @@ public static class MapStrings
     [DescribesCardChoice(CardChoicesType.Tribe)]
     private static readonly Description _cardChoiceTribe = ("Random Card Choice (Tribe)", "Choose between three different tribes and obtain a random card of that tribe.");
 
-    // todo: make this a DescriptionFormat and add the risk/no risk string based on the actual state
     [Describes(typeof(CardStatBoostNodeData))]
-    private static readonly Description _campfire = ("Campfire", $"Choose a card to add either 2 health or 1 power (chosen randomly) to. {CampfireDescRisk}");
+    private static readonly RuntimeDescription _campfire = new(
+        ("Campfire", "Choose a card to add either 2 health or 1 power (chosen randomly) to. {0}"),
+        f => f.Format(RunState.Run.survivorsDead ? CampfireDescNoRisk : CampfireDescRisk)
+    );
     private const string CampfireDescRisk = "You can upgrade the card twice, but the second time will have a 50% risk of destroying the card, removing it from your deck (losing a Poisonous card in this way will remove this risk for the rest of the run).";
     private const string CampfireDescNoRisk = "You can upgrade the card twice with no risk.";
 
@@ -70,7 +76,12 @@ public static class MapStrings
     public static Description? Get(NodeData nodeData)
     {
         FieldInfo? fieldInfo = ReflectionCache.GetAllFields(typeof(MapStrings)).SingleOrDefault(f => f.GetCustomAttributes<DescribesAttribute>().Any(a => a.Matches(nodeData)));
-        return fieldInfo != null ? (Description) fieldInfo.GetValue(null) : null;
+        return fieldInfo?.GetValue(null) switch
+        {
+            Description description => description,
+            RuntimeDescription runtime => runtime.GetDescription(),
+            _ => null,
+        };
     }
 }
 
