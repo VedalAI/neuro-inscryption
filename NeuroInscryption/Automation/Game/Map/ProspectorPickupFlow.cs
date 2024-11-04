@@ -5,6 +5,7 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -22,7 +23,9 @@ public sealed class ProspectorPickupFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator target, CancellationToken ct)
     {
-        await UniTask.Delay(500, cancellationToken: ct);
-        await NeuroMouse.ClickAsync(ct);
+        await Wait.CommonFlowDelay(ct);
+
+        SelectableCard rewardCard = target.GetFieldValue<SelectableCard>("<rewardCard>5__2");
+        await NeuroMouse.MoveAndClick(rewardCard, ct);
     }
 }

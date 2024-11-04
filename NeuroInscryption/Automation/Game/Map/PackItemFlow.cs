@@ -6,13 +6,9 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions;
-using NeuroInscryption.Communication.Data.Describable;
-using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
@@ -20,15 +16,6 @@ namespace NeuroInscryption.Automation.Game.Map;
 
 public sealed class PackItemFlow : HarmonyAutomationFlow<IEnumerator>
 {
-    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(IEnumerable<SelectableItemSlot> items) : ILoadoutContext
-    {
-        public readonly IReadOnlyList<ItemData> ItemOptions = items.Select(ItemData.Create).ToList();
-
-        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
-        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
-    }
-
     public override FlowHook[] Hooks =>
     [
         new()
@@ -42,22 +29,12 @@ public sealed class PackItemFlow : HarmonyAutomationFlow<IEnumerator>
     {
         GainConsumablesSequencer instance = enumerator.GetThis<GainConsumablesSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.CommonFlowDelay(ct);
 
-        Context context = new(instance.slots);
-        LoadoutState state = LoadoutState.Calculate();
-        state.SetContext(context);
+        List<ItemData> items = instance.slots.Select(ItemData.Create).ToList();
+        ItemData item = await Neuro.Loadout.ChooseItem(items, DecisionStrings.ChooseItem, ct);
+        AutomationManager.Assert(item is {}, "did not pick item");
 
-        ChooseAction<ItemData> chooseAction = new(context.ItemOptions);
-
-        Decision decision = new(DecisionStrings.ChooseItem, state);
-        decision.AddAction(chooseAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(chooseAction, out ItemData? item)) action.ThrowInvalid();
-
-        await NeuroMouse.MoveToAsync(item.Slot!, 300, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(item.Slot!, ct);
     }
 }

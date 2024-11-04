@@ -1,14 +1,15 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
+using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -28,22 +29,21 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
     {
         CardMergeSequencer instance = enumerator.GetThis<CardMergeSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.CommonFlowDelay(ct);
 
-        // fun exercise: random order for picking sac/host
-        Card sacrifice = await PickSacrifice(instance, ct);
-        AutomationManager.Assert(sacrifice, "did not pick sacrifice");
+        if (!ViewManager.Instance.Is(View.CardMergeConfirm))
+        {
+            // there's an unlikely edge case here
+            // if host slot is filled (through an error-restart or manual intervention), sacrifice will be picked blindly
+            await PickSacrifice(instance, ct);
+            await PickHost(instance, ct);
+            await Wait.View(View.CardMergeConfirm, ct);
+        }
 
-        await UniTask.Delay(300, cancellationToken: ct);
-
-        Card host = await PickHost(instance, ct);
-        AutomationManager.Assert(host, "did not pick host");
-
-        await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(instance.confirmStone, ct);
     }
 
-    private async UniTask<Card> PickSacrifice(CardMergeSequencer instance, CancellationToken ct)
+    private static async UniTask<Card> PickSacrifice(CardMergeSequencer instance, CancellationToken ct)
     {
         SelectableCard alreadySelected = instance.sacrificeSlot.Card;
         if (alreadySelected)
@@ -52,23 +52,14 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
             return alreadySelected;
         }
 
-        await NeuroMouse.MoveToAsync(instance.sacrificeSlot, 200, ct);
-        await NeuroMouse.ClickAsync(400, ct);
+        Card sacrifice = await Neuro.Cards.SelectCardFromDeck(instance.sacrificeSlot, DecisionStrings.Sacrifice, ct, validSacrificeFilter);
+        AutomationManager.Assert(sacrifice, "did not pick sacrifice");
+        return sacrifice;
 
-        List<SelectableCard> sacrificable = instance.sacrificeSlot.cardSelector.displayedCards
-            .Where(card => instance.GetValidCardsForHost(card.Info).Any())
-            .ToList();
-
-        AutomationManager.Assert(sacrificable.Count > 0, "No sacrificable cards found"); // you can't cancel the stones iirc
-
-        Card card = await Neuro.Cards.ChooseCardLoadout(sacrificable, DecisionStrings.Sacrifice, ct);
-        await NeuroMouse.MoveToAsync(card, 200, ct);
-        await NeuroMouse.ClickAsync(ct);
-
-        return card;
+        bool validSacrificeFilter(SelectableCard c) => instance.GetValidCardsForHost(c.Info).Any();
     }
 
-    private async UniTask<Card> PickHost(CardMergeSequencer instance, CancellationToken ct)
+    private static async UniTask<Card> PickHost(CardMergeSequencer instance, CancellationToken ct)
     {
         SelectableCard alreadySelected = instance.hostSlot.Card;
         if (alreadySelected)
@@ -77,21 +68,14 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
             return alreadySelected;
         }
 
-        SelectableCard sac = instance.sacrificeSlot.Card;
-        AutomationManager.Assert((bool)sac, "Should have picked a sacrifice by this point");
+        Card sac = instance.sacrificeSlot.Card;
+        if (!sac) sac = await PickSacrifice(instance, ct);
         // alternatively,
-        //if (!sac) sac = await PickSacrifice(instance, ct);
+        // AutomationManager.Assert(sac, "Should have picked a sacrifice by this point");
 
-        await NeuroMouse.MoveToAsync(instance.hostSlot, 200, ct);
-        await NeuroMouse.ClickAsync(400, ct);
-
-        List<SelectableCard> hosts = instance.hostSlot.cardSelector.displayedCards;
-        AutomationManager.Assert(hosts.Count > 0, "No host cards found");
-
-        Card card = await Neuro.Cards.ChooseCardLoadout(hosts, DecisionStrings.SacrificeEmpower.Format(CardData.Create(sac.Info).GetDescription()), ct: ct);
-        await NeuroMouse.MoveToAsync(card, 200, ct);
-        await NeuroMouse.ClickAsync(ct);
-
-        return card;
+        Description desc = DecisionStrings.SacrificeEmpower.Format(CardData.Create(sac.Info).GetDescription());
+        Card host = await Neuro.Cards.SelectCardFromDeck(instance.hostSlot, desc, ct);
+        AutomationManager.Assert(host, "did not pick host");
+        return host;
     }
 }

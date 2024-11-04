@@ -30,14 +30,12 @@ public sealed class ChallengesScreenFlow : HarmonyAutomationFlow<AscensionChalle
         {
             if (enabledChallenges.Includes(icon.Info.challengeType, seenDifficulty) != icon.activatedRenderer.enabled)
             {
-                await NeuroMouse.MoveToAsync(icon, 200, ct);
-                await NeuroMouse.ClickAsync(ct);
+                await NeuroMouse.MoveAndClick(icon, ct);
             }
 
             if (icon.Info.challengeType == AscensionChallenge.BaseDifficulty) seenDifficulty = true;
         }
 
-        await NeuroMouse.MoveToAsync(target.continueButton, 500, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(target.continueButton, ct, msDelayBeforeClick: 500);
     }
 }

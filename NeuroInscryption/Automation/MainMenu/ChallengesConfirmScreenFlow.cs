@@ -19,7 +19,6 @@ public sealed class ChallengesConfirmScreenFlow : HarmonyAutomationFlow<Ascensio
 
     protected override async UniTask ExecuteAsync(AscensionChallengeConfirmScreen target, CancellationToken ct)
     {
-        await NeuroMouse.MoveToAsync(target.continueButton, 500, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(target.continueButton, ct, 500);
     }
 }

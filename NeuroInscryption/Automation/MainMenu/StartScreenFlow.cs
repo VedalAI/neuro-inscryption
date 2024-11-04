@@ -20,7 +20,7 @@ public sealed class StartScreenFlow : HarmonyAutomationFlow<AscensionStartScreen
     protected override async UniTask ExecuteAsync(AscensionStartScreen target, CancellationToken ct)
     {
         await UniTask.Delay(1000, cancellationToken: ct);
-        await NeuroMouse.MoveToAsync(target.RunExists ? target.continueRunText : target.newRunText, 500, ct);
-        await NeuroMouse.ClickAsync(ct);
+        AscensionMenuInteractable menuItem = target.RunExists ? target.continueRunText : target.newRunText;
+        await NeuroMouse.MoveAndClick(menuItem, ct, 500);
     }
 }

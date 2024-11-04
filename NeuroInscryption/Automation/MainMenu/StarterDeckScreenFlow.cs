@@ -40,13 +40,11 @@ public sealed class StarterDeckScreenFlow : HarmonyAutomationFlow<AscensionChoos
 
         if (string.IsNullOrEmpty(targetDeck))
         {
-            await NeuroMouse.MoveToAsync(target.randomButton, 500, ct);
-            await NeuroMouse.ClickAsync(ct);
+            await NeuroMouse.MoveAndClick(target.randomButton, ct, 500);
             return;
         }
 
         AscensionStarterDeckIcon deck = target.deckIcons.First(d => d.Info.title == targetDeck);
-        await NeuroMouse.MoveToAsync(deck, 500, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(deck, ct, 500);
     }
 }

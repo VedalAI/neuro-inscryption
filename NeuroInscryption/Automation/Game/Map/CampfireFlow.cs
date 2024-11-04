@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
@@ -7,9 +6,9 @@ using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
-using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -33,39 +32,40 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        EnumeratorWrapper<CardStatBoostSequencer> wrapper = new(enumerator);
-        CardStatBoostSequencer instance = wrapper.This;
-        bool isAttack = wrapper.GetFieldValue<object>("<>8__1").GetFieldValue<bool>("attackMod");
+        CardStatBoostSequencer instance = enumerator.GetThis<CardStatBoostSequencer>();
+        bool isAttack = enumerator.GetFieldValue<object>("<>8__1").GetFieldValue<bool>("attackMod");
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        CardInfo destroyedCard = enumerator.GetFieldValue<CardInfo>("<destroyedCard>5__2");
+        bool finishedBuffing = enumerator.GetFieldValue<bool>("<finishedBuffing>5__3");
+        int numBuffsGiven = enumerator.GetFieldValue<int>("<numBuffsGiven>5__4");
 
-        await NeuroMouse.MoveToAsync(instance.selectionSlot, 200, ct);
-        await NeuroMouse.ClickAsync(400, ct);
+        bool finished = finishedBuffing || destroyedCard != null;
+        if (finished) return;
 
-        CampfireBoostContext context = new CampfireBoostContext(isAttack);
-        List<SelectableCard> cards = instance.selectionSlot.cardSelector.displayedCards;
+        await Wait.CommonFlowDelay(ct);
 
-        Card card = await Neuro.Cards.ChooseCardLoadout(cards, DecisionStrings.CampfireChooseCard, ct, context);
+        if (!ViewManager.Instance.Is(View.StatBoostSlot))
+        {
+            CampfireBoostContext context = new CampfireBoostContext(isAttack);
 
-        await NeuroMouse.MoveToAsync(card, 200, ct);
-        await NeuroMouse.ClickAsync(1000, ct);
+            Card card = await Neuro.Cards.SelectCardFromDeck(instance.selectionSlot, DecisionStrings.CampfireChooseCard, ct,
+                additionalContext: context);
+            AutomationManager.Assert(card, "did not pick campfire card");
 
-        await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);
-        AllowManualInterruption = false;
-        await NeuroMouse.ClickAsync(750, ct);
+            await Wait.View(View.StatBoostSlot, ct);
+        }
 
-        // todo: just ask for a bool instead
+        if (numBuffsGiven == 0)
+        {
+            await NeuroMouse.MoveAndClick(instance.confirmStone, ct,
+                msDelayAfterClick: 300); // there's a WaitForSeconds(0.25f) before stats are actually applied
+        }
 
         Description desc = !RunState.Run.survivorsDead ? DecisionStrings.CampfireRiskUpgrade : DecisionStrings.CampfireNoRiskUpgrade;
-        InteractableBase chosenButton = await Neuro.Misc.ChooseInteractable(desc, LoadoutState.Calculate(),
-            [
-                (new CampfireSecondUpgradeAction(), instance.confirmStone),
-                (new LeaveAction(), instance.selectionSlot),
-            ], ct);
-        AutomationManager.Assert(chosenButton, "did not pick on second campfire upgrade");
+        bool doSecondUpgrade = await Neuro.Loadout.Choose(new CampfireSecondUpgradeAction(), desc, ct);
+        InteractableBase chosenButton = doSecondUpgrade ? instance.confirmStone : instance.retrieveCardInteractable;
+
         await UniTask.WaitUntil(() => instance.confirmStone.Enabled, cancellationToken: ct);
-        
-        await NeuroMouse.MoveToAsync(chosenButton, 200, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(chosenButton, ct);
     }
 }

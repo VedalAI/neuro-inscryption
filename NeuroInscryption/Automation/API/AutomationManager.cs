@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -140,7 +141,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
     }
 
     [Conditional("DEBUG")]
-    public static void Assert(bool condition, string? message = null,
+    public static void Assert([DoesNotReturnIf(false)] bool condition, string? message = null,
         string? details = null,
         [CallerFilePath] string? callerFile = null,
         [CallerMemberName] string? callerMember = null,
@@ -150,7 +151,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
 
         Plugin.Logger.LogWarning("Forcing manual input due to assertion failure");
         AllowManualInput = true;
-        FlowRunner.CancelCurrentFlowForcefully();
+        // FlowRunner.CancelCurrentFlowForcefully();
 
         StringBuilder sb = new("Assertion failed: ");
         sb.AppendLine(message ?? "(no message)");

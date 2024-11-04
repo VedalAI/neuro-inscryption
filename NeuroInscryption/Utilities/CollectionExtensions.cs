@@ -14,6 +14,7 @@ public static class CollectionExtensions
 
     public static T? NullIfEmpty<T>(this T? obj) where T : ICollection => obj != null && obj.Count > 0 ? obj : default;
 
-    public static Dictionary<string, T> ToIndexedDictionary<T>(this IEnumerable<T> enumerable) => enumerable.ToIndexedDictionary(x => x);
-    public static Dictionary<string, TValue> ToIndexedDictionary<T, TValue>(this IEnumerable<T> enumerable, Func<T, TValue> valueSelector) => enumerable.WithIndex().ToDictionary(p => p.index.ToString(), p => valueSelector(p.item));
+    public static Dictionary<string, T> ToIndexedDictionary<T>(this IEnumerable<T> enumerable, int indexBase = 0) => enumerable.ToIndexedDictionary(x => x, indexBase);
+    public static Dictionary<string, TValue> ToIndexedDictionary<T, TValue>(this IEnumerable<T> enumerable, Func<T, TValue> valueSelector, int indexBase = 0)
+        => enumerable.WithIndex().ToDictionary(p => (indexBase + p.index).ToString(), p => valueSelector(p.item));
 }

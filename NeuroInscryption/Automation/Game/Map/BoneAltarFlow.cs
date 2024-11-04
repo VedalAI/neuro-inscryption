@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
@@ -7,6 +6,7 @@ using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -26,19 +26,34 @@ public sealed class BoneAltarFlow : HarmonyAutomationFlow<IEnumerator>
     {
         CardRemoveSequencer instance = target.GetThis<CardRemoveSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.CommonFlowDelay(ct);
 
-        await NeuroMouse.MoveToAsync(instance.sacrificeSlot, 200, ct);
-        await NeuroMouse.ClickAsync(400, ct);
+        if (!ViewManager.Instance.Is(View.CardMergeConfirm))
+        {
+            Card card = await Neuro.Cards.SelectCardFromDeck(instance.sacrificeSlot, DecisionStrings.BoneAltarChooseCard, ct);
+            AutomationManager.Assert(card, "did not pick bone altar card");
 
-        List<SelectableCard> cards = instance.sacrificeSlot.cardSelector.displayedCards;
-        Card card = await Neuro.Cards.ChooseCardLoadout(cards, DecisionStrings.BoneAltarChooseCard, ct: ct);
-        AutomationManager.Assert(card, "did not pick bone altar card");
+            await Wait.View(View.CardMergeConfirm, ct);
+        }
 
-        await NeuroMouse.MoveToAsync(card, 200, ct);
-        await NeuroMouse.ClickAsync(1000, ct);
+        if (!instance.confirmStone.SelectionConfirmed)
+        {
+            await NeuroMouse.MoveAndClick(instance.confirmStone, ct);
+            await UniTask.WaitUntil(() => !instance.sacrificeSlot.Card, cancellationToken: ct);
+        }
 
-        await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);
-        await NeuroMouse.ClickAsync(ct);
+        SelectableCard? boonCard = null;
+        // used to click the slot but the boon card isn't actually placed on the slot, it's just moved to the same position
+        await UniTask.WaitUntil(checkBoonCard, cancellationToken: ct);
+        await NeuroMouse.MoveAndClick(boonCard!, ct);
+
+        return;
+
+        bool checkBoonCard()
+        {
+            boonCard = target.GetFieldValue<SelectableCard>("<boonCard>5__6");
+            return boonCard != null;
+        }
     }
+
 }

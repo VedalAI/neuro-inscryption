@@ -6,29 +6,16 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions;
-using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
-using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
 public sealed class MycologistsFlow : HarmonyAutomationFlow<IEnumerator>
 {
-    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(IEnumerable<SelectableCardPair> pairs, IGameState state) : ILoadoutContext
-    {
-        public readonly IReadOnlyList<SelectableCardPairData> PairOptions = pairs.Select(p => SelectableCardPairData.Create(p, state)).ToList();
-
-        IEnumerable<SigilData> ILoadoutContext.RelevantSigils => [];
-        IEnumerable<TraitData> ILoadoutContext.RelevantTraits => [];
-    }
-
     public override FlowHook[] Hooks =>
     [
         new()
@@ -42,28 +29,29 @@ public sealed class MycologistsFlow : HarmonyAutomationFlow<IEnumerator>
     {
         DuplicateMergeSequencer instance = target.GetThis<DuplicateMergeSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.CommonFlowDelay(ct);
 
-        await NeuroMouse.MoveToAsync(instance.selectionSlot, 200, ct);
-        await NeuroMouse.ClickAsync(400, ct);
+        if (!ViewManager.Instance.Is(View.CardMergeConfirm))
+        {
+            if (ViewManager.Instance.Is(View.Default))
+            {
+                await NeuroMouse.MoveAndClick(instance.selectionSlot, ct,
+                    msDelayAfterClick: Wait.CardPileFullSpawnTimeMs);
 
-        LoadoutState state = LoadoutState.Calculate();
-        Context context = new(((SelectableCardPairArray) instance.selectionSlot.cardSelector).pairs, state);
-        state.SetContext(context);
+                await Wait.View(View.DeckSelection, ct);
+            }
 
-        ChooseAction<SelectableCardPairData> choosePairAction = new(context.PairOptions);
+            SelectableCardPairArray selector = (SelectableCardPairArray)instance.selectionSlot.cardSelector;
+            List<SelectableCardPairData> pairs = selector.pairs.Select(SelectableCardPairData.Create).ToList();
 
-        Decision decision = new(DecisionStrings.MycologistsChoosePair, state);
-        decision.AddAction(choosePairAction);
+            SelectableCardPairData pair = await Neuro.Loadout.ChooseItem(pairs, DecisionStrings.MycologistsChoosePair, ct);
+            AutomationManager.Assert(pair is {} && pair.Pair, "did not pick pair for mycologists");
 
-        Action action = await decision.SendAsync(ct);
+            await NeuroMouse.MoveAndClick(pair.Pair, ct);
 
-        if (!action.Match(choosePairAction, out SelectableCardPairData? selected)) action.ThrowInvalid();
+            await Wait.View(View.CardMergeConfirm, ct);
+        }
 
-        await NeuroMouse.MoveToAsync(selected.Pair, 200, ct);
-        await NeuroMouse.ClickAsync(500, ct);
-
-        await NeuroMouse.MoveToAsync(instance.confirmStone, 250, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(instance.confirmStone, ct, 250);
     }
 }

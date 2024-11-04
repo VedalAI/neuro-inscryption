@@ -5,6 +5,7 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -24,8 +25,8 @@ public sealed class PackFullFlow : HarmonyAutomationFlow<IEnumerator>
     {
         GainConsumablesSequencer instance = enumerator.GetThis<GainConsumablesSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
-        await NeuroMouse.MoveToAsync(instance.ratCard, 200, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await Wait.CommonFlowDelay(ct);
+
+        await NeuroMouse.MoveAndClick(instance.ratCard, ct);
     }
 }

@@ -8,11 +8,9 @@ using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Combat;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities.Enumerators;
-using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
@@ -34,18 +32,12 @@ public sealed class PlaceCardFlow : HarmonyAutomationFlow<IEnumerator>
         CombatState state = CombatState.Calculate();
         PlayableCard card = PlayerHand.Instance.ChoosingSlotCard;
 
-        PlaceCardAction placeCardAction = new(state.PlayerLanes);
-
+        PlaceCardAction placeCardAction = new(BoardManager.Instance.playerSlots);
         Description decisionString = DecisionStrings.PlaceCard.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
-        Decision decision = new(decisionString, state);
-        decision.AddAction(placeCardAction);
 
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(placeCardAction, out int lane)) action.ThrowInvalid();
+        int lane = await Neuro.Common.Choose(placeCardAction, decisionString, state, ct);
 
         CardSlot slot = BoardManager.Instance.playerSlots[lane];
-        await NeuroMouse.MoveToAsync(slot, 500, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(slot, ct, msDelayBeforeClick: 500);
     }
 }

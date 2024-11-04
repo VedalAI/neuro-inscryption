@@ -60,7 +60,8 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             Identifier = GetIdentifier(ijiraq.DisplayedNameEnglish);
             Health = ijiraq.Health;
             Power = ijiraq.Attack.ToString();
-            if (TargetCard.Info.BonesCost > 0) Cost = StringFormatter.Format(CardStrings.BonesCost + CardStrings.IjiraqBonesCostSuffix, TargetCard.Info.BonesCost);
+            if (TargetCard.Info.BonesCost > 0)
+                Cost = StringFormatter.Format(CardStrings.BonesCost + CardStrings.IjiraqBonesCostSuffix, TargetCard.Info.BonesCost);
             CanBeSacrificed = true;
             Tribes = null;
 
@@ -90,7 +91,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             Health,
             SigilNames != null ? CardStrings.InfoSeparator + string.Join(CardStrings.InfoSeparator, SigilNames) : "",
             _maybeIjiraq ? CardStrings.InfoSeparator + CardStrings.IjiraqNarrowedDownShortDescription : "",
-            Cost
+            DescCost
         );
     }
 

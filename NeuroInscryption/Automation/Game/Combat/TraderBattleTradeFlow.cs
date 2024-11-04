@@ -28,7 +28,7 @@ public class TraderBattleTradeFlow : HarmonyAutomationFlow<IEnumerator>
             IsValid = FlowHookHelpers.EnumeratorStateIs(11)
         }
     ];
-    
+
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     private sealed class Context(List<PlayableCard> cards, int amount) : ICombatContext
     {
@@ -39,7 +39,7 @@ public class TraderBattleTradeFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator _, CancellationToken ct)
     {
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.CommonFlowDelay(ct);
 
         int numPelts = PlayerHand.Instance.CardsInHand.Count(c => c.Info.HasTrait(Trait.Pelt));
         if (numPelts == 0)
@@ -47,7 +47,7 @@ public class TraderBattleTradeFlow : HarmonyAutomationFlow<IEnumerator>
             Plugin.Logger.LogMessage("No pelts to trade - flow restarted? Trading phase should end on its own soon, otherwise o7");
             return;
         }
-        
+
         List<PlayableCard> cards = BoardManager.Instance.opponentSlots
             .Select(slot => slot.Card)
             .Concat(TurnManager.Instance.Opponent.Queue)
@@ -69,11 +69,9 @@ public class TraderBattleTradeFlow : HarmonyAutomationFlow<IEnumerator>
 
         foreach (SelectableCardData card in chosenCards)
         {
-            await NeuroMouse.MoveToAsync(card.TargetCard, 500, ct);
-            AllowManualInterruption = false;
-            await NeuroMouse.ClickAsync(250, ct);
+            await NeuroMouse.MoveAndClick(card.TargetCard, ct, msDelayBeforeClick: 500, msDelayAfterClick: 250);
         }
 
-        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 250, ct);
+        await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, ct);
     }
 }

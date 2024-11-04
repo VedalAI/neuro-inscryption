@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using DiskCardGame;
-using NeuroInscryption.Communication.Data.State;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
@@ -17,16 +16,16 @@ public sealed class SelectableCardPairData : IIdentifiable
     [JsonIgnore]
     public SelectableCardPair Pair { get; private set; }
 
-    private SelectableCardPairData(SelectableCardPair pair, IGameState state)
+    private SelectableCardPairData(SelectableCardPair pair)
     {
         Pair = pair;
         Cards =
         [
-            CardData.Create(pair.leftCard.Info, state),
-            CardData.Create(pair.rightCard.Info, state)
+            CardData.Create(pair.leftCard.Info),
+            CardData.Create(pair.rightCard.Info)
         ];
         Identifier = pair.leftCard.Info.DisplayedNameEnglish;
     }
 
-    public static SelectableCardPairData Create(SelectableCardPair pair, IGameState state) => new(pair, state);
+    public static SelectableCardPairData Create(SelectableCardPair pair) => new(pair);
 }

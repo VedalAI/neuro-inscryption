@@ -16,9 +16,8 @@ public static class ItemStrings
         ["Hourglass"] = "Opponent's next turn is skipped.",
         ["MagnifyingGlass"] = "Pick any card from your deck to draw into your hand.",
         ["PiggyBank"] = "Immediately gain 4 bones.",
-        ["Pliers"] = "Use one of your own teeth to add weight to the scale (equivalent to 1 damage).",
-        // todo: lane number mentioned
-        ["PocketWatch"] = "All cards in play move one space clockwise. This means your cards move left and the opponent's cards move right - with the exception of lane 0, where your card moves to the opponent's side, and lane 3, where the opponent's card moves to your side.",
+        ["Pliers"] = "Use one of your own teeth to add weight to the scales and tip them in your favour (equivalent to 1 damage).",
+        ["PocketWatch"] = "All cards in play move one space clockwise. This means your cards move left and the opponent's cards move right - with the exception of your leftmost card (in lane 1), which moves upwards to the opponent's side, and the opponent's rightmost card (in lane 4), which moves downwards to your side.",
         ["Scissors"] = "Target a cuttable opponent card and destroy it.",
     };
 

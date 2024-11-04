@@ -5,6 +5,7 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -22,10 +23,9 @@ public sealed class WoodcarverFullFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator enumerator, CancellationToken ct)
     {
-        SelectableCard card = enumerator.GetFieldValue<SelectableCard>("<card>5__2");
+        await Wait.CommonFlowDelay(ct);
 
-        await UniTask.Delay(500, cancellationToken: ct);
-        await NeuroMouse.MoveToAsync(card, 200, ct);
-        await NeuroMouse.ClickAsync(ct);
+        SelectableCard card = enumerator.GetFieldValue<SelectableCard>("<card>5__2");
+        await NeuroMouse.MoveAndClick(card, ct);
     }
 }

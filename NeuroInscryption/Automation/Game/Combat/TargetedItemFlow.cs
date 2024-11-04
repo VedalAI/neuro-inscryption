@@ -6,11 +6,8 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Actions;
+using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
-using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities.Enumerators;
@@ -20,11 +17,6 @@ namespace NeuroInscryption.Automation.Game.Combat;
 
 public class TargetedItemFlow : HarmonyAutomationFlow<IEnumerator>
 {
-    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class NoSpamDeck : ICombatContext
-    {
-        public bool IncludeDeck => false;
-    }
     public override FlowHook[] Hooks =>
     [
         new()
@@ -45,26 +37,16 @@ public class TargetedItemFlow : HarmonyAutomationFlow<IEnumerator>
         if (validSlots.Count == 0)
         {
             Plugin.Logger.LogWarning($"No valid targets for {itemData.Identifier} (somehow), attempting to back out of using item");
-            await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, 500, ct);
+            await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, ct, 500);
             // CardBattleFlow will interrupt
             return;
         }
 
         List<SelectableCardData> validTargetCards = validSlots.Select(slot => SelectableCardData.Create(slot.Card, slot.Index)).ToList();
-        
-        CombatState state = CombatState.Calculate();
-        state.SetContext(new NoSpamDeck());
+        Description description = DecisionStrings.ChooseItemTarget.Format(itemData.Identifier);
 
-        ChooseAction<SelectableCardData> action = new(validTargetCards);
+        SelectableCardData card = await Neuro.Combat.ChooseItem(validTargetCards, description, ct, includeDeck: false);
 
-        Decision decision = new(DecisionStrings.ChooseItemTarget.Format(itemData.Identifier), state);
-        decision.AddAction(action);
-
-        Action chosenAction = await decision.SendAsync(ct);
-
-        if (!chosenAction.Match(action, out SelectableCardData? card)) chosenAction.ThrowInvalid();
-        
-        await NeuroMouse.MoveToAsync(card.TargetCard, 100, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(card.TargetCard, ct);
     }
 }

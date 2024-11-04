@@ -14,6 +14,7 @@ using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Map;
@@ -43,7 +44,7 @@ public sealed class TraderFlow : HarmonyAutomationFlow<IEnumerator>
     {
         TradePeltsSequencer instance = target.GetThis<TradePeltsSequencer>();
 
-        await UniTask.Delay(500, cancellationToken: ct);
+        await Wait.CommonFlowDelay(ct);
 
         LoadoutState state = LoadoutState.Calculate();
         Context context = new(instance.tradeCards, instance.peltCards.Count);
@@ -60,9 +61,7 @@ public sealed class TraderFlow : HarmonyAutomationFlow<IEnumerator>
 
         foreach (SelectableCardData card in chosenCards)
         {
-            await NeuroMouse.MoveToAsync(card.TargetCard, 500, ct);
-            AllowManualInterruption = false;
-            await NeuroMouse.ClickAsync(250, ct);
+            await NeuroMouse.MoveAndClick(card.TargetCard, ct);
         }
     }
 }

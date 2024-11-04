@@ -10,11 +10,9 @@ using NeuroInscryption.Communication.Actions.Combat;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities.Enumerators;
-using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
@@ -33,24 +31,26 @@ public sealed class ChooseSacrificesFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator _, CancellationToken ct)
     {
-        CombatState state = CombatState.Calculate();
-        PlayableCard card = BoardManager.Instance.CurrentSacrificeDemandingCard;
-
-        SacrificeAction sacrificeAction = new(card, state.PlayerLanes);
-
-        Description decisionString = DecisionStrings.ChooseSacrifices.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
-        Decision decision = new(decisionString, state);
-        decision.AddAction(sacrificeAction);
-
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(sacrificeAction, out IEnumerable<PlayableCardData>? sacrifices)) action.ThrowInvalid();
-
-        foreach (PlayableCardData sacrifice in sacrifices)
+        try
         {
-            await NeuroMouse.MoveToAsync(sacrifice.TargetCard, 500, ct);
-            AllowManualInterruption = false;
-            await NeuroMouse.ClickAsync(250, ct);
+            CombatState state = CombatState.Calculate();
+            PlayableCard card = BoardManager.Instance.CurrentSacrificeDemandingCard;
+
+            SacrificeAction sacrificeAction = new(card, state.PlayerLanes);
+
+            Description decisionString = DecisionStrings.ChooseSacrifices.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
+            IEnumerable<PlayableCardData> sacrifices = await Neuro.Combat.Choose(sacrificeAction, decisionString, ct);
+
+            foreach (PlayableCardData sacrifice in sacrifices)
+            {
+                await NeuroMouse.MoveAndClick(sacrifice.TargetCard, ct, msDelayBeforeClick: 500, msDelayAfterClick: 250);
+            }
+        }
+        catch
+        {
+            // keeping/handling state mid-sacrifice (e.g. picked 1 of 2 blood) is really not worth the work
+            BoardManager.Instance.cancelledPlacementWithInput = true;
+            throw;
         }
     }
 }

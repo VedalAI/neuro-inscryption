@@ -9,10 +9,9 @@ using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Combat;
@@ -20,7 +19,7 @@ namespace NeuroInscryption.Automation.Game.Combat;
 public sealed class MagpieDrawFlow : HarmonyAutomationFlow<IEnumerator>
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    private sealed class Context(IEnumerable<SelectableCard> cards, IGameState state) : ICombatContext
+    private sealed class MagpieDrawContext(IEnumerable<SelectableCard> cards, IGameState state) : ICombatContext
     {
         public readonly IReadOnlyList<SelectableCardData> RemainingDeckToDrawFrom = cards.Select((c, i) => SelectableCardData.Create(c, i, state)).ToList();
 
@@ -38,22 +37,15 @@ public sealed class MagpieDrawFlow : HarmonyAutomationFlow<IEnumerator>
 
     protected override async UniTask ExecuteAsync(IEnumerator _, CancellationToken ct)
     {
-        await UniTask.Delay(1000, cancellationToken: ct);
+        await Wait.CommonFlowDelay(ct);
 
         CombatState state = CombatState.Calculate();
-        Context context = new(BoardManager.Instance.CardSelector.displayedCards, state);
-        state.SetContext(context);
+        MagpieDrawContext context = new(BoardManager.Instance.CardSelector.displayedCards, state);
 
         ChooseAction<SelectableCardData> chooseCardAction = new(context.RemainingDeckToDrawFrom, ActionStrings.DrawCard);
 
-        Decision decision = new(DecisionStrings.MagpieDrawCard, state);
-        decision.AddAction(chooseCardAction);
+        SelectableCardData selected = await Neuro.Common.Choose(chooseCardAction, DecisionStrings.MagpieDrawCard, state, ct, context);
 
-        Action action = await decision.SendAsync(ct);
-
-        if (!action.Match(chooseCardAction, out SelectableCardData? selected)) action.ThrowInvalid();
-
-        await NeuroMouse.MoveToAsync(selected.TargetCard, 200, ct);
-        await NeuroMouse.ClickAsync(ct);
+        await NeuroMouse.MoveAndClick(selected.TargetCard, ct);
     }
 }

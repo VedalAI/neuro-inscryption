@@ -7,7 +7,7 @@ using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Communication.Actions;
 
-public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> cards, int amount) : IAction<IEnumerable<TSelectable>>
+public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> items, int amount) : IAction<IEnumerable<TSelectable>>
     where TSelectable : IIdentifiable
 {
     void ISchemaModifier.Apply(JsonSchema schema)
@@ -21,7 +21,7 @@ public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> c
                 MinItems = amount,
                 MaxItems = amount,
                 UniqueItems = true,
-                Items = QJS.Enum(cards.Select(c => c.Identifier)),
+                Items = QJS.Enum(items.Select(c => c.Identifier)),
             }
         });
     }
@@ -37,7 +37,7 @@ public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> c
             return false;
         }
 
-        response = cardIdentifiers.Select(id => cards.First(c => c?.Identifier == id));
+        response = cardIdentifiers.Select(id => items.First(c => c?.Identifier == id));
         return true;
     }
 }

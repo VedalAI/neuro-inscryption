@@ -60,7 +60,9 @@ public class CardData
 
     [JsonIgnore]
     public CardInfo TargetCardInfo { get; private set; }
-    
+    [JsonIgnore]
+    protected string DescCost => Cost == CardStrings.FreeCost ? "no cost" : CardStrings.CostPrefix + Cost;
+
     protected CardData(CardInfo cardInfo, IGameState? state = null, int? deckIndex = null)
     {
         TargetCardInfo = cardInfo;
@@ -102,7 +104,7 @@ public class CardData
             Health,
             SigilNames != null ? CardStrings.InfoSeparator + string.Join(CardStrings.InfoSeparator, SigilNames) : "",
             "",
-            Cost
+            DescCost
         );
     }
 

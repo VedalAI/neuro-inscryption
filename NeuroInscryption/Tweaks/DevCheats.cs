@@ -66,7 +66,7 @@ internal sealed class DevCheats : Singlyboi<DevCheats>
         _lastWon = Time.time;
 
         if (winHarder) TurnManager.Instance.Opponent.NumLives = 1;
-        
+
         string msg = "winning";
         if (winHarder)
         {
@@ -81,12 +81,12 @@ internal sealed class DevCheats : Singlyboi<DevCheats>
 
     public static void Faster() => Time.timeScale += 1;
     public static void Slower() => Time.timeScale -= 1;
-    
+
     public void ToggleAutoWin(bool? overrideValue = null)
     {
         _doAutoWin = overrideValue ?? !_doAutoWin;
         Plugin.Logger.LogInfo($"autowin {(_doAutoWin ? "on" : "off")}");
-        Win(true);
+        if (_doAutoWin) Win(true);
     }
 
     private static bool _doAutoWin;
