@@ -27,6 +27,6 @@ public static class BossStrings
     public const string RoyalPhase1And2Ability = "He will aim his cannons at the board which will deal 10 damage each to two random spaces.";
     public const string RoyalPhase1Transition = "After defeating his first phase, he will give you a card pack containing 4 random cards from the following list: Squirrel, Rabbit, Mole, Mole Man, Beaver, Opposum, Field Mice, Pack Rat and Stoat.";
     public const string RoyalPhase2Transition = "After defeating his second phase, he will clear his side of the board and play The Limoncello (2 power, 80 health, Mighty Leap, Omni Strike, Made of Stone). After The Limoncello is eliminated, he will not play any more cards.";
-    public const string RoyalCannonTargetCard = "This space is being targeted by Royal's cannons. This card will take 10 damage at the end of his next turn.";
-    public const string RoyalCannonTargetEmpty = "This space is being targeted by Royal's cannons. If any card moves to it, it will take 10 damage at the end of his next turn.";
+    public const string RoyalCannonTargetCard = "The space this card is in is being targeted by Royal's cannons. At the end of his next turn, this card will take 10 damage unless it moves away from this space.";
+    public const string RoyalCannonTargetEmpty = "This space is being targeted by Royal's cannons. At the end of his next turn, he will deal 10 damage to any card on this space.";
 }

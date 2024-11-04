@@ -32,7 +32,7 @@ public sealed class ProspectorFlow : HarmonyAutomationFlow<IEnumerator>
         int selection = await Neuro.Loadout.Choose(new BreakBoulderAction(), DecisionStrings.ChooseBoulder, ct);
         AutomationManager.Assert(selection is >= 1 and <= 3, "picked boulder out of range");
 #if !DEBUG // failsafe
-        if (selection is <1 or >3)
+        if (selection is < 1 or > 3)
         {
             Plugin.Logger.LogError($"Boulder out of range - selected {selection}, should be between 1 and 3");
             selection = UnityEngine.Random.RandomRangeInt(1, 3);

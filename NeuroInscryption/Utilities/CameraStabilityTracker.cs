@@ -2,22 +2,24 @@ using UnityEngine;
 
 namespace NeuroInscryption.Utilities;
 
-public class CameraStabilityTracker : Singlyboi<CameraStabilityTracker>
+public sealed class CameraStabilityTracker : Singlyboi<CameraStabilityTracker>
 {
     private Vector3 _lastCamPos;
     private Vector3 _lastCamAngle;
-    private readonly UniLazy<Camera> _cam = new(() => Camera.main);
 
-    private Camera Cam => _cam.Value;
+    private Camera? _cam;
     public bool IsStable { get; private set; }
 
     private void FixedUpdate()
     {
-        Camera cam = Cam;
-        if (!cam) return;
+        if (_cam == null)
+        {
+            _cam = Camera.main;
+            if (_cam == null) return;
+        }
 
-        Vector3 pos = cam.transform.position;
-        Vector3 angle = cam.transform.rotation.eulerAngles;
+        Vector3 pos = _cam.transform.position;
+        Vector3 angle = _cam.transform.rotation.eulerAngles;
 
         bool isStable = pos == _lastCamPos && angle == _lastCamAngle;
         // if (isStable != IsStable) Plugin.Logger.LogDebug(isStable ? "stable" : "unstable");
