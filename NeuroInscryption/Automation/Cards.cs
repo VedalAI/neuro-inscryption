@@ -6,17 +6,16 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using NeuroInscryption.Automation.API;
+using NeuroInscryption.Communication;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using UnityEngine;
-using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation;
 
@@ -50,14 +49,14 @@ internal sealed class Cards
         decision.AddAction(chooseAction);
         decision.AddAction(rerollAction);
 
-        Action action = await decision.SendAsync(ct);
+        await decision.Send(ct);
 
-        if (action.Match(chooseAction, out SelectableCardData? cardData))
+        if (chooseAction.Matches(decision, out SelectableCardData? cardData))
         {
             Plugin.Logger.LogDebug($"Picked {cardData.Identifier}");
             return cardData.TargetCard;
         }
-        if (action.Match(rerollAction))
+        if (rerollAction.Matches(decision))
         {
             AutomationManager.Assert(clover, $"Ended up in reroll path on non-rerollable choicer {choicer.GetType().Name} - schema enforcement fail?");
             await NeuroMouse.MoveAndClick(clover, ct);
@@ -66,7 +65,7 @@ internal sealed class Cards
             return await ChooseAddToDeck(choicer, ct);
         }
 
-        action.ThrowInvalid();
+        decision.ThrowInvalid();
         throw new InvalidOperationException($"Unreachable in {nameof(ChooseAddToDeck)} after ThrowInvalid");
     }
 

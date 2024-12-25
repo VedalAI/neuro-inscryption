@@ -1,36 +1,21 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NeuroInscryption.Communication.Data;
-using NeuroInscryption.Communication.Json;
-using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
+using NeuroSdk.Json;
 using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions;
 
-public sealed class ChooseAction<T>(IEnumerable<T> items, string actionName = ActionStrings.MakeChoice) : IAction<T>
+public sealed class ChooseAction<T>(IEnumerable<T> items, string name = ActionStrings.MakeChoice) : ActionBase<T>(name)
     where T : class, IIdentifiable
 {
-    public bool Applicable { get; } = items.Any();
+    public override bool IsApplicable => items.Any();
 
-    void ISchemaModifier.Apply(JsonSchema schema)
+    public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out T? response)
     {
-        if (!Applicable) return;
-
-        Dictionary<string, JsonSchema> properties = new()
-        {
-            ["action"] = QJS.Const(ActionName),
-            ["data"] = QJS.Enum(items.Select(item => item.Identifier).Distinct())
-        };
-
-        schema.OneOfAdd(properties);
-    }
-
-    public string ActionName => actionName;
-
-    bool IAction<T>.Deserialize(Action action, out T? response)
-    {
-        string? identifier = action.ActionData?.Value<string>();
+        string? identifier = data?.Value<string>();
         if (identifier == null)
         {
             response = null;
@@ -40,4 +25,6 @@ public sealed class ChooseAction<T>(IEnumerable<T> items, string actionName = Ac
         response = items.FirstOrDefault(node => node.Identifier == identifier);
         return response != null;
     }
+
+    public override JsonSchema GetDataSchema() => QJS.Enum(items.Select(item => item.Identifier).Distinct());
 }

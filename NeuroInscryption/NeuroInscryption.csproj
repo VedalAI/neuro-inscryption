@@ -19,6 +19,7 @@
         <PackageReference Include="Inscryption.GameLibs" Version="1.9.0-r.0" Publicize="true" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="UnityEngine.Modules" Version="2019.4.24" />
+        <PackageReference Include="VedalAI.NeuroSdk.Unity" Version="1.1.5" />
         <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
         <Reference Include="Resources/Assemblies/UniTask.dll" />
         <Reference Include="Resources/Assemblies/UniTask.Linq.dll" />

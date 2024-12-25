@@ -5,13 +5,12 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using DiskCardGame;
+using NeuroInscryption.Communication;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Actions.Map;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using Sirenix.Utilities;
 
@@ -64,19 +63,19 @@ internal sealed class Trade
                 decision.AddAction(buyAction);
                 decision.AddAction(leaveAction);
 
-                Action action = await decision.SendAsync(token);
+                await decision.Send(token);
 
-                if (action.Match(buyAction, out TrapperWareData? trapperWare))
+                if (buyAction.Matches(decision, out TrapperWareData? trapperWare))
                 {
                     await writer.YieldAsync(trapperWare);
                 }
-                else if (action.Match(leaveAction))
+                else if (leaveAction.Matches(decision))
                 {
                     return;
                 }
                 else
                 {
-                    action.ThrowInvalid();
+                    decision.ThrowInvalid();
                 }
             }
         }

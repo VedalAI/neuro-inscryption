@@ -1,30 +1,24 @@
 ﻿using System.Collections.Generic;
-using NeuroInscryption.Communication.Json;
-using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
+using NeuroSdk.Json;
 using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Combat;
 
-public sealed class DrawCardAction(bool mainDeckEmpty, bool sideDeckEmpty) : IAction<bool>
+public sealed class DrawCardAction(bool mainDeckEmpty, bool sideDeckEmpty)
+    : ActionBase<bool>(ActionStrings.DrawCard)
 {
-    void ISchemaModifier.Apply(JsonSchema schema)
+    public override JsonSchema? GetDataSchema()
     {
         List<string> values = [];
         if (!mainDeckEmpty) values.Add("Random");
         if (!sideDeckEmpty) values.Add("Squirrel");
-        schema.OneOfAdd(new Dictionary<string, JsonSchema>
-        {
-            ["action"] = QJS.Const(ActionName),
-            ["data"] = QJS.Enum(values)
-        });
+        return QJS.Enum(values);
     }
 
-    public string ActionName => ActionStrings.DrawCard;
-
-    bool IAction<bool>.Deserialize(Action action, out bool drawFromSideDeck)
+    public override bool TryDeserialize(JToken? data, out bool drawFromSideDeck)
     {
-        string? strResponse = action.ActionData?.Value<string>();
+        string? strResponse = data?.Value<string>();
 
         switch (strResponse)
         {

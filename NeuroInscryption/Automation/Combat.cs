@@ -42,7 +42,7 @@ public sealed class Combat
         return await Choose(drawCardAction, DecisionStrings.DrawCard, ct, includeDeck: true);
     }
 
-    public UniTask<T> Choose<T>(IAction<T> action, Description description, CancellationToken ct = default, object? additionalContext = null, bool? includeDeck = null)
+    public UniTask<T> Choose<T>(ActionBase<T> action, Description description, CancellationToken ct = default, object? additionalContext = null, bool? includeDeck = null)
     {
         if (includeDeck.HasValue)
         {

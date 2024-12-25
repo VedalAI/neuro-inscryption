@@ -1,28 +1,17 @@
-﻿using System.Collections.Generic;
-using NeuroInscryption.Communication.Json;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Strings;
+﻿using NeuroInscryption.Communication.Strings;
+using NeuroSdk.Json;
 using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Map;
 
-public sealed class CampfireSecondUpgradeAction : IAction<bool>
+public sealed class CampfireSecondUpgradeAction() : ActionBase<bool>(ActionStrings.CampfireSecondUpgrade)
 {
-    public string ActionName => ActionStrings.CampfireSecondUpgrade;
-
-    void ISchemaModifier.Apply(JsonSchema schema)
+    public override bool TryDeserialize(JToken? data, out bool response)
     {
-        schema.Properties = new Dictionary<string, JsonSchema>
-        {
-            ["action"] = QJS.Const(ActionName),
-            ["data"] = new() { Type = JsonSchemaType.Boolean },
-        };
-    }
-
-    public bool Deserialize(Action action, out bool response)
-    {
-        bool? value = action.ActionData?.Value<bool>();
+        bool? value = data?.Value<bool>();
         response = value ?? false;
         return value.HasValue;
     }
+
+    public override JsonSchema GetDataSchema() => new JsonSchema { Type = JsonSchemaType.Boolean };
 }

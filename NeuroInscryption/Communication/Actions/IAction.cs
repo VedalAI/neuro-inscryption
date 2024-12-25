@@ -1,14 +1,16 @@
-﻿using NeuroInscryption.Communication.Json;
-using NeuroInscryption.Communication.Messages.Incoming;
+﻿using NeuroSdk.Json;
+using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions;
 
-public interface IAction : ISchemaModifier
+public interface IAction
 {
-    string ActionName { get; }
+    bool IsApplicable { get; }
+    string Name { get; }
+    JsonSchema? GetDataSchema();
 }
 
-public interface IAction<TResponse> : IAction
+public interface IAction<T> : IAction
 {
-    bool Deserialize(Action action, out TResponse? response);
+    bool TryDeserialize(JToken? data, out T? response);
 }

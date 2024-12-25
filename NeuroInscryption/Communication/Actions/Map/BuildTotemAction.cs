@@ -1,40 +1,34 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NeuroInscryption.Communication.Data.Serializable;
-using NeuroInscryption.Communication.Json;
-using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
+using NeuroSdk.Json;
+using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Map;
 
-public sealed class BuildTotemAction(IEnumerable<TotemPieceData> pieces) : IAction<BuildTotemAction.Response>
+public sealed class BuildTotemAction(IEnumerable<TotemPieceData> pieces) : ActionBase<BuildTotemAction.Response>(ActionStrings.BuildTotem)
 {
     public readonly record struct Response(TotemPieceData Top, TotemPieceData Bottom);
 
-    void ISchemaModifier.Apply(JsonSchema schema)
+    public override JsonSchema GetDataSchema()
     {
-        schema.Properties = new Dictionary<string, JsonSchema>
+        return new()
         {
-            ["action"] = QJS.Const(ActionName),
-            ["data"] = new()
+            Properties = new Dictionary<string, JsonSchema>
             {
-                Properties = new Dictionary<string, JsonSchema>
-                {
-                    ["tribe"] = QJS.Enum(pieces.Select(p => p.Tribe).WhereNotNull()),
-                    ["sigil"] = QJS.Enum(pieces.Select(p => p.SigilName).WhereNotNull())
-                },
-                Required = ["tribe", "sigil"],
-            }
+                ["tribe"] = QJS.Enum(pieces.Select(p => p.Tribe).WhereNotNull()),
+                ["sigil"] = QJS.Enum(pieces.Select(p => p.SigilName).WhereNotNull())
+            },
+            Required = ["tribe", "sigil"],
         };
     }
 
-    public string ActionName => ActionStrings.BuildTotem;
-
-    bool IAction<Response>.Deserialize(Action action, out Response response)
+    public override bool TryDeserialize(JToken? data, out Response response)
     {
-        string? tribe = action.ActionData?.Value<string>("tribe");
-        string? sigil = action.ActionData?.Value<string>("sigil");
+        string? tribe = data?.Value<string>("tribe");
+        string? sigil = data?.Value<string>("sigil");
         if (tribe == null || sigil == null)
         {
             response = default;

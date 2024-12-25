@@ -1,27 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DiskCardGame;
 using NeuroInscryption.Communication.Data.Serializable;
-using NeuroInscryption.Communication.Json;
-using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
-
+using NeuroSdk.Json;
+using Newtonsoft.Json.Linq;
 using Sacrifice = (string name, int blood);
 
 namespace NeuroInscryption.Communication.Actions.Combat;
 
-public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary<string, PlayableCardData?> playerLanes) : IAction<IEnumerable<PlayableCardData>>
+public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary<string, PlayableCardData?> playerLanes)
+    : ActionBase<IEnumerable<PlayableCardData>>(ActionStrings.ChooseSacrifices)
 {
-    void ISchemaModifier.Apply(JsonSchema schema)
-    {
-        schema.OneOfAdd(new Dictionary<string, JsonSchema>
-        {
-            ["action"] = QJS.Const(ActionName),
-            ["data"] = QJS.Enum(GetSacrificeCombinations(cardToPlay.Info.BloodCost))
-        });
-    }
-
     private IEnumerable<List<string>> GetSacrificeCombinations(int bloodCost)
     {
         List<Sacrifice> sacrificableSlots = BoardManager.Instance.playerSlots
@@ -47,11 +39,15 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary
         return possibilities.Select(p => p.Select(s => s.name).ToList());
     }
 
-    public string ActionName => ActionStrings.ChooseSacrifices;
-
-    bool IAction<IEnumerable<PlayableCardData>>.Deserialize(Action action, out IEnumerable<PlayableCardData>? response)
+    public override JsonSchema GetDataSchema()
     {
-        IEnumerable<string?>? cardIdentifiers = action.ActionData?.Values<string>()!;
+        Plugin.Logger.LogWarning("QJS.Enum(List<string>)");
+        return QJS.Enum(GetSacrificeCombinations(cardToPlay.Info.BloodCost).Select(combo => string.Join(",", combo)));
+    }
+
+    public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out IEnumerable<PlayableCardData>? response)
+    {
+        IEnumerable<string?>? cardIdentifiers = data?.Value<string>()?.Split(',');
         if (cardIdentifiers == null)
         {
             response = null;
