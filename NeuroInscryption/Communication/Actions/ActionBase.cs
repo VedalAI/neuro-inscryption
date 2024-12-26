@@ -12,7 +12,7 @@ public abstract class ActionBase(string name) : IAction
     public abstract JsonSchema? GetDataSchema();
 
     public bool Matches(Decision decision)
-        => decision.PickedAction == Name;
+        => decision.Result?.PickedAction == Name;
 }
 
 public abstract class ActionBase<T>(string name) : ActionBase(name), IAction<T>
@@ -22,6 +22,6 @@ public abstract class ActionBase<T>(string name) : ActionBase(name), IAction<T>
     public bool Matches(Decision decision, [NotNullWhen(true)] out T? response)
     {
         response = default;
-        return Matches(decision) && TryDeserialize(decision.Data, out response);
+        return Matches(decision) && TryDeserialize(decision.Result?.Data, out response);
     }
 }

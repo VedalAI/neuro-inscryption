@@ -2,56 +2,60 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroSdk.Actions;
 using NeuroSdk.Json;
+using NeuroSdk.Utilities;
 using NeuroSdk.Websocket;
 using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication;
 
+public record struct DecisionResult(string PickedAction, JToken? Data);
 public sealed class Decision(string id, IGameState state, string query)
 {
-    private ActionWindow ActionWindow { get; } = ActionWindow.Create(Plugin.PluginObject);
+    private readonly ActionWindow _actionWindow = ActionWindow.Create(Plugin.PluginObject); // scuff?
 
-    public string? PickedAction { get; private set; }
-    public JToken? Data { get; private set; }
+    public DecisionResult? Result { get; private set; }
 
     private UniTaskCompletionSource _tcs = new();
-    public float Timeout { get; set; } = 5;
+    public float Timeout { get; init; } = 1; // short for randy; todo
+    public bool IsEphemeral { get; init; } // todo
 
-    [SetsRequiredMembers]
-    public Decision(Description decisionDescription, IGameState state) : this(decisionDescription.Name, state, decisionDescription.Info)
+    public Decision(Description decisionDescription, IGameState state)
+        : this(decisionDescription.Name, state, decisionDescription.Info)
     {
     }
 
     public void AddAction(ActionBase action)
     {
-        ActionWindow.AddAction(new DecisionAction(ActionWindow, this, action));
+        _actionWindow.AddAction(new DecisionAction(_actionWindow, this, action));
     }
 
     public UniTask Send(CancellationToken ct)
     {
-        // todo: serialize state
-        if (Timeout > 0) ActionWindow.SetForce(Timeout, () => query, state.ToString);
-        ActionWindow.SetEnd(() => ct.IsCancellationRequested);
-        ActionWindow.Register();
+        // todo: better state representation
+        if (Timeout >= 0) _actionWindow.SetForce(Timeout, () => query, () => Jason.Serialize(state), IsEphemeral);
+        _actionWindow.SetEnd(() => ct.IsCancellationRequested);
+        _actionWindow.Register();
         return _tcs.Task;
     }
 
     [DoesNotReturn]
     public void ThrowInvalid()
     {
-        throw new InvalidOperationException($"Received action '{PickedAction}' which did not match possible expected actions.");
+        AutomationManager.Assert(Result.HasValue, "ThrowInvalid without Result");
+        throw new InvalidOperationException($"Received action '{Result.Value.PickedAction}' which did not match possible expected actions.");
     }
 
     private sealed class DecisionAction(ActionWindow? actionWindow, Decision decision, ActionBase ourAction)
         : NeuroAction(actionWindow)
     {
         public override string Name => ourAction.Name;
-        protected override string Description => "todo";
+        protected override string Description => null!; // todo
         public override bool CanBeUsed() => ourAction.IsApplicable;
 
         protected override JsonSchema? Schema => ourAction.GetDataSchema();
@@ -59,8 +63,7 @@ public sealed class Decision(string id, IGameState state, string query)
         {
             try
             {
-                decision.Data = actionData.Data;
-                decision.PickedAction = Name;
+                decision.Result = new(Name, actionData.Data);
                 return ExecutionResult.Success();
             }
             catch
@@ -73,6 +76,7 @@ public sealed class Decision(string id, IGameState state, string query)
         {
             try
             {
+                // any continuations run here
                 decision._tcs.TrySetResult();
             }
             finally

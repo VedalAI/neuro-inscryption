@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DiskCardGame;
@@ -42,12 +43,12 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary
     public override JsonSchema GetDataSchema()
     {
         Plugin.Logger.LogWarning("QJS.Enum(List<string>)");
-        return QJS.Enum(GetSacrificeCombinations(cardToPlay.Info.BloodCost).Select(combo => string.Join(",", combo)));
+        return QJS.Enum(GetSacrificeCombinations(cardToPlay.Info.BloodCost).Select(combo => string.Join(", ", combo)));
     }
 
     public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out IEnumerable<PlayableCardData>? response)
     {
-        IEnumerable<string?>? cardIdentifiers = data?.Value<string>()?.Split(',');
+        IEnumerable<string?>? cardIdentifiers = data?.Value<string>()?.Split([", "], StringSplitOptions.None);
         if (cardIdentifiers == null)
         {
             response = null;
