@@ -5,15 +5,14 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using NeuroInscryption.Automation.API;
+using NeuroInscryption.Communication;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation;
 
@@ -61,7 +60,7 @@ public sealed class Common
     /// or the <see cref="CombatState"/> (if <see langword="false"/>).
     /// </param>
     /// <returns>A result of type <typeparamref name="T"/> that validates the given <paramref name="action"/>'s schema.</returns>
-    public async UniTask<T> Choose<T>(IAction<T> action, Description description, IGameState state, CancellationToken ct = default,
+    public async UniTask<T> Choose<T>(ActionBase<T> action, Description description, IGameState state, CancellationToken ct = default,
         object? additionalContext = null)
     {
         switch (state)
@@ -79,15 +78,15 @@ public sealed class Common
         Decision decision = new(description, state);
         decision.AddAction(action);
 
-        Action chosenAction = await decision.SendAsync(ct);
+        await decision.Send(ct);
 
-        if (!chosenAction.Match(action, out T? result)) chosenAction.ThrowInvalid();
+        if (!action.Matches(decision, out T? result)) decision.ThrowInvalid();
 
         Plugin.Logger.LogDebug($"Picked {(result is IIdentifiable id ? id.Identifier : result.ToString())}");
         return result;
     }
 
-    public async UniTask<T> Choose<T>(IAction<T> action, Description description, CancellationToken ct = default,
+    public async UniTask<T> Choose<T>(ActionBase<T> action, Description description, CancellationToken ct = default,
         object? additionalContext = null, bool useLoadoutState = true)
     {
         return await Choose(action, description,

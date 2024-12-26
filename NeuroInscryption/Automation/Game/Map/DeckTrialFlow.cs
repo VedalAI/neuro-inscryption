@@ -47,12 +47,12 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
                 await NeuroMouse.MoveAndClick(trial.Card, ct);
             }
             // state 22 is trial cards exit (first yield after trial result is available to us)
-            await UniTask.WaitUntil(wrapper, e => e.State is 22, cancellationToken: ct);
+            await UniTask.WaitUntil(() => wrapper.State is 22, cancellationToken: ct);
 
             bool passedTrial = enumerator.GetFieldValue<bool>("<trialIsPassed>5__4");
             if (!passedTrial) return;
 
-            await UniTask.WaitUntil(wrapper, e => e.State is 27, cancellationToken: ct);
+            await UniTask.WaitUntil(() => wrapper.State is 27, cancellationToken: ct);
         }
 
         Card reward = await Neuro.Cards.ChooseAddToDeck(instance, ct);

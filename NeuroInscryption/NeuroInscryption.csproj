@@ -17,10 +17,8 @@
     <ItemGroup>
         <PackageReference Include="BepInEx.Unity.Mono" Version="6.0.0-be.700" />
         <PackageReference Include="Inscryption.GameLibs" Version="1.9.0-r.0" Publicize="true" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="UnityEngine.Modules" Version="2019.4.24" />
-        <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
-        <Reference Include="Resources/Assemblies/UniTask.dll" />
+        <PackageReference Include="VedalAI.NeuroSdk.Unity" Version="1.1.5" />
         <Reference Include="Resources/Assemblies/UniTask.Linq.dll" />
 
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />

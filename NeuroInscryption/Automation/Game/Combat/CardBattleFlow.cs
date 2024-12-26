@@ -5,16 +5,15 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
+using NeuroInscryption.Communication;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Actions.Combat;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
-using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
 
 namespace NeuroInscryption.Automation.Game.Combat;
@@ -70,27 +69,27 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
         decision.AddAction(acceptSurrenderAction);
         decision.AddAction(endTurnAction);
 
-        Action action = await decision.SendAsync(ct);
+        await decision.Send(ct);
 
         InteractableBase? target = null;
-        if (action.Match(playCardAction, out PlayableCardData? cardData))
+        if (playCardAction.Matches(decision, out PlayableCardData? cardData))
         {
             target = cardData.TargetCard;
         }
-        else if (action.Match(useItemAction, out ItemData? itemData))
+        else if (useItemAction.Matches(decision, out ItemData? itemData))
         {
             target = itemData.Slot!;
         }
-        else if (action.Match(acceptSurrenderAction))
+        else if (acceptSurrenderAction.Matches(decision))
         {
             await UniTask.Delay(500, cancellationToken: ct); // branch takes time to extend, so the mouse aim gets thrown off
             target = LeshyAnimationController.Instance.oliveBranchInteractable;
         }
-        else if (action.Match(endTurnAction))
+        else if (endTurnAction.Matches(decision))
         {
             target = ((BoardManager3D)BoardManager.Instance).Bell;
         }
-        if (target == null) action.ThrowInvalid();
+        if (target == null) decision.ThrowInvalid();
         await NeuroMouse.MoveAndClick(target, ct, msDelayBeforeClick: 500);
     }
 }

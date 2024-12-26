@@ -94,7 +94,7 @@ public sealed class InfoUI : Singlyboi<InfoUI>
     {
         await UniTask.WaitUntil(() => SceneManager.GetActiveScene().name == "Ascension_Configure");
 
-        SequentialPixelTextLines foundText = UnityEngine.Resources.FindObjectsOfTypeAll<SequentialPixelTextLines>()
+        SequentialPixelTextLines foundText = Resources.FindObjectsOfTypeAll<SequentialPixelTextLines>()
             .First(t => t.name == "Footer" && t.transform.parent.name == "ChallengesScreen");
 
         GameObject obj = Instantiate(foundText.transform.gameObject, transform);

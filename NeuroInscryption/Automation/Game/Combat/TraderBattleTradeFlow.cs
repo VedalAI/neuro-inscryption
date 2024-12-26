@@ -6,11 +6,10 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
+using NeuroInscryption.Communication;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Incoming;
-using NeuroInscryption.Communication.Messages.Outgoing;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
@@ -63,9 +62,9 @@ public class TraderBattleTradeFlow : HarmonyAutomationFlow<IEnumerator>
         Decision decision = new(DecisionStrings.ChooseTraderCardsBattle.Format(context.NumberOfCardsToBuy), state);
         decision.AddAction(chooseAction);
 
-        Action action = await decision.SendAsync(ct);
+        await decision.Send(ct);
 
-        if (!action.Match(chooseAction, out IEnumerable<SelectableCardData>? chosenCards)) action.ThrowInvalid();
+        if (!chooseAction.Matches(decision, out IEnumerable<SelectableCardData>? chosenCards)) decision.ThrowInvalid();
 
         foreach (SelectableCardData card in chosenCards)
         {

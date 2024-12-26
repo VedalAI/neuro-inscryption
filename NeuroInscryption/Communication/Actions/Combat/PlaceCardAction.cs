@@ -2,32 +2,26 @@
 using System.Linq;
 using DiskCardGame;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Json;
-using NeuroInscryption.Communication.Messages.Incoming;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
+using NeuroSdk.Json;
 using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions.Combat;
 
-public sealed class PlaceCardAction(IReadOnlyCollection<CardSlot> playerLanes) : IAction<int>
+public sealed class PlaceCardAction(IReadOnlyCollection<CardSlot> playerLanes)
+    : ActionBase<int>(ActionStrings.PlaceCard)
 {
-    void ISchemaModifier.Apply(JsonSchema schema)
+    public override JsonSchema? GetDataSchema()
     {
-        schema.OneOfAdd(new Dictionary<string, JsonSchema>
-        {
-            ["action"] = QJS.Const(ActionName),
-            ["data"] = QJS.Enum(playerLanes.WithIndex()
-                .Where(pair => pair.item.Card == null)
-                .Select(pair => CombatState.LaneIndexBase + pair.index))
-        });
+        return QJS.Enum(playerLanes.WithIndex()
+            .Where(pair => pair.item.Card == null)
+            .Select(pair => CombatState.LaneIndexBase + pair.index));
     }
 
-    public string ActionName => ActionStrings.PlaceCard;
-
-    bool IAction<int>.Deserialize(Action action, out int response)
+    public override bool TryDeserialize(JToken? data, out int response)
     {
-        int? result = action.ActionData?.Value<int>();
+        int? result = data?.Value<int>();
         response = result.HasValue ? result.Value - CombatState.LaneIndexBase : default;
         return result.HasValue;
     }

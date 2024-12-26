@@ -1,36 +1,33 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NeuroInscryption.Communication.Data;
-using NeuroInscryption.Communication.Json;
 using NeuroInscryption.Communication.Strings;
-using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
+using NeuroSdk.Json;
+using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication.Actions;
 
-public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> items, int amount) : IAction<IEnumerable<TSelectable>>
+public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> items, int amount)
+    : ActionBase<IEnumerable<TSelectable>>(ActionStrings.MakeChoice)
     where TSelectable : IIdentifiable
 {
-    void ISchemaModifier.Apply(JsonSchema schema)
+    public override bool IsApplicable => amount > 0 && items.Any();
+    public override JsonSchema GetDataSchema()
     {
-        schema.OneOfAdd(new Dictionary<string, JsonSchema>
+        return new()
         {
-            ["action"] = QJS.Const(ActionName),
-            ["data"] = new()
-            {
-                Type = JsonSchemaType.Array,
-                MinItems = amount,
-                MaxItems = amount,
-                UniqueItems = true,
-                Items = QJS.Enum(items.Select(c => c.Identifier)),
-            }
-        });
+            Type = JsonSchemaType.Array,
+            MinItems = amount,
+            MaxItems = amount,
+            UniqueItems = true,
+            Items = QJS.Enum(items.Select(c => c.Identifier)),
+        };
     }
 
-    public string ActionName => ActionStrings.MakeChoice;
-
-    bool IAction<IEnumerable<TSelectable>>.Deserialize(Action action, out IEnumerable<TSelectable>? response)
+    public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out IEnumerable<TSelectable>? response)
     {
-        IEnumerable<string?>? cardIdentifiers = action.ActionData?.Values<string>()!;
+        IEnumerable<string?>? cardIdentifiers = data?.Values<string>()!;
         if (cardIdentifiers == null)
         {
             response = null;

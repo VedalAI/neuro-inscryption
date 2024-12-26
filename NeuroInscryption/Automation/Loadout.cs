@@ -5,12 +5,11 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using NeuroInscryption.Automation.API;
+using NeuroInscryption.Communication;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Messages.Outgoing;
-using Action = NeuroInscryption.Communication.Messages.Incoming.Action;
 
 namespace NeuroInscryption.Automation;
 
@@ -41,17 +40,17 @@ internal sealed class Loadout
             decision.AddAction(option.Action);
         }
 
-        Action chosenAction = await decision.SendAsync(ct);
+        await decision.Send(ct);
 
-        InteractableOption chosenOption = Array.Find(options, opt => chosenAction.Match(opt.Action));
-        if (chosenOption == default) chosenAction.ThrowInvalid();
+        InteractableOption chosenOption = Array.Find(options, opt => opt.Action.Matches(decision));
+        if (chosenOption == default) decision.ThrowInvalid();
 
-        Plugin.Logger.LogDebug($"Picked {chosenOption.Interactable} ({chosenOption.Action.ActionName})");
+        Plugin.Logger.LogDebug($"Picked {chosenOption.Interactable} ({chosenOption.Action.Name})");
 
         return chosenOption.Interactable;
     }
 
-    public UniTask<T> Choose<T>(IAction<T> action, Description description, CancellationToken ct = default, object? additionalContext = null)
+    public UniTask<T> Choose<T>(ActionBase<T> action, Description description, CancellationToken ct = default, object? additionalContext = null)
     {
         return Neuro.Common.Choose(action, description, LoadoutState.Calculate(), ct, additionalContext);
     }
