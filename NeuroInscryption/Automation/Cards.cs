@@ -44,7 +44,7 @@ internal sealed class Cards
         CardSingleChoicesSequencer? rerollable = choicer as CardSingleChoicesSequencer;
         MainInputInteractable clover = rerollable != null ? rerollable.rerollInteractable : null!;
         RerollAction rerollAction = new(clover);
-        ChooseAction<SelectableCardData> chooseAction = new(context.Items);
+        ChooseAction<SelectableCardData> chooseAction = new(context.Items, ActionStrings.AddToDeck);
 
         Decision decision = new(DecisionStrings.ChooseCard, state);
         decision.AddAction(chooseAction);

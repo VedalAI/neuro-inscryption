@@ -139,7 +139,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
         }
         else
         {
-            sb.AppendFormat(CardStrings.OnBoardDiscriminator, BoardManager.Instance.playerSlots.FindIndex(slot => slot.Card == TargetCard));
+            sb.AppendFormat(CardStrings.OnBoardDiscriminator, CombatState.LaneIndexBase + BoardManager.Instance.playerSlots.FindIndex(slot => slot.Card == TargetCard));
         }
 
         return sb.ToString();

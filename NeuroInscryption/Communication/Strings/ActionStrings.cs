@@ -9,6 +9,7 @@ public static class ActionStrings
     public const string UseItem = "use_item";
     public const string AcceptSurrender = "accept_surrender";
     public const string EndTurn = "end_turn";
+    public const string AddToDeck = "add_to_deck";
 
     public const string Reroll = "reroll";
     public const string MakeChoice = "make_choice";
