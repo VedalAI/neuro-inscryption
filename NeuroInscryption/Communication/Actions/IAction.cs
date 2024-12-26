@@ -7,6 +7,7 @@ public interface IAction
 {
     bool IsApplicable { get; }
     string Name { get; }
+    string Description { get; }
     JsonSchema? GetDataSchema();
 }
 

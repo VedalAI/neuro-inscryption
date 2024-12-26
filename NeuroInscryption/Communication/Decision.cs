@@ -27,7 +27,7 @@ public sealed class Decision(string query, IGameState state)
 
     public void AddAction(ActionBase action)
     {
-        _actionWindow.AddAction(new DecisionAction(_actionWindow, this, action));
+        _actionWindow.AddAction(new DecisionAction(this, action));
     }
 
     public UniTask Send(CancellationToken ct)
@@ -46,12 +46,11 @@ public sealed class Decision(string query, IGameState state)
         throw new InvalidOperationException($"Received action '{Result.Value.PickedAction}' which did not match possible expected actions.");
     }
 
-    private sealed class DecisionAction(ActionWindow? actionWindow, Decision decision, ActionBase ourAction)
-        : NeuroAction(actionWindow)
+    private sealed class DecisionAction(Decision decision, ActionBase ourAction) : NeuroAction
     {
         public override string Name => ourAction.Name;
-        protected override string Description => null!; // todo
-        public override bool CanBeUsed() => ourAction.IsApplicable;
+        protected override string Description => ourAction.Description;
+        public override bool CanAddToActionWindow(ActionWindow window) => ourAction.IsApplicable;
 
         protected override JsonSchema? Schema => ourAction.GetDataSchema();
         protected override ExecutionResult Validate(ActionJData actionData)
