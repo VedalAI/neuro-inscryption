@@ -2,7 +2,6 @@
 using DiskCardGame;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
-using NeuroInscryption.Utilities.Strings;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
@@ -24,11 +23,11 @@ public sealed class DeckTrialData : IIdentifiable
     {
         Identifier = trial.type switch
         {
-            DeckTrialSequencer.Trial.Type.Wisdom => StringFormatter.Format(TrialStrings.Sigils, trial.threshold),
-            DeckTrialSequencer.Trial.Type.Blood => StringFormatter.Format(TrialStrings.Blood, trial.threshold),
-            DeckTrialSequencer.Trial.Type.Bones => StringFormatter.Format(TrialStrings.Bones, trial.threshold),
-            DeckTrialSequencer.Trial.Type.Power => StringFormatter.Format(TrialStrings.Power, trial.threshold),
-            DeckTrialSequencer.Trial.Type.Health => StringFormatter.Format(TrialStrings.Health, trial.threshold),
+            DeckTrialSequencer.Trial.Type.Wisdom => TrialStrings.Sigils.Format(trial.threshold),
+            DeckTrialSequencer.Trial.Type.Blood => TrialStrings.Blood.Format(trial.threshold),
+            DeckTrialSequencer.Trial.Type.Bones => TrialStrings.Bones.Format(trial.threshold),
+            DeckTrialSequencer.Trial.Type.Power => TrialStrings.Power.Format(trial.threshold),
+            DeckTrialSequencer.Trial.Type.Health => TrialStrings.Health.Format(trial.threshold),
             DeckTrialSequencer.Trial.Type.Kin => TrialStrings.Kin,
             _ => throw new ArgumentOutOfRangeException()
         };

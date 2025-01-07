@@ -7,7 +7,6 @@ using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
-using NeuroInscryption.Utilities.Strings;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
@@ -25,7 +24,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
     public int? TimesSacrificed { get; private set; }
 
     [JsonProperty(Order = 100)]
-    private string? Note => _maybeIjiraq ? StringFormatter.Format(CardStrings.IjiraqNarrowedDown, TargetCardInfo.DisplayedNameEnglish) : null;
+    private string? Note => _maybeIjiraq ? CardStrings.IjiraqNarrowedDown.Format(TargetCardInfo.DisplayedNameEnglish) : null;
 
     // Excluded from JSON
 
@@ -61,7 +60,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             Health = ijiraq.Health;
             Power = ijiraq.Attack.ToString();
             if (TargetCard.Info.BonesCost > 0)
-                Cost = StringFormatter.Format(CardStrings.BonesCost + CardStrings.IjiraqBonesCostSuffix, TargetCard.Info.BonesCost);
+                Cost = CardStrings.IjiraqBonesCost.Format(TargetCard.Info.BonesCost);
             CanBeSacrificed = true;
             Tribes = null;
 
@@ -85,7 +84,7 @@ public sealed class PlayableCardData : CardData, IIdentifiable
 
     public override string GetDescription()
     {
-        return StringFormatter.Format(CardStrings.Description,
+        return CardStrings.Description.Format(
             DisplayName,
             Power,
             Health,
@@ -102,25 +101,25 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             switch (ability)
             {
                 case SpecialTriggeredAbility.Ant:
-                    return PowerStrings.Ant + StringFormatter.Format(PowerStrings.InPlaySuffix, BoardManager.Instance.playerSlots.Count(s => s.Card && s.Card.Info.traits.Contains(Trait.Ant)));
+                    return PowerStrings.Ant + PowerStrings.InPlaySuffix.Format(BoardManager.Instance.playerSlots.Count(s => s.Card && s.Card.Info.traits.Contains(Trait.Ant)));
 
                 case SpecialTriggeredAbility.Lammergeier:
-                    return PowerStrings.Lammergeier + StringFormatter.Format(PowerStrings.LammergeierInPlaySuffix, _state.Bones, _state.Bones / 2);
+                    return PowerStrings.Lammergeier + PowerStrings.LammergeierInPlaySuffix.Format(_state.Bones, _state.Bones / 2);
 
                 case SpecialTriggeredAbility.SacrificesThisTurn:
-                    return PowerStrings.SacrificesThisTurn + StringFormatter.Format(PowerStrings.InPlaySuffix, BoardManager.Instance.SacrificesMadeThisTurn);
+                    return PowerStrings.SacrificesThisTurn + PowerStrings.InPlaySuffix.Format(BoardManager.Instance.SacrificesMadeThisTurn);
 
                 case SpecialTriggeredAbility.Mirror:
                     if (TargetCard.InHand) return PowerStrings.Mirror;
-                    return PowerStrings.Mirror + StringFormatter.Format(PowerStrings.InPlaySuffix, TargetCard.Attack);
+                    return PowerStrings.Mirror + PowerStrings.InPlaySuffix.Format(TargetCard.Attack);
 
                 case SpecialTriggeredAbility.BellProximity:
                     if (TargetCard.InHand) return PowerStrings.BellProximity;
-                    return PowerStrings.BellProximity + StringFormatter.Format(PowerStrings.InPlaySuffix, TargetCard.Attack);
+                    return PowerStrings.BellProximity + PowerStrings.InPlaySuffix.Format(TargetCard.Attack);
 
                 case SpecialTriggeredAbility.CardsInHand:
                     // we can get here from inside the LINQ expression that constructs _state.PlayerHand so it's not available
-                    return PowerStrings.CardsInHand + StringFormatter.Format(PowerStrings.InPlaySuffix, PlayerHand.Instance.CardsInHand.Count);
+                    return PowerStrings.CardsInHand + PowerStrings.InPlaySuffix.Format(PlayerHand.Instance.CardsInHand.Count);
             }
         }
 
@@ -135,11 +134,11 @@ public sealed class PlayableCardData : CardData, IIdentifiable
 
         if (TargetCard.InHand)
         {
-            sb.AppendFormat(CardStrings.GenericDiscriminator, PlayerHand.Instance.CardsInHand.IndexOf(TargetCard));
+            sb.Append(CardStrings.GenericDiscriminator.Format(PlayerHand.Instance.CardsInHand.IndexOf(TargetCard)));
         }
         else
         {
-            sb.AppendFormat(CardStrings.OnBoardDiscriminator, CombatState.LaneIndexBase + BoardManager.Instance.playerSlots.FindIndex(slot => slot.Card == TargetCard));
+            sb.Append(CardStrings.OnBoardDiscriminator.Format(CombatState.LaneIndexBase + BoardManager.Instance.playerSlots.FindIndex(slot => slot.Card == TargetCard)));
         }
 
         return sb.ToString();

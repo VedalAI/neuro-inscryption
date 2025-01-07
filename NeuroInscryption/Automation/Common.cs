@@ -50,7 +50,7 @@ public sealed class Common
     /// <summary>
     /// Send a <see cref="Decision"/> that contains the given <paramref name="action"/> and <paramref name="additionalContext"/> and return the result from the response.
     /// </summary>
-    /// <param name="description">Description to send. This should describe what kind of choice is being made.</param>
+    /// <param name="decisionQuery">Query to send. This should describe what kind of choice is being made.</param>
     /// <param name="additionalContext">
     /// Any additional context to include in the state.
     /// This can be an anonymous object, or you can pass a custom <see cref="ILoadoutContext"/>/<see cref="ICombatContext"/> instead.
@@ -60,7 +60,7 @@ public sealed class Common
     /// or the <see cref="CombatState"/> (if <see langword="false"/>).
     /// </param>
     /// <returns>A result of type <typeparamref name="T"/> that validates the given <paramref name="action"/>'s schema.</returns>
-    public async UniTask<T> Choose<T>(ActionBase<T> action, Description description, IGameState state, CancellationToken ct = default,
+    public async UniTask<T> Choose<T>(ActionBase<T> action, string decisionQuery, IGameState state, CancellationToken ct = default,
         object? additionalContext = null)
     {
         switch (state)
@@ -75,7 +75,7 @@ public sealed class Common
                 throw new ArgumentException($"Invalid state - must be {nameof(LoadoutState)} or {nameof(CombatState)}", nameof(state));
         }
 
-        Decision decision = new(description, state);
+        Decision decision = new(decisionQuery, state);
         decision.AddAction(action);
 
         await decision.Send(ct);
@@ -86,16 +86,16 @@ public sealed class Common
         return result;
     }
 
-    public async UniTask<T> Choose<T>(ActionBase<T> action, Description description, CancellationToken ct = default,
+    public async UniTask<T> Choose<T>(ActionBase<T> action, string decisionQuery, CancellationToken ct = default,
         object? additionalContext = null, bool useLoadoutState = true)
     {
-        return await Choose(action, description,
+        return await Choose(action, decisionQuery,
             useLoadoutState ? LoadoutState.Calculate() : CombatState.Calculate(),
             ct, additionalContext
         );
     }
 
-    public async UniTask<TData> ChooseItem<TData>(IReadOnlyCollection<TData> items, Description description, IGameState state,
+    public async UniTask<TData> ChooseItem<TData>(IReadOnlyCollection<TData> items, string decisionQuery, IGameState state,
         CancellationToken ct = default, object? additionalContext = null)
         where TData : class, IIdentifiable
     {
@@ -107,6 +107,6 @@ public sealed class Common
         object context = additionalContext is ILoadoutContext or ICombatContext ? additionalContext
             : new ItemsContext<TData>(items, additionalContext);
 
-        return await Choose(chooseAction, description, state, ct, context);
+        return await Choose(chooseAction, decisionQuery, state, ct, context);
     }
 }

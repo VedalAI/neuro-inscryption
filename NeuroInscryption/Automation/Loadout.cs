@@ -8,7 +8,6 @@ using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data;
-using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 
 namespace NeuroInscryption.Automation;
@@ -28,13 +27,13 @@ internal sealed class Loadout
             return new InteractableOption(tuple.Action, tuple.Interactable);
         }
     }
-    public async UniTask<InteractableBase> ChooseInteractable(InteractableOption[] options, Description description, IGameState state,
+    public async UniTask<InteractableBase> ChooseInteractable(InteractableOption[] options, string decisionQuery, IGameState state,
         CancellationToken ct = default)
     {
         AutomationManager.Assert(options.Length > 0, "Nothing to pick from");
         if (options.Length == 1) return options[0].Interactable;
 
-        Decision decision = new(description, state);
+        Decision decision = new(decisionQuery, state);
         foreach (InteractableOption option in options)
         {
             decision.AddAction(option.Action);
@@ -50,14 +49,14 @@ internal sealed class Loadout
         return chosenOption.Interactable;
     }
 
-    public UniTask<T> Choose<T>(ActionBase<T> action, Description description, CancellationToken ct = default, object? additionalContext = null)
+    public UniTask<T> Choose<T>(ActionBase<T> action, string decisionQuery, CancellationToken ct = default, object? additionalContext = null)
     {
-        return Neuro.Common.Choose(action, description, LoadoutState.Calculate(), ct, additionalContext);
+        return Neuro.Common.Choose(action, decisionQuery, LoadoutState.Calculate(), ct, additionalContext);
     }
 
-    public UniTask<TData> ChooseItem<TData>(IReadOnlyCollection<TData> items, Description description, CancellationToken ct, object? additionalContext = null)
+    public UniTask<TData> ChooseItem<TData>(IReadOnlyCollection<TData> items, string decisionQuery, CancellationToken ct, object? additionalContext = null)
         where TData : class, IIdentifiable
     {
-        return Neuro.Common.ChooseItem(items, description, LoadoutState.Calculate(), ct, additionalContext);
+        return Neuro.Common.ChooseItem(items, decisionQuery, LoadoutState.Calculate(), ct, additionalContext);
     }
 }

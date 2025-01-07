@@ -45,7 +45,7 @@ public sealed class MycologistsFlow : HarmonyAutomationFlow<IEnumerator>
             List<SelectableCardPairData> pairs = selector.pairs.Select(SelectableCardPairData.Create).ToList();
 
             SelectableCardPairData pair = await Neuro.Loadout.ChooseItem(pairs, DecisionStrings.MycologistsChoosePair, ct);
-            AutomationManager.Assert(pair is {} && pair.Pair, "did not pick pair for mycologists");
+            AutomationManager.Assert(pair?.Pair != null, "did not pick pair for mycologists");
 
             await NeuroMouse.MoveAndClick(pair.Pair, ct);
 

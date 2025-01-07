@@ -2,7 +2,6 @@
 using DiskCardGame;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
-using NeuroInscryption.Utilities.Strings;
 using Newtonsoft.Json;
 
 namespace NeuroInscryption.Communication.Data.Serializable;
@@ -37,7 +36,7 @@ public sealed class SelectableCardData : IIdentifiable
         {
             Card = CardData.Create(card.Info, state);
             CardIdentifier = Card.DisplayName;
-            if (index != -1) CardIdentifier += StringFormatter.Format(CardStrings.GenericDiscriminator, index);
+            if (index != -1) CardIdentifier += CardStrings.GenericDiscriminator.Format(index);
 
             Identifier = CardIdentifier;
             return;
@@ -50,7 +49,7 @@ public sealed class SelectableCardData : IIdentifiable
         {
             Card = CardData.Create(selectable.ChoiceInfo.CardInfo);
             CardIdentifier = Card.DisplayName;
-            if (index != -1) CardIdentifier += StringFormatter.Format(CardStrings.GenericDiscriminator, index);
+            if (index != -1) CardIdentifier += CardStrings.GenericDiscriminator.Format(index);
 
             Identifier = CardIdentifier;
         }
@@ -62,8 +61,8 @@ public sealed class SelectableCardData : IIdentifiable
         {
             Identifier = Cost = selectable.ChoiceInfo.resourceType switch
             {
-                ResourceType.Blood => StringFormatter.Format(CardStrings.BloodCost, selectable.ChoiceInfo.resourceAmount),
-                ResourceType.Bone => StringFormatter.Format(CardStrings.BonesCost, "random amount of"),
+                ResourceType.Blood => CardStrings.BloodCost.Format(selectable.ChoiceInfo.resourceAmount),
+                ResourceType.Bone => CardStrings.BonesCost.Format("random amount of"),
                 ResourceType.None => throw new InvalidOperationException("Cannot create SelectableCardData for uninitialized CardChoice"),
                 _ => throw new ArgumentOutOfRangeException()
             };

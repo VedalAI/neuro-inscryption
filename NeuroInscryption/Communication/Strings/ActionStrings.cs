@@ -1,4 +1,6 @@
-﻿namespace NeuroInscryption.Communication.Strings;
+﻿using NeuroInscryption.Utilities.Strings;
+
+namespace NeuroInscryption.Communication.Strings;
 
 public static class ActionStrings
 {
@@ -19,5 +21,5 @@ public static class ActionStrings
     public const string BreakBoulder = "choose_boulder_to_break";
     public const string BuyTrapperItem = "buy_item";
 
-    public const string PathDiscriminator = " ({0})";
+    public static readonly FormatString PathDiscriminator = " ({0})";
 }

@@ -6,7 +6,6 @@ using DiskCardGame;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Actions.Combat;
 using NeuroInscryption.Communication.Data;
-using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
 using Newtonsoft.Json;
@@ -42,17 +41,17 @@ public sealed class Combat
         return await Choose(drawCardAction, DecisionStrings.DrawCard, ct, includeDeck: true);
     }
 
-    public UniTask<T> Choose<T>(ActionBase<T> action, Description description, CancellationToken ct = default, object? additionalContext = null, bool? includeDeck = null)
+    public UniTask<T> Choose<T>(ActionBase<T> action, string decisionQuery, CancellationToken ct = default, object? additionalContext = null, bool? includeDeck = null)
     {
         if (includeDeck.HasValue)
         {
             ICombatContext combatContext = additionalContext as ICombatContext ?? new Common.ContextBase(additionalContext);
             additionalContext = new IncludeDeckOverride(includeDeck.Value, combatContext);
         }
-        return Neuro.Common.Choose(action, description, CombatState.Calculate(), ct, additionalContext);
+        return Neuro.Common.Choose(action, decisionQuery, CombatState.Calculate(), ct, additionalContext);
     }
 
-    public UniTask<TData> ChooseItem<TData>(IReadOnlyCollection<TData> items, Description description, CancellationToken ct = default,
+    public UniTask<TData> ChooseItem<TData>(IReadOnlyCollection<TData> items, string decisionQuery, CancellationToken ct = default,
         object? additionalContext = null, bool? includeDeck = null)
         where TData : class, IIdentifiable
     {
@@ -61,6 +60,6 @@ public sealed class Combat
             ICombatContext combatContext = additionalContext as ICombatContext ?? new Common.ContextBase(additionalContext);
             additionalContext = new IncludeDeckOverride(includeDeck.Value, combatContext);
         }
-        return Neuro.Common.ChooseItem(items, description, CombatState.Calculate(), ct, additionalContext);
+        return Neuro.Common.ChooseItem(items, decisionQuery, CombatState.Calculate(), ct, additionalContext);
     }
 }

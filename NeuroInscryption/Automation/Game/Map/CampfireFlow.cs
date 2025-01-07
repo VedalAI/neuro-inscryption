@@ -5,7 +5,6 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Map;
-using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
@@ -61,8 +60,8 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
                 msDelayAfterClick: 300); // there's a WaitForSeconds(0.25f) before stats are actually applied
         }
 
-        Description desc = !RunState.Run.survivorsDead ? DecisionStrings.CampfireRiskUpgrade : DecisionStrings.CampfireNoRiskUpgrade;
-        bool doSecondUpgrade = await Neuro.Loadout.Choose(new CampfireSecondUpgradeAction(), desc, ct);
+        string decisionQuery = !RunState.Run.survivorsDead ? DecisionStrings.CampfireRiskUpgrade : DecisionStrings.CampfireNoRiskUpgrade;
+        bool doSecondUpgrade = await Neuro.Loadout.Choose(new CampfireSecondUpgradeAction(), decisionQuery, ct);
         InteractableBase chosenButton = doSecondUpgrade ? instance.confirmStone : instance.retrieveCardInteractable;
 
         await UniTask.WaitUntil(() => instance.confirmStone.Enabled, cancellationToken: ct);

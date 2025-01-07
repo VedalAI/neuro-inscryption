@@ -7,7 +7,6 @@ using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions.Combat;
-using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
@@ -38,8 +37,8 @@ public sealed class ChooseSacrificesFlow : HarmonyAutomationFlow<IEnumerator>
 
             SacrificeAction sacrificeAction = new(card, state.PlayerLanes);
 
-            Description decisionString = DecisionStrings.ChooseSacrifices.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
-            IEnumerable<PlayableCardData> sacrifices = await Neuro.Combat.Choose(sacrificeAction, decisionString, ct);
+            string decisionQuery = DecisionStrings.ChooseSacrifices.Format(state.PlayerHand.First(c => c.TargetCard == card).GetDescription());
+            IEnumerable<PlayableCardData> sacrifices = await Neuro.Combat.Choose(sacrificeAction, decisionQuery, ct);
 
             foreach (PlayableCardData sacrifice in sacrifices)
             {

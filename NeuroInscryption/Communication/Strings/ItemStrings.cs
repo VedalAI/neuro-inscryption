@@ -27,6 +27,6 @@ public static class ItemStrings
         string info = _descriptionOverrides.TryGetValue(data.name, out string overrideDesc)
             ? overrideDesc
             : data.rulebookDescription.ParseDescription();
-        return new(data.rulebookName, info);
+        return new Description(data.rulebookName, info);
     }
 }

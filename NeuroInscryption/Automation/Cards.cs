@@ -82,7 +82,7 @@ internal sealed class Cards
     /// <summary>
     /// Pick a card from the given <paramref name="cards"/> in the <see cref="LoadoutState">loadout context</see>.
     /// </summary>
-    /// <param name="description">Description to send. This should describe what kind of choice is being made.</param>
+    /// <param name="decisionQuery">Query to send. This should describe what kind of choice is being made.</param>
     /// <param name="additionalContext">Any additional context to include in the state. This can be an anonymous object.</param>
     /// <example>
     /// <code>
@@ -92,7 +92,7 @@ internal sealed class Cards
     /// );
     /// </code>
     /// </example>
-    public async UniTask<Card> ChooseCardLoadout(IReadOnlyCollection<SelectableCard> cards, Description description, CancellationToken ct = default, object? additionalContext = null)
+    public async UniTask<Card> ChooseCardLoadout(IReadOnlyCollection<SelectableCard> cards, string decisionQuery, CancellationToken ct = default, object? additionalContext = null)
     {
         AutomationManager.Assert(cards.Count > 0, "Nothing to pick from");
 
@@ -101,11 +101,11 @@ internal sealed class Cards
         if (cards.Count == 1) return cards.First();
 
         List<SelectableCardData> data = cards.Select(SelectableCardData.Create).ToList();
-        SelectableCardData selected = await Neuro.Loadout.ChooseItem(data, description, ct, additionalContext);
+        SelectableCardData selected = await Neuro.Loadout.ChooseItem(data, decisionQuery, ct, additionalContext);
         return selected.TargetCard;
     }
 
-    public async UniTask<Card> SelectCardFromDeck(SelectCardFromDeckSlot slot, Description description, CancellationToken ct = default,
+    public async UniTask<Card> SelectCardFromDeck(SelectCardFromDeckSlot slot, string decisionQuery, CancellationToken ct = default,
         Func<SelectableCard, bool>? filter = null, object? additionalContext = null,
         float cardPileSpawnTimeMultiplier = 1f, float cardPileDespawnTimeMultiplier = 0.5f)
     {
@@ -119,11 +119,11 @@ internal sealed class Cards
         }
 
         List<SelectableCard> cards = slot.cardSelector.displayedCards;
-        if (filter is { }) cards = cards.Where(filter).ToList();
+        if (filter is not null) cards = cards.Where(filter).ToList();
 
-        AutomationManager.Assert(cards.Count > 0, "No selectable cards found" + (filter is { } ? ", check filter" : ""));
+        AutomationManager.Assert(cards.Count > 0, "No selectable cards found" + (filter is not null ? ", check filter" : ""));
 
-        Card card = await Neuro.Cards.ChooseCardLoadout(cards, description, ct, additionalContext);
+        Card card = await Neuro.Cards.ChooseCardLoadout(cards, decisionQuery, ct, additionalContext);
         await NeuroMouse.MoveAndClick(card, ct,
             msDelayAfterClick: Mathf.CeilToInt(Wait.CardPileFullSpawnTimeMs * cardPileDespawnTimeMultiplier));
 

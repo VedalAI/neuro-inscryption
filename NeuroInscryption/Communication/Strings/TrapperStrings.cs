@@ -1,10 +1,11 @@
 ﻿using NeuroInscryption.Communication.Data.Describable;
+using NeuroInscryption.Utilities.Strings;
 
 namespace NeuroInscryption.Communication.Strings;
 
 public static class TrapperStrings
 {
-    public const string TeethCost = "{0} {0:tooth|teeth}";
+    public static readonly FormatString TeethCost = "{0} {0:tooth|teeth}";
 
     public static readonly Description RabbitPelt = ("Rabbit Pelt", "A pelt card with 1 health and 0 power. Can be traded at the Trader for a regular card.");
     public static readonly Description WolfPelt = ("Wolf Pelt", "A pelt card with 2 health and 0 power. Can be traded at the Trader for a regular card with 1 additional sigil.");

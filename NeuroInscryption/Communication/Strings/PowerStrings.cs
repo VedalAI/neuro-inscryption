@@ -1,4 +1,6 @@
-﻿namespace NeuroInscryption.Communication.Strings;
+﻿using NeuroInscryption.Utilities.Strings;
+
+namespace NeuroInscryption.Communication.Strings;
 
 public static class PowerStrings
 {
@@ -9,6 +11,6 @@ public static class PowerStrings
     public const string BellProximity = "Grows from 1 to 4 the closer this card is to the bell (which is left of lane 1). Additionally, gains 1 power for every adjacent Chime.";
     public const string CardsInHand = "Equal to the number of cards in your hand";
 
-    public const string InPlaySuffix = " (currently {0})";
-    public const string LammergeierInPlaySuffix = " (currently {0} bones, meaning {1} damage)";
+    public static readonly FormatString InPlaySuffix = " (currently {0})";
+    public static readonly FormatString LammergeierInPlaySuffix = " (currently {0} bones, meaning {1} damage)";
 }

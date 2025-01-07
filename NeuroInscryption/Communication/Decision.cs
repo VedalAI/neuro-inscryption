@@ -4,7 +4,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions;
-using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroSdk.Actions;
 using NeuroSdk.Json;
@@ -15,7 +14,8 @@ using Newtonsoft.Json.Linq;
 namespace NeuroInscryption.Communication;
 
 public record struct DecisionResult(string PickedAction, JToken? Data);
-public sealed class Decision(string id, IGameState state, string query)
+
+public sealed class Decision(string query, IGameState state)
 {
     private readonly ActionWindow _actionWindow = ActionWindow.Create(Plugin.PluginObject); // scuff?
 
@@ -24,11 +24,6 @@ public sealed class Decision(string id, IGameState state, string query)
     private UniTaskCompletionSource _tcs = new();
     public float Timeout { get; init; } = 1; // short for randy; todo
     public bool IsEphemeral { get; init; } // todo
-
-    public Decision(Description decisionDescription, IGameState state)
-        : this(decisionDescription.Name, state, decisionDescription.Info)
-    {
-    }
 
     public void AddAction(ActionBase action)
     {
@@ -81,7 +76,7 @@ public sealed class Decision(string id, IGameState state, string query)
             }
             finally
             {
-                decision._tcs = new();
+                decision._tcs = new UniTaskCompletionSource();
             }
             return UniTask.CompletedTask;
         }

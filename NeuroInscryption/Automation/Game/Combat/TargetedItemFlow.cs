@@ -6,7 +6,6 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
@@ -43,9 +42,9 @@ public class TargetedItemFlow : HarmonyAutomationFlow<IEnumerator>
         }
 
         List<SelectableCardData> validTargetCards = validSlots.Select(slot => SelectableCardData.Create(slot.Card, slot.Index)).ToList();
-        Description description = DecisionStrings.ChooseItemTarget.Format(itemData.Identifier);
+        string decisionQuery = DecisionStrings.ChooseItemTarget.Format(itemData.Identifier);
 
-        SelectableCardData card = await Neuro.Combat.ChooseItem(validTargetCards, description, ct, includeDeck: false);
+        SelectableCardData card = await Neuro.Combat.ChooseItem(validTargetCards, decisionQuery, ct, includeDeck: false);
 
         await NeuroMouse.MoveAndClick(card.TargetCard, ct);
     }

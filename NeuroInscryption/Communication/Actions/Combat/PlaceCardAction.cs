@@ -12,7 +12,7 @@ namespace NeuroInscryption.Communication.Actions.Combat;
 public sealed class PlaceCardAction(IReadOnlyCollection<CardSlot> playerLanes)
     : ActionBase<int>(ActionStrings.PlaceCard)
 {
-    public override JsonSchema? GetDataSchema()
+    public override JsonSchema GetDataSchema()
     {
         return QJS.Enum(playerLanes.WithIndex()
             .Where(pair => pair.item.Card == null)

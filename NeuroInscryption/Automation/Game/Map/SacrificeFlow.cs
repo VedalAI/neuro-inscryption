@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication.Data.Describable;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
@@ -73,8 +72,8 @@ public sealed class SacrificeFlow : HarmonyAutomationFlow<IEnumerator>
         // alternatively,
         // AutomationManager.Assert(sac, "Should have picked a sacrifice by this point");
 
-        Description desc = DecisionStrings.SacrificeEmpower.Format(CardData.Create(sac.Info).GetDescription());
-        Card host = await Neuro.Cards.SelectCardFromDeck(instance.hostSlot, desc, ct);
+        string decisionQuery = DecisionStrings.SacrificeEmpower.Format(CardData.Create(sac.Info).GetDescription());
+        Card host = await Neuro.Cards.SelectCardFromDeck(instance.hostSlot, decisionQuery, ct);
         AutomationManager.Assert(host, "did not pick host");
         return host;
     }

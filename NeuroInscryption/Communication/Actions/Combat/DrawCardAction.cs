@@ -8,7 +8,7 @@ namespace NeuroInscryption.Communication.Actions.Combat;
 public sealed class DrawCardAction(bool mainDeckEmpty, bool sideDeckEmpty)
     : ActionBase<bool>(ActionStrings.DrawCard)
 {
-    public override JsonSchema? GetDataSchema()
+    public override JsonSchema GetDataSchema()
     {
         List<string> values = [];
         if (!mainDeckEmpty) values.Add("Random");
