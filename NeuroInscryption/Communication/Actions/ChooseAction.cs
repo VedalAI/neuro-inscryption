@@ -15,7 +15,7 @@ public sealed class ChooseAction<T>(IEnumerable<T> items, string name = ActionSt
 
     public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out T? response)
     {
-        string? identifier = data?.Value<string>();
+        string? identifier = data?.Value<string>("choice");
         if (identifier == null)
         {
             response = null;
@@ -26,5 +26,16 @@ public sealed class ChooseAction<T>(IEnumerable<T> items, string name = ActionSt
         return response != null;
     }
 
-    public override JsonSchema GetDataSchema() => QJS.Enum(items.Select(item => item.Identifier).Distinct());
+    public override JsonSchema GetDataSchema()
+    {
+        return new JsonSchema
+        {
+            Type = JsonSchemaType.Object,
+            Properties = new Dictionary<string, JsonSchema>
+            {
+                ["choice"] = QJS.Enum(items.Select(item => item.Identifier).Distinct()),
+            },
+            Required = ["choice"],
+        };
+    }
 }

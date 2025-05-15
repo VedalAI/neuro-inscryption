@@ -1,4 +1,5 @@
-﻿using NeuroInscryption.Communication.Strings;
+﻿using System.Collections.Generic;
+using NeuroInscryption.Communication.Strings;
 using NeuroSdk.Json;
 using Newtonsoft.Json.Linq;
 
@@ -8,10 +9,21 @@ public sealed class CampfireSecondUpgradeAction() : ActionBase<bool>(ActionStrin
 {
     public override bool TryDeserialize(JToken? data, out bool response)
     {
-        bool? value = data?.Value<bool>();
+        bool? value = data?.Value<bool>("wantSecondUpgrade");
         response = value ?? false;
         return value.HasValue;
     }
 
-    public override JsonSchema GetDataSchema() => new JsonSchema { Type = JsonSchemaType.Boolean };
+    public override JsonSchema GetDataSchema()
+    {
+        return new JsonSchema
+        {
+            Type = JsonSchemaType.Object,
+            Properties = new Dictionary<string, JsonSchema>
+            {
+                ["wantSecondUpgrade"] = QJS.Type(JsonSchemaType.Boolean)
+            },
+            Required = ["wantSecondUpgrade"],
+        };
+    }
 }

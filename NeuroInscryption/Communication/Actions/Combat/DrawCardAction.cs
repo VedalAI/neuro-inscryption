@@ -10,15 +10,24 @@ public sealed class DrawCardAction(bool mainDeckEmpty, bool sideDeckEmpty)
 {
     public override JsonSchema GetDataSchema()
     {
-        List<string> values = [];
-        if (!mainDeckEmpty) values.Add("Random");
-        if (!sideDeckEmpty) values.Add("Squirrel");
-        return QJS.Enum(values);
+        List<string> decks = [];
+        if (!mainDeckEmpty) decks.Add("Random");
+        if (!sideDeckEmpty) decks.Add("Squirrel");
+
+        return new JsonSchema
+        {
+            Type = JsonSchemaType.Object,
+            Properties = new Dictionary<string, JsonSchema>
+            {
+                ["deck"] = QJS.Enum(decks),
+            },
+            Required = ["deck"]
+        };
     }
 
     public override bool TryDeserialize(JToken? data, out bool drawFromSideDeck)
     {
-        string? strResponse = data?.Value<string>();
+        string? strResponse = data?.Value<string>("deck");
 
         switch (strResponse)
         {
