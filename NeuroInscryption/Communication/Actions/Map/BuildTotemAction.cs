@@ -27,9 +27,9 @@ public sealed class BuildTotemAction(IEnumerable<TotemPieceData> pieces) : Actio
 
     public override bool TryDeserialize(JToken? data, out Response response)
     {
-        string? tribe = data?.Value<string>("tribe");
-        string? sigil = data?.Value<string>("sigil");
-        if (tribe == null || sigil == null)
+        if (!data.TryValue(out string? tribe, "tribe")
+            || !data.TryValue(out string? sigil, "sigil")
+            || tribe == null || sigil == null)
         {
             response = default;
             return false;

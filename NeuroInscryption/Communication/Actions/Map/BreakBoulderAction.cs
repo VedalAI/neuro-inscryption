@@ -1,4 +1,5 @@
 ﻿using NeuroInscryption.Communication.Strings;
+using NeuroInscryption.Utilities;
 using NeuroSdk.Json;
 using Newtonsoft.Json.Linq;
 
@@ -18,14 +19,13 @@ public sealed class BreakBoulderAction() : ActionBase<int>(ActionStrings.BreakBo
 
     public override bool TryDeserialize(JToken? data, out int response)
     {
-        int boulder = data?.Value<int>() ?? -1;
-        if (boulder is < 1 or > 3)
+        if (!data.TryValue(out int? boulder) || boulder is null or < 1 or > 3)
         {
             response = -1;
             return false;
         }
 
-        response = boulder;
+        response = boulder.Value;
         return true;
     }
 }

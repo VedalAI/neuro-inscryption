@@ -30,6 +30,11 @@ public sealed class Decision(string query, IGameState state)
         _actionWindow.AddAction(new DecisionAction(this, action));
     }
 
+    public void AddAction<T>(ActionBase<T> action)
+    {
+        _actionWindow.AddAction(new DecisionAction<T>(this, action));
+    }
+
     public UniTask Send(CancellationToken ct)
     {
         // todo: better state representation
@@ -46,7 +51,7 @@ public sealed class Decision(string query, IGameState state)
         throw new InvalidOperationException($"Received action '{Result.Value.PickedAction}' which did not match possible expected actions.");
     }
 
-    private sealed class DecisionAction(Decision decision, ActionBase ourAction) : NeuroAction
+    private class DecisionAction(Decision decision, ActionBase ourAction) : NeuroAction
     {
         public override string Name => ourAction.Name;
         protected override string Description => ourAction.Description;
@@ -60,9 +65,9 @@ public sealed class Decision(string query, IGameState state)
                 decision.Result = new(Name, actionData.Data);
                 return ExecutionResult.Success();
             }
-            catch
+            catch (Exception e)
             {
-                return ExecutionResult.Failure("Something went wrong."); // placeholder
+                return ExecutionResult.Failure("Something went wrong." + e); // placeholder
             }
         }
 
@@ -81,4 +86,24 @@ public sealed class Decision(string query, IGameState state)
         }
     }
 
+    private sealed class DecisionAction<T>(Decision decision, ActionBase<T> ourAction) : DecisionAction(decision, ourAction)
+    {
+        private readonly Decision _decision = decision;
+        protected override ExecutionResult Validate(ActionJData actionData)
+        {
+            try
+            {
+                _decision.Result = new(Name, actionData.Data);
+                // ISSUE: the data is deserialized again later in the action itself (ActionBase<T>.TryDeserialize)
+                // as it is, it's just a small perf hit - would need a big refactor to actually fix
+                if (ourAction.Matches(_decision, out _))
+                    return ExecutionResult.Success();
+                return ExecutionResult.Failure("Failed to deserialize action data. Please check that the data conforms to the given schema.");
+            }
+            catch (Exception e)
+            {
+                return ExecutionResult.Failure("Something went wrong: " + e); // placeholder
+            }
+        }
+    }
 }
