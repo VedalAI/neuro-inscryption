@@ -4,3 +4,5 @@ This mod allows [Neuro-sama](https://twitch.tv/vedal987) to play Inscryption by 
 ### Credits
 Developed by AlexejheroDev and Govorunb.  
 Additional prompts by Amarok_24 and ErinYeet_.
+
+<!-- a -->
