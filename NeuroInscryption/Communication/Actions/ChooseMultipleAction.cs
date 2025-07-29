@@ -41,8 +41,8 @@ public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> i
             response = null;
             return false;
         }
-        
-        HashSet<string?> uniqueIdentifiers = cardIdentifiers.ToHashSet();
+
+        HashSet<string?> uniqueIdentifiers = new(cardIdentifiers);
         if (uniqueIdentifiers.Count != amount || uniqueIdentifiers.Any(i => i == null))
         {
             response = null;

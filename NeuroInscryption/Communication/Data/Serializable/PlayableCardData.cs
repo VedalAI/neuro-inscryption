@@ -26,6 +26,9 @@ public sealed class PlayableCardData : CardData, IIdentifiable
 
     [JsonProperty(Order = 90)]
     public string? MoveDirection { get; private set; }
+    
+    [JsonProperty(Order = 95)]
+    public string? Warning { get; private set; }
 
     [JsonProperty(Order = 100)]
     private string? Note => _maybeIjiraq ? CardStrings.IjiraqNarrowedDown.Format(TargetCardInfo.DisplayedNameEnglish) : null;
@@ -69,6 +72,11 @@ public sealed class PlayableCardData : CardData, IIdentifiable
             foundStrafe = true;
             
             MoveDirection = strafe.movingLeft ? SigilStrings.MovingLeft : SigilStrings.MovingRight;
+        }
+
+        if (((PaperCardAnimationController) TargetCard.Anim).fishHookMarker.gameObject.activeSelf)
+        {
+            Warning = BossStrings.AnglerHookTarget;
         }
 
         if (_state.Ijiraq.ExposableIjiraqs.Contains(TargetCard))
