@@ -80,13 +80,7 @@ public sealed class Common
 
         await decision.Send(ct);
 
-        if (!action.Matches(decision, out T? result))
-        {
-            if (action.Matches(decision))
-                decision.ThrowInvalid();
-            else
-                throw new InvalidOperationException($"Failed to deserialize action data in {action.Name} - and it passed SDK validation earlier! Good luck debugging this."); // not reachable afaik
-        }
+        if (!action.Matches(decision, out T? result)) decision.ThrowInvalid();
 
         Plugin.Logger.LogDebug($"Picked {(result is IIdentifiable id ? id.Identifier : result.ToString())}");
         return result;

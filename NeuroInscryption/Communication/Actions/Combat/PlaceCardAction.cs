@@ -21,12 +21,8 @@ public sealed class PlaceCardAction(IReadOnlyCollection<CardSlot> playerLanes)
 
     public override bool TryDeserialize(JToken? data, out int response)
     {
-        if (!data.TryValue(out int? resp) || !resp.HasValue)
-        {
-            response = default;
-            return false;
-        }
-        response = resp.Value - CombatState.LaneIndexBase;
-        return true;
+        int? result = data?.Value<int>();
+        response = result.HasValue ? result.Value - CombatState.LaneIndexBase : default;
+        return result.HasValue;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using NeuroInscryption.Communication.Strings;
-using NeuroInscryption.Utilities;
 using NeuroSdk.Json;
 using Newtonsoft.Json.Linq;
 
@@ -19,11 +18,7 @@ public sealed class DrawCardAction(bool mainDeckEmpty, bool sideDeckEmpty)
 
     public override bool TryDeserialize(JToken? data, out bool drawFromSideDeck)
     {
-        if (!data.TryValue(out string? strResponse))
-        {
-            drawFromSideDeck = false;
-            return false;
-        }
+        string? strResponse = data?.Value<string>();
 
         switch (strResponse)
         {

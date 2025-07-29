@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Strings;
-using NeuroInscryption.Utilities;
 using NeuroSdk.Json;
 using Newtonsoft.Json.Linq;
 
@@ -16,7 +15,8 @@ public sealed class ChooseAction<T>(IEnumerable<T> items, string name = ActionSt
 
     public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out T? response)
     {
-        if (!data.TryValue(out string? identifier) || identifier is null)
+        string? identifier = data?.Value<string>();
+        if (identifier == null)
         {
             response = null;
             return false;

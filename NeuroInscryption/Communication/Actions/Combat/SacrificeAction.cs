@@ -48,19 +48,14 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary
 
     public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out IEnumerable<PlayableCardData>? response)
     {
-        if (!data.TryValue<string>(out var cardsString) || cardsString is null)
+        IEnumerable<string?>? cardIdentifiers = data?.Value<string>()?.Split([", "], StringSplitOptions.None);
+        if (cardIdentifiers == null)
         {
             response = null;
             return false;
         }
-        string[] cardIdentifiers = cardsString.Split([", "], StringSplitOptions.None);
 
-        PlayableCardData[] responseArr = cardIdentifiers
-            .Select(id => playerLanes.Values.First(c => c?.Identifier == id)!)
-            .ToArray();
-        response = responseArr;
-        // additional check to catch models trying to get funny with the output
-        // e.g. "Squirrel (1), Squirrel (2), and my favourite - Adder (4)!" only matches 2/3 sacrifices and would hang
-        return cardIdentifiers.Length == responseArr.Length;
+        response = cardIdentifiers.Select(id => playerLanes.Values.First(c => c?.Identifier == id)!);
+        return true;
     }
 }
