@@ -40,7 +40,7 @@ public sealed class AutomationManager : Singlyboi<AutomationManager>
             }
             else
             {
-                FlowRunner.RestartLastFlow();
+                FlowRunner.RestartLastFlow(false);
             }
             _allowManualInput = value;
             InfoUI.SetManualInputActive(value);

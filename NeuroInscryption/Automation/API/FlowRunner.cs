@@ -18,7 +18,7 @@ public sealed class FlowRunner
     public void StartFlow(IAutomationFlow flow, object context)
     {
         QueueFlow(flow, context);
-        RestartLastFlow();
+        RestartLastFlow(false);
     }
 
     public void CancelCurrentFlowForManualInput()
@@ -64,11 +64,11 @@ public sealed class FlowRunner
         _currentContext = context;
     }
 
-    public void RestartLastFlow()
+    public void RestartLastFlow(bool force)
     {
         if (_currentFlow == null) return;
 
-        if (_cts?.IsCancellationRequested == false)
+        if (_cts?.IsCancellationRequested == false && !force)
         {
             if (_currentFlow.FlowsBlockedForInterruption.Contains(_currentFlow.GetType()))
             {
@@ -117,7 +117,7 @@ public sealed class FlowRunner
         {
             Plugin.Logger.LogError($"Caught exception while executing flow {flowToExecute.FlowName}. Flow will be restarted");
             Plugin.Logger.LogError(e);
-            RestartLastFlow();
+            RestartLastFlow(true);
         }
     }
 }
