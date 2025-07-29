@@ -34,5 +34,14 @@ public sealed class RunEndScreenFlow : HarmonyAutomationFlow<AscensionRunEndScre
 
         MainInputInteractable backButton = screen.screenInteractables.Find(i => i.name == "BackButton");
         await NeuroMouse.MoveAndClick(backButton, ct, 500);
+
+        await NeuroMouse.Click(700, ct);
+        await NeuroMouse.Click(700, ct);
+        await NeuroMouse.Click(700, ct);
+        await NeuroMouse.Click(700, ct);
+        await NeuroMouse.Click(700, ct);
+        await NeuroMouse.Click(700, ct);
+        await NeuroMouse.Click(700, ct);
+        await NeuroMouse.Click(700, ct);
     }
 }

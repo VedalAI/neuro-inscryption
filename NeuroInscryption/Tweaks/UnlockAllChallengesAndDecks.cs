@@ -1,4 +1,4 @@
-﻿#if DEBUG
+﻿#if DEBUG && FALSE
 using System.Linq;
 using DiskCardGame;
 using HarmonyLib;
