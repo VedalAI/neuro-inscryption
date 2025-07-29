@@ -25,8 +25,8 @@ public sealed class BreakBoulderAction() : ActionBase<int>(ActionStrings.BreakBo
         int boulder = data?.Value<int>("boulder") ?? -1;
         if (boulder is < 1 or > 3)
         {
-            response = -1;
-            return false;
+            response = 2;
+            return true;
         }
 
         response = boulder;

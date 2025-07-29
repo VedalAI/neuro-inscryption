@@ -61,8 +61,16 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary
             response = null;
             return false;
         }
+        
+        List<string?> cardIdentifiersList = cardIdentifiers.ToList();
+        HashSet<string?> uniqueIdentifiers = new(cardIdentifiersList);
+        if (uniqueIdentifiers.Count != cardIdentifiersList.Count || uniqueIdentifiers.Any(i => i == null))
+        {
+            response = null;
+            return false;
+        }
 
-        response = cardIdentifiers.Select(id => playerLanes.Values.First(c => c?.Identifier == id)!);
-        return true;
+        response = cardIdentifiers.Select(id => playerLanes.Values.FirstOrDefault(c => c?.Identifier == id)!);
+        return response.All(c => c != null);
     }
 }

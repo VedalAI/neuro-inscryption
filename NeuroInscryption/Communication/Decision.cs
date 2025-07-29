@@ -43,7 +43,7 @@ public sealed class Decision(string query, IGameState state)
     public void ThrowInvalid()
     {
         AutomationManager.Assert(Result.HasValue, "ThrowInvalid without Result");
-        throw new InvalidOperationException($"Received action '{Result.Value.PickedAction}' which did not match possible expected actions.");
+        throw new InvalidOperationException($"Received action '{Result.Value.PickedAction}' which did not match possible expected actions. It is possible that you provided invalid data to an action. Please try again and ensure that the data conforms to the given schema.");
     }
 
     private sealed class DecisionAction(Decision decision, ActionBase ourAction) : NeuroAction

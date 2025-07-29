@@ -36,8 +36,13 @@ public sealed class BuildTotemAction(IEnumerable<TotemPieceData> pieces) : Actio
             return false;
         }
 
-        TotemPieceData top = pieces.Single(p => p.Tribe == tribe);
-        TotemPieceData bottom = pieces.Single(p => p.SigilName == sigil);
+        TotemPieceData? top = pieces.SingleOrDefault(p => p.Tribe == tribe);
+        TotemPieceData? bottom = pieces.SingleOrDefault(p => p.SigilName == sigil);
+        if (top == null || bottom == null)
+        {
+            response = default;
+            return false;
+        }
 
         response = new Response(top, bottom);
         return true;

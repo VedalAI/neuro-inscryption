@@ -21,7 +21,7 @@ public sealed class PlaceCardAction(IReadOnlyCollection<CardSlot> playerLanes)
             {
                 ["lane"] = QJS.Enum(playerLanes.WithIndex()
                     .Where(pair => pair.item.Card == null)
-                    .Select(pair => CombatState.LaneIndexBase + pair.index))
+                    .Select(pair => pair.index + CombatState.LaneIndexBase))
             },
             Required = ["lane"]
         };
@@ -30,7 +30,13 @@ public sealed class PlaceCardAction(IReadOnlyCollection<CardSlot> playerLanes)
     public override bool TryDeserialize(JToken? data, out int response)
     {
         int? result = data?.Value<int>("lane");
-        response = result.HasValue ? result.Value - CombatState.LaneIndexBase : 0;
-        return result.HasValue;
+        if (!result.HasValue)
+        {
+            response = 0;
+            return false;
+        }
+        
+        response = result.Value - CombatState.LaneIndexBase;
+        return playerLanes.WithIndex().Where(pair => pair.item.Card == null).Any(pair => pair.index == result.Value);
     }
 }

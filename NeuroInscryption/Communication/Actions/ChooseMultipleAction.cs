@@ -49,7 +49,7 @@ public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> i
             return false;
         }
 
-        response = uniqueIdentifiers.Select(id => items.First(c => c?.Identifier == id));
-        return true;
+        response = uniqueIdentifiers.Select(id => items.FirstOrDefault(c => c?.Identifier == id));
+        return response.All(c => c != null);
     }
 }
