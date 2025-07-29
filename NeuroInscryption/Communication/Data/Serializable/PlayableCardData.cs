@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,9 @@ public sealed class PlayableCardData : CardData, IIdentifiable
 
     [JsonProperty(Order = 51)]
     public int? TimesSacrificed { get; private set; }
+
+    [JsonProperty(Order = 90)]
+    public string? MoveDirection { get; private set; }
 
     [JsonProperty(Order = 100)]
     private string? Note => _maybeIjiraq ? CardStrings.IjiraqNarrowedDown.Format(TargetCardInfo.DisplayedNameEnglish) : null;
@@ -50,6 +54,22 @@ public sealed class PlayableCardData : CardData, IIdentifiable
 
         if (TargetCard.TryGetSpecialAbility(SpecialTriggeredAbility.Cat, out Cat? cat)) TimesSacrificed = cat.sacrificeCount;
         if (TargetCard.TryGetSpecialAbility(SpecialTriggeredAbility.JerseyDevil, out JerseyDevil? child13)) TimesSacrificed = child13.sacrificeCount;
+
+        bool foundStrafe = false;
+        foreach ((Ability ability, AbilityBehaviour? behaviour) in TargetCard.TriggerHandler.triggeredAbilities)
+        {
+            if (ability is not Ability.Strafe and not Ability.StrafePush and not Ability.StrafeSwap) continue;
+            if (behaviour is not Strafe strafe) continue;
+            
+            if (foundStrafe)
+            {
+                MoveDirection = SigilStrings.MultipleMoveSigils;
+                break;
+            }
+            foundStrafe = true;
+            
+            MoveDirection = strafe.movingLeft ? SigilStrings.MovingLeft : SigilStrings.MovingRight;
+        }
 
         if (_state.Ijiraq.ExposableIjiraqs.Contains(TargetCard))
         {

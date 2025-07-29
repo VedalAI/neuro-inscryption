@@ -8,6 +8,10 @@ namespace NeuroInscryption.Communication.Strings;
 
 public static class SigilStrings
 {
+    public const string MultipleMoveSigils = "This card has multiple movement sigils, so you can't tell which direction it will go in!";
+    public const string MovingLeft = "This card's movement sigil indicates that it will move left (towards lane 1).";
+    public const string MovingRight = "This card's movement sigil indicates that it will move right (towards lane 4).";
+    
     private static readonly Dictionary<Ability, string> _nameOverrides = new()
     {
         [Ability.SubmergeSquid] = "Kraken Waterborne",
