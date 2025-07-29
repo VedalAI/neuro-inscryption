@@ -14,15 +14,23 @@ public sealed class PlaceCardAction(IReadOnlyCollection<CardSlot> playerLanes)
 {
     public override JsonSchema GetDataSchema()
     {
-        return QJS.Enum(playerLanes.WithIndex()
-            .Where(pair => pair.item.Card == null)
-            .Select(pair => CombatState.LaneIndexBase + pair.index));
+        return new JsonSchema
+        {
+            Type = JsonSchemaType.Object,
+            Properties = new Dictionary<string, JsonSchema>
+            {
+                ["lane"] = QJS.Enum(playerLanes.WithIndex()
+                    .Where(pair => pair.item.Card == null)
+                    .Select(pair => CombatState.LaneIndexBase + pair.index))
+            },
+            Required = ["lane"]
+        };
     }
 
     public override bool TryDeserialize(JToken? data, out int response)
     {
-        int? result = data?.Value<int>();
-        response = result.HasValue ? result.Value - CombatState.LaneIndexBase : default;
+        int? result = data?.Value<int>("lane");
+        response = result.HasValue ? result.Value - CombatState.LaneIndexBase : 0;
         return result.HasValue;
     }
 }

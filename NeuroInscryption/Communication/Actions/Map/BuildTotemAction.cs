@@ -14,8 +14,9 @@ public sealed class BuildTotemAction(IEnumerable<TotemPieceData> pieces) : Actio
 
     public override JsonSchema GetDataSchema()
     {
-        return new()
+        return new JsonSchema
         {
+            Type = JsonSchemaType.Object,
             Properties = new Dictionary<string, JsonSchema>
             {
                 ["tribe"] = QJS.Enum(pieces.Select(p => p.Tribe).WhereNotNull()),

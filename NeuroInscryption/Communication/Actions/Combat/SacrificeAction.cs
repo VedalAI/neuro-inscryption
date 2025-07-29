@@ -42,13 +42,20 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary
 
     public override JsonSchema GetDataSchema()
     {
-        Plugin.Logger.LogWarning("QJS.Enum(List<string>)");
-        return QJS.Enum(GetSacrificeCombinations(cardToPlay.Info.BloodCost).Select(combo => string.Join(", ", combo)));
+        return new JsonSchema
+        {
+            Type = JsonSchemaType.Object,
+            Properties = new Dictionary<string, JsonSchema>
+            {
+                ["sacrifices"] = QJS.Enum(GetSacrificeCombinations(cardToPlay.Info.BloodCost).Select(combo => string.Join(", ", combo)))
+            },
+            Required = ["sacrifices"]
+        };
     }
 
     public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out IEnumerable<PlayableCardData>? response)
     {
-        IEnumerable<string?>? cardIdentifiers = data?.Value<string>()?.Split([", "], StringSplitOptions.None);
+        IEnumerable<string?>? cardIdentifiers = data?.Value<string>("sacrifices")?.Split([", "], StringSplitOptions.None);
         if (cardIdentifiers == null)
         {
             response = null;

@@ -26,8 +26,6 @@ public sealed partial class Plugin : BaseUnityPlugin
         Singlyboi.AddAll(gameObject);
 
         Harmony.PatchAll();
-
-        // TODO: twitch integration to change the challenges and starter deck
     }
 
     private void Start()

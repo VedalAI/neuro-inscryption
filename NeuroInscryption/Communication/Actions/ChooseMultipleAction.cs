@@ -15,19 +15,27 @@ public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> i
     public override bool IsApplicable => amount > 0 && items.Any();
     public override JsonSchema GetDataSchema()
     {
-        return new()
+        return new JsonSchema
         {
-            Type = JsonSchemaType.Array,
-            MinItems = amount,
-            MaxItems = amount,
-            UniqueItems = true,
-            Items = QJS.Enum(items.Select(c => c.Identifier)),
+            Type = JsonSchemaType.Object,
+            Properties = new Dictionary<string, JsonSchema>
+            {
+                ["choices"] = new()
+                {
+                    Type = JsonSchemaType.Array,
+                    MinItems = amount,
+                    MaxItems = amount,
+                    UniqueItems = true,
+                    Items = QJS.Enum(items.Select(c => c.Identifier)),
+                }
+            },
+            Required = ["choices"],
         };
     }
 
     public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out IEnumerable<TSelectable>? response)
     {
-        IEnumerable<string?>? cardIdentifiers = data?.Values<string>()!;
+        IEnumerable<string?>? cardIdentifiers = data?["choices"]?.Values<string>();
         if (cardIdentifiers == null)
         {
             response = null;

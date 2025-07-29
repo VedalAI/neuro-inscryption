@@ -13,8 +13,9 @@ namespace NeuroInscryption.Input;
 
 public static class NeuroMouse
 {
-    private const float MouseSpeed = 4.0f; // magic number, works well with the cursor's weird coordinate scale
-
+    private const float MouseSpeedConstant = 4.0f; // magic number, works well with the cursor's weird coordinate scale
+    private static float MouseSpeed => MouseSpeedConstant * Plugin.Config.MouseSpeedMultiplier.Value;
+    
     private static InteractableBase? _current;
 
     public static async UniTask MoveTo(InteractableBase interactable, CancellationToken ct = default, float mouseSpeedMultiplier = 1, int tries = 10)

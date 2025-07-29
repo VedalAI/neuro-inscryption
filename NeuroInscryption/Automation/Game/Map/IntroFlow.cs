@@ -36,6 +36,9 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
 
         // Stop inspecting deck
         ViewManager.Instance.SwitchToView(View.MapDefault);
+
+        return; // todo: we're not sending state of oil painting puzzle yet so this is pointless to check
+        
         if (puzzle.state.puzzleSolved) return;
 
         AutomationManager.Assert(ViewManager.Instance.Is(ViewLockState.Unlocked));
@@ -67,7 +70,7 @@ public sealed class IntroFlow : HarmonyAutomationFlow<IEnumerator>
         // Inspect painting
         await NeuroMouse.MoveAndClick(puzzle.zoomInteractable, ct, mouseSpeedMultiplier: 10);
         // todo: send context here
-        await UniTask.Delay(2500, cancellationToken: ct); // explicit "looking" wait
+        await UniTask.Delay(1750, cancellationToken: ct); // explicit "looking" wait
 
         // Return to table
         await NeuroKeyboard.Press(NeuroKeyboard.Button.LookDown, ct);

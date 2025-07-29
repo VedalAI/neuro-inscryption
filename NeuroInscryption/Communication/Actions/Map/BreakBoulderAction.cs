@@ -1,4 +1,5 @@
-﻿using NeuroInscryption.Communication.Strings;
+﻿using System.Collections.Generic;
+using NeuroInscryption.Communication.Strings;
 using NeuroSdk.Json;
 using Newtonsoft.Json.Linq;
 
@@ -8,17 +9,20 @@ public sealed class BreakBoulderAction() : ActionBase<int>(ActionStrings.BreakBo
 {
     public override JsonSchema GetDataSchema()
     {
-        return new()
+        return new JsonSchema
         {
-            Type = JsonSchemaType.Integer,
-            Minimum = 1,
-            Maximum = 3
+            Type = JsonSchemaType.Object,
+            Properties = new Dictionary<string, JsonSchema>
+            {
+                ["boulder"] = QJS.Enum([1, 2, 3])
+            },
+            Required = ["boulder"],
         };
     }
 
     public override bool TryDeserialize(JToken? data, out int response)
     {
-        int boulder = data?.Value<int>() ?? -1;
+        int boulder = data?.Value<int>("boulder") ?? -1;
         if (boulder is < 1 or > 3)
         {
             response = -1;
