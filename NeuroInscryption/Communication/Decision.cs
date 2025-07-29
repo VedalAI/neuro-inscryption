@@ -22,7 +22,7 @@ public sealed class Decision(string query, IGameState state)
     public DecisionResult? Result { get; private set; }
 
     private UniTaskCompletionSource _tcs = new();
-    public float Timeout { get; init; } = 1; // short for randy; todo
+    public float Timeout { get; init; } = 0;
     public bool IsEphemeral { get; init; } // todo
 
     public void AddAction(ActionBase action)
