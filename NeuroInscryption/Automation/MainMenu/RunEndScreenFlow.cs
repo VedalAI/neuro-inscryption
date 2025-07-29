@@ -9,7 +9,6 @@ using NeuroSdk.Messages.Outgoing;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
-// TODO: flows for reward screens
 public sealed class RunEndScreenFlow : HarmonyAutomationFlow<AscensionRunEndScreen>
 {
     public override FlowHook[] Hooks =>

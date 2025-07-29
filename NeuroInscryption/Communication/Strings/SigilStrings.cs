@@ -21,7 +21,7 @@ public static class SigilStrings
     {
         [Ability.DrawRabbits] = "When played, a Rabbit [0 power, 1 health, inherits this card's sigils] is created in your hand.",
         [Ability.BeesOnHit] = "When struck, a Bee [1 power, 1 health, Airborne] is created in your hand.",
-        [Ability.Strafe] = "At the end of the owner's turn, attempts to move one space in the direction of the sigil.", // todo: specify which direction it moves in
+        [Ability.Strafe] = "At the end of the owner's turn, attempts to move one space in the direction of the sigil.",
         [Ability.Deathtouch] = "When this card deals damage to another card, the other card dies.",
         [Ability.Evolve] = "Grows into a more powerful form after 1 full turn on the board.",
         [Ability.CreateDams] = "When played, plays Dams [0 power, 2 health] on adjacent spaces.",
@@ -34,7 +34,7 @@ public static class SigilStrings
         [Ability.Submerge] = "Submerges itself during its opponent's turn. While submerged, opposing creatures attack its owner directly.",
         [Ability.DrawCopyOnDeath] = "On death, a copy of this card is created in your hand.",
         [Ability.Sharp] = "When damaged, the attacker is dealt 1 damage.",
-        [Ability.StrafePush] = "At the end of the owner's turn, moves one space in the direction of the sigil, pushing any creatures in the way.", // todo: direction
+        [Ability.StrafePush] = "At the end of the owner's turn, moves one space in the direction of the sigil, pushing any creatures in the way.",
         [Ability.DrawAnt] = "When played, a Worker Ant [Ant Power, 1 health] is created in your hand.",
         [Ability.GuardDog] = "When an opponent card is played, this card moves to oppose it.",
         [Ability.Flying] = "Attacks strike the opponent directly, flying over any opposing cards.",
@@ -66,7 +66,7 @@ public static class SigilStrings
         [Ability.DeathShield] = "Negates the first instance of damage taken.",
         [Ability.BloodGuzzler] = "On kill, gains 1 temporary power.",
         [Ability.OpponentBones] = "While in play, grants bones when opponents' creatures die.",
-        [Ability.StrafeSwap] = "At the end of the owner's turn, moves one space in the direction of the sigil, switching places with any card in its way.", // todo: direction
+        [Ability.StrafeSwap] = "At the end of the owner's turn, moves one space in the direction of the sigil, switching places with any card in its way.",
     };
 
     private static readonly Description[] _descriptions;

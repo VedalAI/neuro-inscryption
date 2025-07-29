@@ -42,7 +42,6 @@ public class CardData
     public bool? IsRare { get; protected set; }
     
     // TODO: Is empowered
-    // TODO: about to be grabbed by hook
     // TODO: about to be cannoned
     // TODO: empty slot about to be cannoned
 
