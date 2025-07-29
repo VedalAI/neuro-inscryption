@@ -35,8 +35,9 @@ public sealed class PlaceCardAction(IReadOnlyCollection<CardSlot> playerLanes)
             response = 0;
             return false;
         }
-        
-        response = result.Value - CombatState.LaneIndexBase;
-        return playerLanes.WithIndex().Where(pair => pair.item.Card == null).Any(pair => pair.index == result.Value);
+
+        int actualLane = result.Value - CombatState.LaneIndexBase;
+        response = actualLane;
+        return playerLanes.WithIndex().Where(pair => pair.item.Card == null).Any(pair => pair.index == actualLane);
     }
 }
