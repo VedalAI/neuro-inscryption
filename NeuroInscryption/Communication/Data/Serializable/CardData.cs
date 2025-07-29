@@ -40,7 +40,7 @@ public class CardData
 
     [JsonProperty(Order = 80)]
     public bool? IsRare { get; protected set; }
-
+    
     // TODO: Is empowered
     // TODO: about to be grabbed by hook
     // TODO: about to be cannoned
@@ -93,7 +93,8 @@ public class CardData
     }
 
     [return: NotNullIfNotNull(nameof(cardInfo))]
-    public static CardData? Create(CardInfo? cardInfo, IGameState? state = null, int? deckIndex = null) => cardInfo != null ? new CardData(cardInfo, state, deckIndex) : null;
+    public static CardData? Create(CardInfo? cardInfo, IGameState? state = null, int? deckIndex = null) 
+        => cardInfo != null ? new CardData(cardInfo, state, deckIndex) : null;
 
     public virtual string GetDescription()
     {
