@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
+using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
+using NeuroSdk.Messages.Outgoing;
 
 namespace NeuroInscryption.Automation.MainMenu;
 
@@ -19,17 +22,14 @@ public sealed class RunEndScreenFlow : HarmonyAutomationFlow<AscensionRunEndScre
         }
     ];
 
-    public override Type[] FlowsBlockedForInterruption => [typeof(StartScreenFlow)];
-
     public override ManualInterruptionBehaviour ManualInterruptionBehaviour => ManualInterruptionBehaviour.Cancel;
 
     protected override async UniTask ExecuteAsync(AscensionRunEndScreen target, CancellationToken ct)
     {
         await UniTask.Delay(1000, cancellationToken: ct);
 
-        // TODO: Share run results with Neuro
-        // TODO: Wait for start new run message from ws
-
+        Context.Send(GenericStrings.EndRun.Format(target.isVictory ? GenericStrings.EndRunVictory : GenericStrings.EndRunDefeat));
+        
         await UniTask.Delay(4000, cancellationToken: ct);
 
         AscensionMenuScreenTransition screen = target.GetComponent<AscensionMenuScreenTransition>();
