@@ -27,10 +27,10 @@
     </ItemGroup>
     
     <ItemGroup>
-        <Reference Include="../Dependencies/UniTask.dll"/>
-        <Reference Include="../Dependencies/UniTask.Linq.dll"/>
+        <Reference Include="Resources/Assemblies/*.dll"/>
+        <EmbeddedResource Include="Resources/Assemblies/*.dll" />
     </ItemGroup>
-
+    
     <Target Name="Copy" AfterTargets="Build" Condition="'$(Inscryption)' != ''">
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(Inscryption)/BepInEx/plugins/" UseSymboliclinksIfPossible="true" />
     </Target>

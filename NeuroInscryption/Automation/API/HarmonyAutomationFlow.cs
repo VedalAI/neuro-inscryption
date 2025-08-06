@@ -3,8 +3,6 @@ using Cysharp.Threading.Tasks;
 
 namespace NeuroInscryption.Automation.API;
 
-extern alias JetBrains;
-
 [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 public abstract class HarmonyAutomationFlow : AutomationFlow<HarmonyContext>
 {

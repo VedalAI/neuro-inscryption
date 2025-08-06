@@ -2,10 +2,13 @@
 using BepInEx.Logging;
 using BepInEx.Unity.Mono;
 using HarmonyLib;
+using NeuroInscryption.Automation.API;
+using NeuroInscryption.Automation.Game.Map;
 using NeuroInscryption.Configuration;
 using NeuroInscryption.Utilities;
 using NeuroSdk;
 using UnityEngine;
+using UnityEngine.LowLevel;
 
 namespace NeuroInscryption;
 
@@ -19,6 +22,9 @@ public sealed partial class Plugin : BaseUnityPlugin
 
     private void Awake()
     {
+        PlayerLoopSystem loop = PlayerLoop.GetCurrentPlayerLoop();
+        Cysharp.Threading.Tasks.PlayerLoopHelper.Initialize(ref loop);
+        
         Logger = base.Logger;
         Config = new ModConfig(base.Config);
         PluginObject = gameObject;
