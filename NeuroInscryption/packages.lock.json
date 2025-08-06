@@ -60,12 +60,9 @@
       },
       "VedalAI.NeuroSdk.Unity": {
         "type": "Direct",
-        "requested": "[1.2.0, )",
-        "resolved": "1.2.0",
-        "contentHash": "gmM4UQOqfsN31HPMHY9sl2EUYXhM5AqWcl9XHcuVXAe38wvpN6EE9W9BcjtvUTG1lOs9AIbojl4QhfQQcSK7Iw==",
-        "dependencies": {
-          "Newtonsoft.Json": "13.0.3"
-        }
+        "requested": "[2.0.0-pre.4-dev.2, )",
+        "resolved": "2.0.0-pre.4-dev.2",
+        "contentHash": "kVSCt50CYnxYeb/VaykOyxSEhtEFfXU68ROiBMpnnAoviFjiEBjpYAdEwqez3acA/cwC0hknisfjWafuxCIUjw=="
       },
       "BepInEx.Core": {
         "type": "Transitive",
@@ -111,11 +108,6 @@
         "dependencies": {
           "Mono.Cecil": "0.11.4"
         }
-      },
-      "Newtonsoft.Json": {
-        "type": "Transitive",
-        "resolved": "13.0.3",
-        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
       "SemanticVersioning": {
         "type": "Transitive",

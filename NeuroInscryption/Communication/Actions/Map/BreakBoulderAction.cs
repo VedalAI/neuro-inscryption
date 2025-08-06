@@ -1,35 +1,39 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using DiskCardGame;
 using NeuroInscryption.Communication.Strings;
+using NeuroInscryption.Input;
+using NeuroSdk.Actions;
 using NeuroSdk.Json;
-using Newtonsoft.Json.Linq;
+using NeuroSdk.Websocket;
 
 namespace NeuroInscryption.Communication.Actions.Map;
 
-public sealed class BreakBoulderAction() : ActionBase<int>(ActionStrings.BreakBoulder)
+public sealed class BreakBoulderAction(IEnumerable<SelectableCard> boulders, CancellationToken ct = default) : AsyncNeuroAction<SelectableCard>(ct)
 {
-    public override JsonSchema GetDataSchema()
+    public override string Name => ActionStrings.BreakBoulder;
+    
+    protected override string Description { get; }
+
+    protected override JsonSchema Schema => QJS.WrapObject(new Dictionary<string, JsonSchema>
     {
-        return new JsonSchema
-        {
-            Type = JsonSchemaType.Object,
-            Properties = new Dictionary<string, JsonSchema>
-            {
-                ["boulder"] = QJS.Enum([1, 2, 3])
-            },
-            Required = ["boulder"],
-        };
+        ["boulder"] = QJS.Enum([1, 2, 3])
+    });
+    
+    protected override ExecutionResult Validate(ActionJData actionData, out SelectableCard? boulder)
+    {
+        int index = actionData.GetValue<int>("boulder");
+        if (index is < 1 or > 3) index = 2;
+        
+        boulder = boulders.ElementAt(index - 1);
+        
+        return ExecutionResult.Success();
     }
 
-    public override bool TryDeserialize(JToken? data, out int response)
+    protected override async UniTask ExecuteAsync(SelectableCard? boulder, CancellationToken ct)
     {
-        int boulder = data?.Value<int>("boulder") ?? -1;
-        if (boulder is < 1 or > 3)
-        {
-            response = 2;
-            return true;
-        }
-
-        response = boulder;
-        return true;
+        await NeuroMouse.MoveAndClick(boulder!, ct);
     }
 }
