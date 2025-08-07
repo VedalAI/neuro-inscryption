@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -8,6 +9,7 @@ using NeuroInscryption.Communication.Data.State;
 using NeuroSdk.Actions;
 using NeuroSdk.Internal;
 using NeuroSdk.Json;
+using NeuroSdk.Messages.Outgoing;
 using NeuroSdk.Websocket;
 using Newtonsoft.Json.Linq;
 
@@ -19,7 +21,8 @@ public sealed class Decision(string query, IGameState state)
 {
     private readonly ActionWindow _actionWindow = ActionWindow.Create(Plugin.PluginObject); // scuff?
 
-    public DecisionResult? Result { get; private set; }
+    public DecisionResult? RawResponse { get; private set; }
+    public ExecutionResult? Result { get; private set; }
 
     private UniTaskCompletionSource _tcs = new();
     public float Timeout { get; init; } = 1;
@@ -39,11 +42,16 @@ public sealed class Decision(string query, IGameState state)
         return _tcs.Task;
     }
 
+    private const string CheckDataMsg = "It is possible that you provided invalid data to an action. Please try again and ensure that the data conforms to the given schema.";
+
     [DoesNotReturn]
     public void ThrowInvalid()
     {
-        AutomationManager.Assert(Result.HasValue, "ThrowInvalid without Result");
-        throw new InvalidOperationException($"Received action '{Result.Value.PickedAction}' which did not match possible expected actions. It is possible that you provided invalid data to an action. Please try again and ensure that the data conforms to the given schema.");
+        // this shouldn't ever get called anymore
+        AutomationManager.Assert(RawResponse.HasValue, "ThrowInvalid without Result");
+        string errMsg = $"Received action '{RawResponse.Value.PickedAction}' which did not match possible expected actions.";
+        Context.Send($"{errMsg} {CheckDataMsg}");
+        throw new InvalidOperationException(errMsg); // restarts the flow
     }
 
     private sealed class DecisionAction(Decision decision, ActionBase ourAction) : NeuroAction
@@ -55,14 +63,19 @@ public sealed class Decision(string query, IGameState state)
         protected override JsonSchema? Schema => ourAction.GetDataSchema();
         protected override ExecutionResult Validate(ActionJData actionData)
         {
+            decision.RawResponse = new(Name, actionData.Data);
             try
             {
-                decision.Result = new(Name, actionData.Data);
+                if (!ourAction.Matches(decision))
+                    return ExecutionResult.Failure($"Action failed validation. {CheckDataMsg}");
                 return ExecutionResult.Success();
             }
-            catch
+            catch (Exception e)
             {
-                return ExecutionResult.Failure("Something went wrong."); // placeholder
+                decision.Result = ExecutionResult.ModFailure($"Failed to validate action {Name}");
+                Plugin.Logger.LogWarning($"Failed to validate {Name} in decision");
+                Plugin.Logger.LogError(e);
+                return decision.Result;
             }
         }
 
@@ -70,8 +83,7 @@ public sealed class Decision(string query, IGameState state)
         {
             try
             {
-                // any continuations run here
-                decision._tcs.TrySetResult();
+                decision._tcs.TrySetResult(); // this synchronously runs any continuations (i.e. calls back into awaiters)
             }
             finally
             {
@@ -79,5 +91,4 @@ public sealed class Decision(string query, IGameState state)
             }
         }
     }
-
 }

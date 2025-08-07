@@ -87,7 +87,7 @@ internal sealed class Cards
     /// <example>
     /// <code>
     /// Card cardToGloopBlurb = await Neuro.Cards.ChooseCardLoadout(cards,
-    ///     description: new Description("choice_gloop_blurb", "Choose a card to gloop blurb. The card's immediate family will be murgled."),
+    ///     decisionQuery: "Choose a card to gloop blurb. The card's immediate family will be murgled.",
     ///     additionalContext: new { MurgleInsensity = 5 }
     /// );
     /// </code>
