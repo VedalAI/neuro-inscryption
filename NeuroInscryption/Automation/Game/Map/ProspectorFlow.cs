@@ -4,13 +4,11 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication;
 using NeuroInscryption.Communication.Actions.Map;
-using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
+using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
-using NeuroSdk.Actions;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
@@ -31,8 +29,17 @@ public sealed class ProspectorFlow : HarmonyAutomationFlow<IEnumerator>
 
         await Wait.CommonFlowDelay(ct);
 
-        AsyncActionWindow window = new(DecisionStrings.ChooseBoulder, LoadoutState.Calculate());
-        window.AddAction(new BreakBoulderAction(instance.selectableCards));
-        await window.SendAsync();
+        int selection = await Neuro.Loadout.Choose(new BreakBoulderAction(), DecisionStrings.ChooseBoulder, ct);
+        AutomationManager.Assert(selection is >= 1 and <= 3, "picked boulder out of range");
+#if !DEBUG // failsafe
+        if (selection is < 1 or > 3)
+        {
+            Plugin.Logger.LogError($"Boulder out of range - selected {selection}, should be between 1 and 3");
+            selection = UnityEngine.Random.RandomRangeInt(1, 3);
+        }
+#endif
+
+        SelectableCard boulder = instance.selectableCards[selection - 1];
+        await NeuroMouse.MoveAndClick(boulder, ct);
     }
 }

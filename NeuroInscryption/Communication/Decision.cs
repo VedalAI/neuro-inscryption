@@ -13,10 +13,8 @@ using Newtonsoft.Json.Linq;
 
 namespace NeuroInscryption.Communication;
 
-[Obsolete("", true)]
 public record struct DecisionResult(string PickedAction, JToken? Data);
 
-[Obsolete("", true)]
 public sealed class Decision(string query, IGameState state)
 {
     private readonly ActionWindow _actionWindow = ActionWindow.Create(Plugin.PluginObject); // scuff?
@@ -59,7 +57,7 @@ public sealed class Decision(string query, IGameState state)
         {
             try
             {
-                decision.Result = new DecisionResult(Name, actionData.Data);
+                decision.Result = new(Name, actionData.Data);
                 return ExecutionResult.Success();
             }
             catch

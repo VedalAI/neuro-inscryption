@@ -11,6 +11,7 @@ using NeuroInscryption.Communication.Actions.Combat;
 using NeuroInscryption.Communication.Data.Serializable;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
+using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 using ItemData = NeuroInscryption.Communication.Data.Serializable.ItemData;
@@ -57,16 +58,38 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
 
         CombatState state = CombatState.Calculate();
 
-        ChooseClickAction<PlayableCardData> playCardAction = new(state.PlayerHand.Where(c => c.IsPlayable == true), c => c.TargetCard, 500, ActionStrings.PlayCard);
-        ChooseClickAction<ItemData> useItemAction = new(state.Items.Where(i => i.IsUsable == true), i => i.Slot!, 500, ActionStrings.UseItem);
+        ChooseAction<PlayableCardData> playCardAction = new(state.PlayerHand.Where(c => c.IsPlayable == true), ActionStrings.PlayCard);
+        ChooseAction<ItemData> useItemAction = new(state.Items.Where(i => i.IsUsable == true), ActionStrings.UseItem);
         AcceptSurrenderAction acceptSurrenderAction = new(state.IsOpponentSurrendering);
         EndTurnAction endTurnAction = new();
 
-        AsyncActionWindow window = new(DecisionStrings.CardBattleTurn, state);
-        window.AddAction(playCardAction);
-        window.AddAction(useItemAction);
-        window.AddAction(acceptSurrenderAction);
-        window.AddAction(endTurnAction);
-        await window.SendAsync(ct);
+        Decision decision = new(DecisionStrings.CardBattleTurn, state);
+        decision.AddAction(playCardAction);
+        decision.AddAction(useItemAction);
+        decision.AddAction(acceptSurrenderAction);
+        decision.AddAction(endTurnAction);
+
+        await decision.Send(ct);
+
+        InteractableBase? target = null;
+        if (playCardAction.Matches(decision, out PlayableCardData? cardData))
+        {
+            target = cardData.TargetCard;
+        }
+        else if (useItemAction.Matches(decision, out ItemData? itemData))
+        {
+            target = itemData.Slot!;
+        }
+        else if (acceptSurrenderAction.Matches(decision))
+        {
+            await UniTask.Delay(500, cancellationToken: ct); // branch takes time to extend, so the mouse aim gets thrown off
+            target = LeshyAnimationController.Instance.oliveBranchInteractable;
+        }
+        else if (endTurnAction.Matches(decision))
+        {
+            target = ((BoardManager3D)BoardManager.Instance).Bell;
+        }
+        if (target == null) decision.ThrowInvalid();
+        await NeuroMouse.MoveAndClick(target, ct, msDelayBeforeClick: 500);
     }
 }

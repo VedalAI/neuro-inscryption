@@ -4,10 +4,6 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
-using NeuroInscryption.Communication;
-using NeuroInscryption.Communication.Actions.Combat;
-using NeuroInscryption.Communication.Data.State;
-using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
@@ -29,16 +25,9 @@ public sealed class DrawCardFlow : HarmonyAutomationFlow<IEnumerator>
     {
         await Wait.CommonFlowDelay(ct);
 
-        bool mainDeckEmpty = CardDrawPiles3D.Instance.Deck.Cards.Count == 0;
-        bool sideDeckEmpty = CardDrawPiles3D.Instance.SideDeck.Cards.Count == 0;
-
-        AsyncActionWindow window = new(DecisionStrings.DrawCard, CombatState.Calculate());
-        window.AddAction(new DrawCardAction(mainDeckEmpty, sideDeckEmpty));
-        DrawCardAction drawCardAction = new(mainDeckEmpty, sideDeckEmpty);
-        return await Choose(drawCardAction, , ct, includeDeck: true);
-        
         bool drawFromSideDeck = await Neuro.Combat.ChooseDrawFromSideDeck(ct);
 
-        
+        CardPile target = !drawFromSideDeck ? CardDrawPiles3D.Instance.Pile : CardDrawPiles3D.Instance.SidePile;
+        await NeuroMouse.MoveAndClick(target, ct, msDelayBeforeClick: 500);
     }
 }
