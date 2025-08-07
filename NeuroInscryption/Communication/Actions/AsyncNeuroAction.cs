@@ -4,11 +4,14 @@ using NeuroSdk.Actions;
 
 namespace NeuroInscryption.Communication.Actions;
 
-public abstract class AsyncNeuroAction : NeuroAction
+public abstract class AsyncNeuroAction : NeuroAction, IAsyncNeuroAction
 {
+    protected override string Description => "";
+
     private readonly CancellationToken _externalCt;
     private readonly CancellationTokenSource _cts;
-    public readonly UniTask ReturningTask; 
+    public UniTask ReturningTask { get; }
+    public abstract bool IsApplicable { get; }
 
     protected AsyncNeuroAction(CancellationToken ct = default)
     {
@@ -27,11 +30,14 @@ public abstract class AsyncNeuroAction : NeuroAction
     }
 }
 
-public abstract class AsyncNeuroAction<T> : NeuroAction<T>
+public abstract class AsyncNeuroAction<T> : NeuroAction<T>, IAsyncNeuroAction
 {
+    protected override string Description => "";
+    
     private readonly CancellationToken _externalCt;
     private readonly CancellationTokenSource _cts;
-    public readonly UniTask ReturningTask; 
+    public UniTask ReturningTask { get; }
+    public abstract bool IsApplicable { get; }
 
     protected AsyncNeuroAction(CancellationToken ct = default)
     {
@@ -52,4 +58,10 @@ public abstract class AsyncNeuroAction<T> : NeuroAction<T>
 
 public abstract class AsyncNeuroActionS<T>(CancellationToken ct = default) : AsyncNeuroAction<T?>(ct) where T : struct
 {
+}
+
+public interface IAsyncNeuroAction : INeuroAction
+{
+    bool IsApplicable { get; }
+    UniTask ReturningTask { get; }
 }

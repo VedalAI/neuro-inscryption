@@ -4,7 +4,10 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
+using NeuroInscryption.Communication;
 using NeuroInscryption.Communication.Actions.Map;
+using NeuroInscryption.Communication.Data.State;
+using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
 using NeuroSdk.Actions;
@@ -28,11 +31,8 @@ public sealed class ProspectorFlow : HarmonyAutomationFlow<IEnumerator>
 
         await Wait.CommonFlowDelay(ct);
 
-        BreakBoulderAction breakBoulderAction = new(instance.selectableCards);
-        ActionWindow window = ActionWindow.Create(Plugin.PluginObject);
-        window.AddAction(breakBoulderAction);
-        window.Register();
-
-        await UniTask.WhenAny(breakBoulderAction.ReturningTask);
+        AsyncActionWindow window = new(DecisionStrings.ChooseBoulder, LoadoutState.Calculate());
+        window.AddAction(new BreakBoulderAction(instance.selectableCards));
+        await window.SendAsync();
     }
 }

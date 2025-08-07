@@ -1,41 +1,48 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using NeuroInscryption.Communication.Data;
 using NeuroInscryption.Communication.Strings;
+using NeuroSdk.Actions;
 using NeuroSdk.Json;
-using Newtonsoft.Json.Linq;
+using NeuroSdk.Websocket;
 
 namespace NeuroInscryption.Communication.Actions;
 
-public sealed class ChooseAction<T>(IEnumerable<T> items, string name = ActionStrings.MakeChoice) : ActionBase<T>(name)
+public class ChooseAction<T>(IEnumerable<T> items, Func<T, CancellationToken, UniTask> handler, string name = ActionStrings.MakeChoice) : AsyncNeuroAction<T>
     where T : class, IIdentifiable
 {
+    public override string Name => name;
+
     public override bool IsApplicable => items.Any();
 
-    public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out T? response)
+    protected override JsonSchema Schema => new()
     {
-        string? identifier = data?.Value<string>("choice");
+        Type = JsonSchemaType.Object,
+        Properties = new Dictionary<string, JsonSchema>
+        {
+            ["choice"] = QJS.Enum(items.Select(item => item.Identifier).Distinct()),
+        },
+        Required = ["choice"],
+    };
+    
+    protected override ExecutionResult Validate(ActionJData actionData, out T? response)
+    {
+        string? identifier = actionData.GetValue<string>("choice");
         if (identifier == null)
         {
             response = null;
-            return false;
+            return ExecutionResult.Failure("Choice is missing.");
         }
-
-        response = items.FirstOrDefault(node => node.Identifier == identifier);
-        return response != null;
+        
+        response = items.FirstOrDefault(item => item.Identifier == identifier);
+        return response != null ? ExecutionResult.Success() : ExecutionResult.Failure($"Choice '{identifier}' is not valid.");
     }
 
-    public override JsonSchema GetDataSchema()
+    protected override UniTask ExecuteAsync(T? parsedData, CancellationToken ct)
     {
-        return new JsonSchema
-        {
-            Type = JsonSchemaType.Object,
-            Properties = new Dictionary<string, JsonSchema>
-            {
-                ["choice"] = QJS.Enum(items.Select(item => item.Identifier).Distinct()),
-            },
-            Required = ["choice"],
-        };
+        return handler(parsedData!, ct);
     }
 }

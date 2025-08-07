@@ -15,8 +15,6 @@ public sealed class BreakBoulderAction(IEnumerable<SelectableCard> boulders, Can
 {
     public override string Name => ActionStrings.BreakBoulder;
     
-    protected override string Description { get; }
-
     protected override JsonSchema Schema => QJS.WrapObject(new Dictionary<string, JsonSchema>
     {
         ["boulder"] = QJS.Enum([1, 2, 3])
