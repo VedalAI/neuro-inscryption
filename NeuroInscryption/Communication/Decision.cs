@@ -6,8 +6,8 @@ using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.State;
 using NeuroSdk.Actions;
+using NeuroSdk.Internal;
 using NeuroSdk.Json;
-using NeuroSdk.Utilities;
 using NeuroSdk.Websocket;
 using Newtonsoft.Json.Linq;
 
@@ -66,7 +66,7 @@ public sealed class Decision(string query, IGameState state)
             }
         }
 
-        protected override UniTask ExecuteAsync()
+        protected override void Execute()
         {
             try
             {
@@ -77,7 +77,6 @@ public sealed class Decision(string query, IGameState state)
             {
                 decision._tcs = new UniTaskCompletionSource();
             }
-            return UniTask.CompletedTask;
         }
     }
 
