@@ -2,4 +2,4 @@
 
 namespace NeuroInscryption.Communication.Actions.Map;
 
-public sealed class LeaveAction() : BasicAction(ActionStrings.Leave);
+public sealed class LeaveAction() : EmptyAction(ActionStrings.Leave);

@@ -15,14 +15,14 @@ namespace NeuroInscryption.Automation;
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
 internal sealed class Loadout
 {
-    public record struct InteractableOption(BasicAction Action, InteractableBase Interactable)
+    public record struct InteractableOption(EmptyAction Action, InteractableBase Interactable)
     {
         public static implicit operator InteractableOption((string ActionName, InteractableBase Interactable) tuple)
         {
-            return new InteractableOption(new BasicAction(tuple.ActionName), tuple.Interactable);
+            return new InteractableOption(new EmptyAction(tuple.ActionName), tuple.Interactable);
         }
 
-        public static implicit operator InteractableOption((BasicAction Action, InteractableBase Interactable) tuple)
+        public static implicit operator InteractableOption((EmptyAction Action, InteractableBase Interactable) tuple)
         {
             return new InteractableOption(tuple.Action, tuple.Interactable);
         }

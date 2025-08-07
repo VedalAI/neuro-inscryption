@@ -2,4 +2,4 @@
 
 namespace NeuroInscryption.Communication.Actions.Combat;
 
-public sealed class EndTurnAction() : BasicAction(ActionStrings.EndTurn);
+public sealed class EndTurnAction() : EmptyAction(ActionStrings.EndTurn);
