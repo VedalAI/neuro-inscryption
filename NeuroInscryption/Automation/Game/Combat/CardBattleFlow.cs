@@ -69,27 +69,27 @@ public sealed class CardBattleFlow : HarmonyAutomationFlow<IEnumerator>
         decision.AddAction(acceptSurrenderAction);
         decision.AddAction(endTurnAction);
 
-        await decision.Send(ct);
+        ActionBase pickedAction = await decision.Send(ct);
 
         InteractableBase? target = null;
-        if (playCardAction.Matches(decision, out PlayableCardData? cardData))
+        if (pickedAction == playCardAction)
         {
-            target = cardData.TargetCard;
+            target = playCardAction.GetResult().TargetCard;
         }
-        else if (useItemAction.Matches(decision, out ItemData? itemData))
+        else if (pickedAction == useItemAction)
         {
-            target = itemData.Slot!;
+            target = useItemAction.GetResult().Slot!;
         }
-        else if (acceptSurrenderAction.Matches(decision))
+        else if (pickedAction == acceptSurrenderAction)
         {
             await UniTask.Delay(500, cancellationToken: ct); // branch takes time to extend, so the mouse aim gets thrown off
             target = LeshyAnimationController.Instance.oliveBranchInteractable;
         }
-        else if (endTurnAction.Matches(decision))
+        else if (pickedAction == endTurnAction)
         {
             target = ((BoardManager3D)BoardManager.Instance).Bell;
         }
-        if (target == null) decision.ThrowInvalid();
+        AutomationManager.Assert(target != null, "Did not pick valid target");
         await NeuroMouse.MoveAndClick(target, ct, msDelayBeforeClick: 500);
     }
 }

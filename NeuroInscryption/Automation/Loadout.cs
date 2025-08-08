@@ -39,10 +39,10 @@ internal sealed class Loadout
             decision.AddAction(option.Action);
         }
 
-        await decision.Send(ct);
+        ActionBase pickedAction = await decision.Send(ct);
 
-        InteractableOption chosenOption = Array.Find(options, opt => opt.Action.Matches(decision));
-        if (chosenOption == default) decision.ThrowInvalid();
+        InteractableOption chosenOption = Array.Find(options, opt => opt.Action == pickedAction);
+        AutomationManager.Assert(chosenOption != default, "Sanity: picked non-existent option");
 
         Plugin.Logger.LogDebug($"Picked {chosenOption.Interactable} ({chosenOption.Action.Name})");
 

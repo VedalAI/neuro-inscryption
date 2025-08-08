@@ -20,7 +20,7 @@ public sealed class BreakBoulderAction() : ActionBase<int>(ActionStrings.BreakBo
         };
     }
 
-    public override bool TryDeserialize(JToken? data, out int response)
+    protected override bool TryDeserialize(JToken? data, out int response)
     {
         int boulder = data?.Value<int>("boulder") ?? -1;
         if (boulder is < 1 or > 3)

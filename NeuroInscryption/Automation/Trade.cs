@@ -5,6 +5,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using DiskCardGame;
+using NeuroInscryption.Automation.API;
 using NeuroInscryption.Communication;
 using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Actions.Map;
@@ -63,19 +64,16 @@ internal sealed class Trade
                 decision.AddAction(buyAction);
                 decision.AddAction(leaveAction);
 
-                await decision.Send(token);
+                ActionBase pickedAction = await decision.Send(token);
 
-                if (buyAction.Matches(decision, out TrapperWareData? trapperWare))
+                if (pickedAction == buyAction)
                 {
-                    await writer.YieldAsync(trapperWare);
+                    await writer.YieldAsync(buyAction.GetResult());
                 }
-                else if (leaveAction.Matches(decision))
+                else // picked leave
                 {
+                    AutomationManager.Assert(pickedAction == leaveAction, "Sanity: picked a non-existent action");
                     return;
-                }
-                else
-                {
-                    decision.ThrowInvalid();
                 }
             }
         }

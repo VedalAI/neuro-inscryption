@@ -27,7 +27,7 @@ public sealed class PlaceCardAction(IReadOnlyCollection<CardSlot> playerLanes)
         };
     }
 
-    public override bool TryDeserialize(JToken? data, out int response)
+    protected override bool TryDeserialize(JToken? data, out int response)
     {
         int? result = data?.Value<int>("lane");
         if (!result.HasValue)

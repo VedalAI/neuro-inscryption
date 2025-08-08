@@ -26,7 +26,7 @@ public sealed class BuildTotemAction(IEnumerable<TotemPieceData> pieces) : Actio
         };
     }
 
-    public override bool TryDeserialize(JToken? data, out Response response)
+    protected override bool TryDeserialize(JToken? data, out Response response)
     {
         string? tribe = data?.Value<string>("tribe");
         string? sigil = data?.Value<string>("sigil");

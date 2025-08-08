@@ -77,9 +77,9 @@ public sealed class Common
 
         await decision.Send(ct);
 
-        if (!action.Matches(decision, out T? result)) decision.ThrowInvalid();
+        T result = action.GetResult();
 
-        Plugin.Logger.LogDebug($"Picked {(result is IIdentifiable id ? id.Identifier : result.ToString())}");
+        Plugin.Logger.LogDebug($"Picked {(result is IIdentifiable id ? id.Identifier : result?.ToString())}");
         return result;
     }
 

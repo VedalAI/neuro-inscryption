@@ -13,7 +13,7 @@ public sealed class ChooseAction<T>(IEnumerable<T> items, string name = ActionSt
 {
     public override bool IsApplicable => items.Any();
 
-    public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out T? response)
+    protected override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out T? response)
     {
         string? identifier = data?.Value<string>("choice");
         if (identifier == null)
