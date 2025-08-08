@@ -64,7 +64,7 @@ public class TraderBattleTradeFlow : HarmonyAutomationFlow<IEnumerator>
 
         await decision.Send(ct);
 
-        if (!chooseAction.Matches(decision, out IEnumerable<SelectableCardData>? chosenCards)) decision.ThrowInvalid();
+        IEnumerable<SelectableCardData> chosenCards = chooseAction.GetResult();
 
         foreach (SelectableCardData card in chosenCards)
         {

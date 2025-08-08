@@ -33,7 +33,7 @@ public sealed class ChooseMultipleAction<TSelectable>(IEnumerable<TSelectable> i
         };
     }
 
-    public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out IEnumerable<TSelectable>? response)
+    protected override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out IEnumerable<TSelectable>? response)
     {
         IEnumerable<string?>? cardIdentifiers = data?["choices"]?.Values<string>();
         if (cardIdentifiers == null)

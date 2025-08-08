@@ -51,13 +51,10 @@ public sealed class Common
     /// Send a <see cref="Decision"/> that contains the given <paramref name="action"/> and <paramref name="additionalContext"/> and return the result from the response.
     /// </summary>
     /// <param name="decisionQuery">Query to send. This should describe what kind of choice is being made.</param>
+    /// <param name="state">Game state to send as context.</param>
     /// <param name="additionalContext">
     /// Any additional context to include in the state.
     /// This can be an anonymous object, or you can pass a custom <see cref="ILoadoutContext"/>/<see cref="ICombatContext"/> instead.
-    /// </param>
-    /// <param name="loadout">
-    /// Whether to use the <see cref="LoadoutState"/> (if <see langword="true"/>)
-    /// or the <see cref="CombatState"/> (if <see langword="false"/>).
     /// </param>
     /// <returns>A result of type <typeparamref name="T"/> that validates the given <paramref name="action"/>'s schema.</returns>
     public async UniTask<T> Choose<T>(ActionBase<T> action, string decisionQuery, IGameState state, CancellationToken ct = default,
@@ -80,19 +77,10 @@ public sealed class Common
 
         await decision.Send(ct);
 
-        if (!action.Matches(decision, out T? result)) decision.ThrowInvalid();
+        T result = action.GetResult();
 
-        Plugin.Logger.LogDebug($"Picked {(result is IIdentifiable id ? id.Identifier : result.ToString())}");
+        Plugin.Logger.LogDebug($"Picked {(result is IIdentifiable id ? id.Identifier : result?.ToString())}");
         return result;
-    }
-
-    public async UniTask<T> Choose<T>(ActionBase<T> action, string decisionQuery, CancellationToken ct = default,
-        object? additionalContext = null, bool useLoadoutState = true)
-    {
-        return await Choose(action, decisionQuery,
-            useLoadoutState ? LoadoutState.Calculate() : CombatState.Calculate(),
-            ct, additionalContext
-        );
     }
 
     public async UniTask<TData> ChooseItem<TData>(IReadOnlyCollection<TData> items, string decisionQuery, IGameState state,

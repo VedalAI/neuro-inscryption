@@ -2,7 +2,7 @@
 
 namespace NeuroInscryption.Communication.Actions.Combat;
 
-public sealed class AcceptSurrenderAction(bool? isOpponentSurrendering) : BasicAction(ActionStrings.AcceptSurrender)
+public sealed class AcceptSurrenderAction(bool? isOpponentSurrendering) : EmptyAction(ActionStrings.AcceptSurrender)
 {
     public override bool IsApplicable => isOpponentSurrendering == true;
 }

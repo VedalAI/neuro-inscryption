@@ -7,7 +7,7 @@ namespace NeuroInscryption.Communication.Actions.Map;
 
 public sealed class CampfireSecondUpgradeAction() : ActionBase<bool>(ActionStrings.CampfireSecondUpgrade)
 {
-    public override bool TryDeserialize(JToken? data, out bool response)
+    protected override bool TryDeserialize(JToken? data, out bool response)
     {
         bool? value = data?.Value<bool>("wantSecondUpgrade");
         response = value ?? false;

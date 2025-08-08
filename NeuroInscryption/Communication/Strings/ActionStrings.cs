@@ -22,4 +22,6 @@ public static class ActionStrings
     public const string BuyTrapperItem = "buy_item";
 
     public static readonly FormatString PathDiscriminator = " ({0})";
+
+    public const string CheckDataMsg = "It is possible that you provided invalid data to an action. Please try again and ensure that the data conforms to the given schema.";
 }

@@ -25,7 +25,7 @@ public sealed class DrawCardAction(bool mainDeckEmpty, bool sideDeckEmpty)
         };
     }
 
-    public override bool TryDeserialize(JToken? data, out bool drawFromSideDeck)
+    protected override bool TryDeserialize(JToken? data, out bool drawFromSideDeck)
     {
         string? strResponse = data?.Value<string>("deck");
 

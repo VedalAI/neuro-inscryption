@@ -53,7 +53,7 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary
         };
     }
 
-    public override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out IEnumerable<PlayableCardData>? response)
+    protected override bool TryDeserialize(JToken? data, [NotNullWhen(true)] out IEnumerable<PlayableCardData>? response)
     {
         IEnumerable<string?>? cardIdentifiers = data?.Value<string>("sacrifices")?.Split([", "], StringSplitOptions.None);
         if (cardIdentifiers == null)

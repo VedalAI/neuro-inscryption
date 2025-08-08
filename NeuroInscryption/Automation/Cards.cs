@@ -49,24 +49,21 @@ internal sealed class Cards
         decision.AddAction(chooseAction);
         decision.AddAction(rerollAction);
 
-        await decision.Send(ct);
+        ActionBase pickedAction = await decision.Send(ct);
 
-        if (chooseAction.Matches(decision, out SelectableCardData? cardData))
+        if (pickedAction == chooseAction)
         {
+            SelectableCardData cardData = chooseAction.GetResult();
             Plugin.Logger.LogDebug($"Picked {cardData.Identifier}");
             return cardData.TargetCard;
         }
-        if (rerollAction.Matches(decision))
-        {
-            AutomationManager.Assert(clover, $"Ended up in reroll path on non-rerollable choicer {choicer.GetType().Name} - schema enforcement fail?");
-            await NeuroMouse.MoveAndClick(clover, ct);
-            // choicer sets this back to false when ready for input again
-            await UniTask.WaitUntil(() => !rerollable!.choicesRerolled, cancellationToken: ct);
-            return await ChooseAddToDeck(choicer, ct);
-        }
 
-        decision.ThrowInvalid();
-        throw new InvalidOperationException($"Unreachable in {nameof(ChooseAddToDeck)} after ThrowInvalid");
+        AutomationManager.Assert(pickedAction == rerollAction, "Sanity: picked non-existent action");
+        AutomationManager.Assert(clover, $"Ended up in reroll path on non-rerollable choicer {choicer.GetType().Name} - schema enforcement fail?");
+        await NeuroMouse.MoveAndClick(clover, ct);
+        // choicer sets this back to false when ready for input again
+        await UniTask.WaitUntil(() => !rerollable!.choicesRerolled, cancellationToken: ct);
+        return await ChooseAddToDeck(choicer, ct);
     }
 
     public async UniTask UnflipCards(IEnumerable<SelectableCard> cards, CancellationToken ct = default)
@@ -87,7 +84,7 @@ internal sealed class Cards
     /// <example>
     /// <code>
     /// Card cardToGloopBlurb = await Neuro.Cards.ChooseCardLoadout(cards,
-    ///     description: new Description("choice_gloop_blurb", "Choose a card to gloop blurb. The card's immediate family will be murgled."),
+    ///     decisionQuery: "Choose a card to gloop blurb. The card's immediate family will be murgled.",
     ///     additionalContext: new { MurgleInsensity = 5 }
     /// );
     /// </code>
