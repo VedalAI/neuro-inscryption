@@ -11,6 +11,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
+using NeuroSdk.Messages.Outgoing;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
@@ -50,7 +51,11 @@ public sealed class DeckTrialFlow : HarmonyAutomationFlow<IEnumerator>
             await UniTask.WaitUntil(() => wrapper.State is 22, cancellationToken: ct);
 
             bool passedTrial = enumerator.GetFieldValue<bool>("<trialIsPassed>5__4");
-            if (!passedTrial) return;
+            if (!passedTrial)
+            {
+                Context.Send(ContextStrings.DeckTrialFailed);
+                return;
+            }
 
             await UniTask.WaitUntil(() => wrapper.State is 27, cancellationToken: ct);
         }

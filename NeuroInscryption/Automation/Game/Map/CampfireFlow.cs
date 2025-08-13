@@ -9,6 +9,7 @@ using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
+using NeuroSdk.Messages.Outgoing;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
@@ -39,7 +40,15 @@ public sealed class CampfireFlow : HarmonyAutomationFlow<IEnumerator>
         int numBuffsGiven = enumerator.GetFieldValue<int>("<numBuffsGiven>5__4");
 
         bool finished = finishedBuffing || destroyedCard != null;
-        if (finished) return;
+        if (finished)
+        {
+            if (destroyedCard != null)
+            {
+                Context.Send(ContextStrings.CampfireBurned.Format(destroyedCard.DisplayedNameEnglish));
+            }
+
+            return;
+        }
 
         await Wait.CommonFlowDelay(ct);
 

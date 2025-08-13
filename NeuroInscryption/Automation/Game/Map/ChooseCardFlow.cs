@@ -4,9 +4,11 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
+using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
+using NeuroSdk.Messages.Outgoing;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
@@ -44,8 +46,9 @@ public sealed class ChooseCardFlow : HarmonyAutomationFlow<IEnumerator>
         if (instance is RareCardChoicesSequencer) return;
         CardChoicesType choiceType = enumerator.GetFieldValue<CardChoicesNodeData>("<choicesData>5__2").choicesType;
         if (choiceType == CardChoicesType.Random) return;
-
+        
         await UniTask.WaitUntil(() => instance.chosenReward != null, cancellationToken: ct);
-        await NeuroMouse.MoveAndClick(instance.chosenReward!, ct);
+        Context.Send(ContextStrings.AddCardToDeck.Format(instance.chosenReward!.Info.DisplayedNameEnglish));
+        await NeuroMouse.MoveAndClick(instance.chosenReward!, ct, msDelayBeforeClick: 300);
     }
 }

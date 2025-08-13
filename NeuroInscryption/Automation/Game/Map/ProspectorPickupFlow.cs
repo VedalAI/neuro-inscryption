@@ -4,9 +4,11 @@ using Cysharp.Threading.Tasks;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Automation.API;
+using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Input;
 using NeuroInscryption.Utilities;
 using NeuroInscryption.Utilities.Enumerators;
+using NeuroSdk.Messages.Outgoing;
 
 namespace NeuroInscryption.Automation.Game.Map;
 
@@ -26,6 +28,7 @@ public sealed class ProspectorPickupFlow : HarmonyAutomationFlow<IEnumerator>
         await Wait.CommonFlowDelay(ct);
 
         SelectableCard rewardCard = target.GetFieldValue<SelectableCard>("<rewardCard>5__2");
+        Context.Send(ContextStrings.AddCardToDeck.Format(rewardCard.Info.DisplayedNameEnglish));
         await NeuroMouse.MoveAndClick(rewardCard, ct);
     }
 }
