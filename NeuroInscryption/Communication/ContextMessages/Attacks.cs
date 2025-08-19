@@ -3,6 +3,7 @@ using System.Text;
 using DiskCardGame;
 using HarmonyLib;
 using NeuroInscryption.Communication.Data.State;
+using NeuroInscryption.Communication.Strings;
 using NeuroInscryption.Utilities.Enumerators;
 using NeuroSdk.Messages.Outgoing;
 using UnityEngine;
@@ -22,7 +23,7 @@ file static class Attacks
         if (__instance.GetState() != 10) return;
 
         _contextBuilder.Clear();
-        _contextBuilder.Append("Combat initiated. ");
+        _contextBuilder.Append(ContextStrings.CardBattleCombatInitiated);
     }
     
     [HarmonyPatch(typeof(TurnManager), nameof(TurnManager.OpponentTurn), MethodType.Enumerator)]
@@ -31,7 +32,7 @@ file static class Attacks
     {
         if (__instance.GetState() != 2) return;
         
-        _contextBuilder.Append("It is your opponent's turn. ");
+        _contextBuilder.Append(ContextStrings.CardBattleOpponentTurn);
     }
     
     [HarmonyPatch(typeof(TurnManager), nameof(TurnManager.OpponentTurn), MethodType.Enumerator)]
@@ -57,15 +58,17 @@ file static class Attacks
     [HarmonyPrefix]
     public static void CaptureCardPlayed(PlayableCard __instance)
     {
+        string slot;
         if (_lastSlot == null)
         {
             Debug.LogError("Last slot not assigned when card captured, this should never happen");
-            _contextBuilder.Append($"Their {__instance.Info.DisplayedNameEnglish} was played in a slot. ");
+            slot = "???";
         }
         else
         {
-            _contextBuilder.Append($"Their {__instance.Info.DisplayedNameEnglish} was played in slot {_lastSlot.Index + CombatState.LaneIndexBase}. ");
+            slot = _lastSlot.Index + CombatState.LaneIndexBase + "";
         }
+        _contextBuilder.Append(ContextStrings.CardBattleOpponentPlayedCard.Format(__instance.Info.DisplayedNameEnglish, slot));
     }
 
     [HarmonyPatch(typeof(PlayableCard), nameof(PlayableCard.AttackIsBlocked))]
@@ -74,7 +77,8 @@ file static class Attacks
     {
         if (__result)
         {
-            _contextBuilder.Append($"{P(__instance)} {__instance.Info.DisplayedNameEnglish} could not attack {Pl(opposingSlot.Card)} {opposingSlot.Card.Info.DisplayedNameEnglish}! ");
+            _contextBuilder.Append(ContextStrings.CardBattleAttackBlocked.Format(P(__instance), __instance.Info.DisplayedNameEnglish,
+                Pl(opposingSlot.Card), opposingSlot.Card.Info.DisplayedNameEnglish));
         }
     }
     
@@ -86,17 +90,19 @@ file static class Attacks
         CardSlot targetSlot = __instance.GetFieldValue<CardSlot>("targetSlot");
         int damage = __instance.GetFieldValue<int>("damage");
         
-        _contextBuilder.Append($"{P(attackingSlot.Card)} {attackingSlot.Card.Info.DisplayedNameEnglish} attacked {D(targetSlot)} directly for {damage} damage. ");
+        _contextBuilder.Append(ContextStrings.CardBattleAttackedPlayer.Format(P(attackingSlot.Card), attackingSlot.Card.Info.DisplayedNameEnglish,
+            D(targetSlot), damage));
     }
     
     [HarmonyPatch(typeof(PlayableCard), nameof(PlayableCard.TakeDamage))]
     [HarmonyPrefix]
     public static void CaptureAttack(PlayableCard __instance, int damage, PlayableCard attacker)
     {
-        _contextBuilder.Append($"{P(attacker)} {attacker.Info.DisplayedNameEnglish} dealt {damage} damage to {Pl(__instance)} {__instance.Info.DisplayedNameEnglish}. ");
+        _contextBuilder.Append(ContextStrings.CardBattleAttackedCard.Format(P(attacker), attacker.Info.DisplayedNameEnglish,
+            damage, Pl(__instance), __instance.Info.DisplayedNameEnglish));
     }
 
-    private static string P(PlayableCard card) => card.OpponentCard ? "Their" : "Your";
+    private static string P(PlayableCard card) => card.OpponentCard ? ContextStrings.PronounOpponentPossessive : ContextStrings.PronounPlayerPossessive;
     private static string Pl(PlayableCard card) => P(card).ToLowerInvariant();
-    private static string D(CardSlot slot) => !slot.IsPlayerSlot ? "the opponent" : "you";
+    private static string D(CardSlot slot) => !slot.IsPlayerSlot ? ContextStrings.PronounOpponent.ToLowerInvariant() : ContextStrings.PronounPlayer.ToLowerInvariant();
 }
