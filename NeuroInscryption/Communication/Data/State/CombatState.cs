@@ -28,7 +28,7 @@ public sealed class CombatState : IGameState
     public readonly IReadOnlyDictionary<string, PlayableCardData?> OpponentQueueLanes;
 
     public readonly IReadOnlyList<PlayableCardData> PlayerHand;
-    public IReadOnlyList<CardData>? RemainingDeck => _contextInterface is { IncludeDeck: false } ? null : _remainingDeck;
+    //public IReadOnlyList<CardData>? RemainingDeck => _contextInterface is { IncludeDeck: false } ? null : _remainingDeck;
     public string RemainingSquirrels;
     public readonly IReadOnlyList<BoonData>? Boons;
 
@@ -95,7 +95,7 @@ public sealed class CombatState : IGameState
         OpponentTotem = TotemData.Create(opponent.totem);
         IsOpponentSurrendering = TurnManager.Instance.Opponent.OfferingSurrender ? true : null;
 
-        List<CardData> allCardsInPlay = [..PlayerLanes.Values, ..OpponentLanes.Values, ..OpponentQueueLanes.Values, ..PlayerHand, .._remainingDeck];
+        List<CardData> allCardsInPlay = [..PlayerLanes.Values, ..OpponentLanes.Values, ..OpponentQueueLanes.Values, ..PlayerHand/*, .._remainingDeck*/];
         allCardsInPlay.RemoveAll(data => data == null);
 
         IEnumerable<SigilData> relevantSigils = allCardsInPlay.SelectMany(c => c.RelevantSigils);
