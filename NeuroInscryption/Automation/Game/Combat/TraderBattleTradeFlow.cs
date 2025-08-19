@@ -17,7 +17,7 @@ using NeuroInscryption.Utilities.Enumerators;
 
 namespace NeuroInscryption.Automation.Game.Combat;
 
-public class TraderBattleTradeFlow : HarmonyAutomationFlow<IEnumerator>
+public sealed class TraderBattleTradeFlow : HarmonyAutomationFlow<IEnumerator>
 {
     public override FlowHook[] Hooks =>
     [
