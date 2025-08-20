@@ -11,7 +11,7 @@ public sealed class DrawCardAction(bool mainDeckEmpty, bool sideDeckEmpty)
     public override JsonSchema GetDataSchema()
     {
         List<string> decks = [];
-        if (!mainDeckEmpty) decks.Add("Random");
+        if (!mainDeckEmpty) decks.Add("Main Deck");
         if (!sideDeckEmpty) decks.Add("Squirrel");
 
         return new JsonSchema
@@ -31,7 +31,7 @@ public sealed class DrawCardAction(bool mainDeckEmpty, bool sideDeckEmpty)
 
         switch (strResponse)
         {
-            case "Random":
+            case "Main Deck":
                 drawFromSideDeck = mainDeckEmpty;
                 return true;
 
