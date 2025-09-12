@@ -19,7 +19,7 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary
     {
         List<Sacrifice> sacrificableSlots = BoardManager.Instance.playerSlots
             .Where(p => p.Card && p.Card.CanBeSacrificed)
-            .Select(p => (playerLanes.Values.First(c => c?.TargetCard == p.Card)!.Identifier, p.Card.HasAbility(Ability.TripleBlood) ? 3 : 1))
+            .Select(p => (playerLanes.Values.First(c => c?.TargetCard == p.Card)!.Identifier, GetBloodYield(p.Card)))
             .ToList();
 
         List<List<Sacrifice>> possibilities = DontOpenJumpscareWarning.GenerateAllPermutationsOfSubsets(sacrificableSlots);
@@ -70,7 +70,9 @@ public sealed class SacrificeAction(PlayableCard cardToPlay, IReadOnlyDictionary
             return false;
         }
 
-        response = cardIdentifiers.Select(id => playerLanes.Values.FirstOrDefault(c => c?.Identifier == id)!);
-        return response.All(c => c != null);
+        response = cardIdentifiers.Select(id => playerLanes.Values.FirstOrDefault(c => c?.Identifier == id)!).ToArray();
+        return response.All(c => c is { CanBeSacrificed: true }) && response.Sum(card => GetBloodYield(card.TargetCard)) >= cardToPlay.Info.BloodCost;
     }
+    
+    private static int GetBloodYield(PlayableCard card) => card.HasAbility(Ability.TripleBlood) ? 3 : 1;
 }
