@@ -5,7 +5,6 @@ using NeuroInscryption.Communication.Actions;
 using NeuroInscryption.Communication.Data.State;
 using NeuroInscryption.Communication.Strings;
 using NeuroSdk.Actions;
-using NeuroSdk.Internal;
 using NeuroSdk.Json;
 using NeuroSdk.Websocket;
 using Newtonsoft.Json.Linq;
@@ -31,8 +30,7 @@ public sealed class Decision(string query, IGameState state)
 
     public UniTask<ActionBase> Send(CancellationToken ct)
     {
-        // todo: better state representation
-        if (Timeout >= 0) _actionWindow.SetForce(Timeout, () => query, () => Jason.Serialize(state), IsEphemeral);
+        if (Timeout >= 0) _actionWindow.SetForce(Timeout, () => query, () => MarkdownSerializer.Serialize(state), IsEphemeral);
         _actionWindow.SetEnd(() => ct.IsCancellationRequested);
         _actionWindow.Register();
         return _tcs.Task;
